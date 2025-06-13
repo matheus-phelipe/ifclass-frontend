@@ -17,6 +17,8 @@ import { Router, RouterLink, RouterModule } from '@angular/router';
 
 export class LoginComponent {
   mensagemDoModal: string = 'Texto inicial';
+  mostrarSenha: boolean = false;
+
   @ViewChild('meuModal') modal!: ModalComponent;
 
   credenciais: Login = {

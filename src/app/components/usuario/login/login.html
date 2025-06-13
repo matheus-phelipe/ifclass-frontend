@@ -23,10 +23,18 @@
         <div class="mb-2">
           <label class="form-label fw-medium">Senha:</label>
           <div class="input-group">
-            <input [(ngModel)]="credenciais.senha" name="senha" type="password" class="form-control" placeholder="Digite sua senha" required>
-            <span class="input-group-text bg-success text-white">
-              <i class="bi bi-lock-fill"></i>
-            </span>
+            <input [(ngModel)]="credenciais.senha"
+                  name="senha"
+                  [type]="mostrarSenha ? 'text' : 'password'"
+                  class="form-control"
+                  placeholder="Digite sua senha"
+                  required>
+
+            <button type="button"
+                    class="input-group-text bg-success text-white"
+                    (click)="mostrarSenha = !mostrarSenha">
+              <i [class]="mostrarSenha ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'"></i>
+            </button>
           </div>
         </div>
 
@@ -34,8 +42,11 @@
           <a href="#" class="text-decoration-none small text-primary">Esqueceu sua senha?</a>
         </div>
 
-        <button type="submit" class="btn btn-success w-100 mb-3 fw-semibold shadow-sm">Entrar</button>
-
+        <button type="submit" 
+                class="btn btn-success w-100 mb-3 fw-semibold shadow-sm"
+                [disabled]="!credenciais.email || !credenciais.senha">
+          Entrar
+        </button>
         <div class="text-center text-muted my-2">— OU —</div>
 
         <a routerLink="/cadastro" class="btn btn-outline-success w-100 fw-medium">Cadastre-se agora</a>

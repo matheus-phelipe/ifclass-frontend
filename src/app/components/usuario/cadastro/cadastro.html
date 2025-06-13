@@ -18,7 +18,9 @@
                 #inputModel="ngModel"
                 [(ngModel)]="usuario[campo.nome]"
                 [name]="campo.nome"
-                [type]="campo.tipo"
+                [type]="(campo.nome === 'senha' || campo.nome === 'confirmarSenha') 
+                        ? (mostrarSenha[campo.nome] ? 'text' : 'password') 
+                        : campo.tipo"
                 class="form-control"
                 [placeholder]="campo.placeholder"
                 required
@@ -26,7 +28,15 @@
                 [minlength]="(campo.nome === 'senha' || campo.nome === 'confirmarSenha') ? 6 : null"
                 [attr.autocomplete]="(campo.nome === 'senha' || campo.nome === 'confirmarSenha') ? 'new-password' : null"
               />
-              <span class="input-group-text bg-success text-white">
+
+              <span class="input-group-text bg-success text-white"
+                    *ngIf="campo.nome === 'senha' || campo.nome === 'confirmarSenha'"
+                    (click)="toggleMostrarSenha(campo.nome)" style="cursor: pointer;">
+                <i class="bi" [ngClass]="mostrarSenha[campo.nome] ? 'bi-eye-slash-fill' : 'bi-eye-fill'"></i>
+              </span>
+
+              <span class="input-group-text bg-success text-white"
+                    *ngIf="campo.nome !== 'senha' && campo.nome !== 'confirmarSenha'">
                 <i class="bi" [ngClass]="campo.icone"></i>
               </span>
             </div>

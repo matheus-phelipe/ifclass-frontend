@@ -16,6 +16,11 @@ import { FormsModule, NgModel } from '@angular/forms';
 export class CadastroComponent {
   mensagemDoModal: string = '';
   
+  mostrarSenha: { [campo: string]: boolean } = {
+    senha: false,
+    confirmarSenha: false
+  };
+
   @ViewChild('meuModal') modal!: ModalComponent;
 
   usuario: Cadastro = {
@@ -30,8 +35,8 @@ export class CadastroComponent {
     { nome: 'nome', label: 'Nome:', tipo: 'text', placeholder: 'Digite seu nome', icone: 'bi-person-fill' },
     { nome: 'prontuario', label: 'Prontuário:', tipo: 'text', placeholder: 'Digite seu prontuário', icone: 'bi-person-badge-fill' },
     { nome: 'email', label: 'Email:', tipo: 'email', placeholder: 'Digite seu email', icone: 'bi-envelope-fill' },
-    { nome: 'senha', label: 'Senha:', tipo: 'password', placeholder: 'Digite sua senha', icone: 'bi-lock-fill' },
-    { nome: 'confirmarSenha', label: 'Confirmar Senha:', tipo: 'password', placeholder: 'Digite sua senha novamente', icone: 'bi-lock-fill' }
+    { nome: 'senha', label: 'Senha:', tipo: 'password', placeholder: 'Digite sua senha', icone: 'bi-eye-slash-fill' },
+    { nome: 'confirmarSenha', label: 'Confirmar Senha:', tipo: 'password', placeholder: 'Digite sua senha novamente', icone: 'bi-eye-slash-fill' }
   ];
 
   constructor(private service: UsuarioService, private router: Router) {}
@@ -64,6 +69,10 @@ export class CadastroComponent {
 
   isInvalidField(field: NgModel | undefined): boolean | null {
     return !!field && field.invalid && (field.dirty || field.touched);
+  }
+
+  toggleMostrarSenha(campo: 'senha' | 'confirmarSenha') {
+    this.mostrarSenha[campo] = !this.mostrarSenha[campo];
   }
 
   abrirModal(mensagem: string) {
