@@ -1,18 +1,23 @@
-import { Component } from '@angular/core';
-import { UsuarioService } from '../../service/usuario/usuario.service';
+import { ModalComponent } from './../../../shared/modal/modal';
+import { Cadastro } from './../../../model/usuario/cadastro.model';
+import { UsuarioService } from './../../../service/usuario/usuario.service';
+import { Component, ViewChild } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgModel } from '@angular/forms';
-import { Cadastro } from '../../model/usuario/cadastro.model';
 
 @Component({
   selector: 'app-cadastro',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, ModalComponent],
   templateUrl: './cadastro.html',
   styleUrl: './cadastro.css'
 })
 export class CadastroComponent {
+  mensagemDoModal: string = 'Texto inicial';
+  
+  @ViewChild('meuModal') modal!: ModalComponent;
+
   usuario: Cadastro = {
     nome: '',
     prontuario: '',
@@ -33,7 +38,7 @@ export class CadastroComponent {
 
   cadastrar() {
     if (this.usuario.senha !== this.usuario.confirmarSenha) {
-      alert('As senhas não coincidem');
+      this.abrirModal("Senhas não coincidem!");
       return;
     }
 
@@ -50,12 +55,17 @@ export class CadastroComponent {
         this.router.navigate(['/login']);
       },
       error: (err) => {
-        alert('Erro ao cadastrar usuário');
+        this.abrirModal("Erro ao cadastrar usuário!");
       }
     });
   }
 
   isInvalidField(field: NgModel | undefined): boolean | null {
     return !!field && field.invalid && (field.dirty || field.touched);
+  }
+
+  abrirModal(mensagem: string) {
+    this.mensagemDoModal = mensagem;
+    this.modal.open();
   }
 }

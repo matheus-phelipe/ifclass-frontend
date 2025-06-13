@@ -1,19 +1,23 @@
+import { ModalComponent } from './../../../shared/modal/modal';
+import { AuthService } from './../../../service/auth/auth.service';
+import { UsuarioService } from './../../../service/usuario/usuario.service';
+import { Login } from './../../../model/usuario/login.model';
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, RouterModule } from '@angular/router';
-import { Login } from '../../model/usuario/login.model';
-import { UsuarioService } from '../../service/usuario/usuario.service';
-import { AuthService } from '../../service/auth/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterModule, RouterLink, ModalComponent],
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
+
 export class LoginComponent {
+  mensagemDoModal: string = 'Texto inicial';
+  @ViewChild('meuModal') modal!: ModalComponent;
 
   credenciais: Login = {
     email: '',
@@ -29,9 +33,13 @@ export class LoginComponent {
         this.router.navigate(['/home']);
       },
       error: () => {
-        alert('Credenciais inválidas');
+        this.abrirModal('Credenciais inválidas');
       }
     });
   }
 
+  abrirModal(mensagem: string) {
+    this.mensagemDoModal = mensagem;
+    this.modal.open();
+  }
 }

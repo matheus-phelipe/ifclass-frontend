@@ -1,0 +1,56 @@
+<div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center bg-light">
+  <div class="row w-100 justify-content-center align-items-center">
+    
+    <!-- Lado esquerdo: formulário -->
+    <div class="col-md-5 col-lg-3 bg-white rounded-4 shadow p-5 login-box">
+      <div class="text-center mb-4">
+        <img src="assets/ifclass.png" alt="Logo IF" width="100">
+        <h5 class="mt-3 fw-semibold text-dark">Faça login em sua conta</h5>
+      </div>
+
+      <form (ngSubmit)="login()">
+        <div class="mb-3">
+          <label class="form-label fw-medium">Email:</label>
+          <div class="input-group">
+            <input [(ngModel)]="credenciais.email" name="email" type="email" class="form-control" placeholder="Digite seu email" required>
+            <span class="input-group-text bg-success text-white">
+              <i class="bi bi-envelope-fill"></i>
+            </span>
+          </div>
+        </div>
+
+        <div class="mb-2">
+          <label class="form-label fw-medium">Senha:</label>
+          <div class="input-group">
+            <input [(ngModel)]="credenciais.senha" name="senha" type="password" class="form-control" placeholder="Digite sua senha" required>
+            <span class="input-group-text bg-success text-white">
+              <i class="bi bi-lock-fill"></i>
+            </span>
+          </div>
+        </div>
+
+        <div class="mb-3 text-end">
+          <a href="#" class="text-decoration-none small text-primary">Esqueceu sua senha?</a>
+        </div>
+
+        <button type="submit" class="btn btn-success w-100 mb-3 fw-semibold shadow-sm">Entrar</button>
+
+        <div class="text-center text-muted my-2">— OU —</div>
+
+        <a routerLink="/cadastro" class="btn btn-outline-success w-100 fw-medium">Cadastre-se agora</a>
+      </form>
+    </div>
+
+    <!-- Lado direito: ilustração -->
+    <div class="col-md-7 col-lg-7 d-none d-md-flex align-items-center justify-content-center login-image shadow">
+      <img src="assets/painelifclass.png" alt="Ilustração Login" class="img-fluid" style="max-width: 85%;">
+    </div>
+  </div>
+</div>
+
+<app-modal
+  #meuModal
+  id="meuModal"
+  title="Alerta"
+  [message]="mensagemDoModal">
+</app-modal>

@@ -1,8 +1,8 @@
-import { CadastroComponent } from './components/cadastro/cadastro';
+import { LoginComponent } from './components/usuario/login/login';
 import { Routes } from '@angular/router';
 import { Home } from './components/home/home';
-import { LoginComponent } from './components/login/login';
 import { authGuard } from './service/auth/auth.guard';
+import { CadastroComponent } from './components/usuario/cadastro/cadastro';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
