@@ -6,16 +6,16 @@
       <div class="col-md-5 col-lg-5 bg-white rounded-4 shadow-sm p-4 login-box ">
         <div class="text-center mb-4">
           <img src="assets/ifclass.png" alt="Logo" width="100">
-          <img src="assets/Class.png" alt="Logo" width="100" >
+          <img src="assets/Class.png" alt="Logo" width="100">
           <h5 class="mt-3 fw-semibold text-dark">Faça seu cadastro</h5>
         </div>
 
         <form #formCadastro="ngForm" (ngSubmit)="cadastrar()" novalidate>
           <div class="mb-3" *ngFor="let campo of campos">
             <label [for]="campo.nome" class="form-label fw-medium">{{ campo.label }}</label>
+
             <div class="input-group">
               <input
-                #inputModel="ngModel"
                 [(ngModel)]="usuario[campo.nome]"
                 [name]="campo.nome"
                 [type]="(campo.nome === 'senha' || campo.nome === 'confirmarSenha') 
@@ -24,9 +24,10 @@
                 class="form-control"
                 [placeholder]="campo.placeholder"
                 required
-                [attr.email]="campo.tipo === 'email' ? '' : null"
-                [minlength]="(campo.nome === 'senha' || campo.nome === 'confirmarSenha') ? 6 : null"
+                [attr.minlength]="(campo.nome === 'senha' || campo.nome === 'confirmarSenha') ? 6 : null"
                 [attr.autocomplete]="(campo.nome === 'senha' || campo.nome === 'confirmarSenha') ? 'new-password' : null"
+                [pattern]="campo.nome === 'email' ? '^[\\w.-]+@([\\w-]+\\.)+(com|br)$' : ''"
+                #model="ngModel"
               />
 
               <span class="input-group-text bg-success text-white"
@@ -41,10 +42,10 @@
               </span>
             </div>
 
-            <div class="text-danger small mt-1" *ngIf="isInvalidField(inputModel)">
-              <div *ngIf="inputModel.errors?.['required']">{{ campo.label }} é obrigatório.</div>
-              <div *ngIf="inputModel.errors?.['email']">Por favor, insira um email válido.</div>
-              <div *ngIf="inputModel.errors?.['minlength']">Mínimo de 6 caracteres.</div>
+            <div class="text-danger small mt-1" *ngIf="isInvalidField(model)">
+              <div *ngIf="model.errors?.['required']">{{ campo.label }} é obrigatório.</div>
+              <div *ngIf="model.errors?.['pattern']">Formato de e-mail inválido. Use .com ou .br</div>
+              <div *ngIf="model.errors?.['minlength']">Mínimo de 6 caracteres.</div>
             </div>
           </div>
 

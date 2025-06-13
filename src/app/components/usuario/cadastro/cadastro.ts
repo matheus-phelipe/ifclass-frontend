@@ -34,7 +34,7 @@ export class CadastroComponent {
   campos: { nome: keyof Cadastro; label: string; tipo: string; placeholder: string; icone: string }[] = [
     { nome: 'nome', label: 'Nome:', tipo: 'text', placeholder: 'Digite seu nome', icone: 'bi-person-fill' },
     { nome: 'prontuario', label: 'Prontuário:', tipo: 'text', placeholder: 'Digite seu prontuário', icone: 'bi-person-badge-fill' },
-    { nome: 'email', label: 'Email:', tipo: 'email', placeholder: 'Digite seu email', icone: 'bi-envelope-fill' },
+    { nome: 'email', label: 'Email:', tipo: 'text', placeholder: 'Digite seu email', icone: 'bi-envelope-fill' },
     { nome: 'senha', label: 'Senha:', tipo: 'password', placeholder: 'Digite sua senha', icone: 'bi-eye-slash-fill' },
     { nome: 'confirmarSenha', label: 'Confirmar Senha:', tipo: 'password', placeholder: 'Digite sua senha novamente', icone: 'bi-eye-slash-fill' }
   ];

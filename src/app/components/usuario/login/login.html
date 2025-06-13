@@ -9,48 +9,69 @@
         <h5 class="mt-3 fw-semibold text-dark">Faça login em sua conta</h5>
       </div>
 
-      <form (ngSubmit)="login()">
-        <div class="mb-3">
-          <label class="form-label fw-medium">Email:</label>
-          <div class="input-group">
-            <input [(ngModel)]="credenciais.email" name="email" type="email" class="form-control" placeholder="Digite seu email" required>
-            <span class="input-group-text bg-success text-white">
-              <i class="bi bi-envelope-fill"></i>
-            </span>
-          </div>
-        </div>
+      <form (ngSubmit)="login()" #formLogin="ngForm" novalidate>
+  <div class="mb-3">
+    <label class="form-label fw-medium">Email:</label>
+    <div class="input-group">
+      <input
+        [(ngModel)]="credenciais.email"
+        name="email"
+        type="email"
+        class="form-control"
+        placeholder="Digite seu email"
+        required
+        pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+        #emailModel="ngModel"
+      >
+      <span class="input-group-text bg-success text-white">
+        <i class="bi bi-envelope-fill"></i>
+      </span>
+    </div>
+    <div class="text-danger small mt-1" *ngIf="emailModel.invalid && emailModel.touched">
+      <div *ngIf="emailModel.errors?.['required']">Email é obrigatório.</div>
+      <div *ngIf="emailModel.errors?.['pattern']">Formato de email inválido.</div>
+    </div>
+  </div>
 
-        <div class="mb-2">
-          <label class="form-label fw-medium">Senha:</label>
-          <div class="input-group">
-            <input [(ngModel)]="credenciais.senha"
-                  name="senha"
-                  [type]="mostrarSenha ? 'text' : 'password'"
-                  class="form-control"
-                  placeholder="Digite sua senha"
-                  required>
+  <div class="mb-2">
+    <label class="form-label fw-medium">Senha:</label>
+    <div class="input-group">
+      <input
+        [(ngModel)]="credenciais.senha"
+        name="senha"
+        [type]="mostrarSenha ? 'text' : 'password'"
+        class="form-control"
+        placeholder="Digite sua senha"
+        required
+        minlength="6"
+        #senhaModel="ngModel"
+      >
+      <button type="button"
+              class="input-group-text bg-success text-white"
+              (click)="mostrarSenha = !mostrarSenha">
+        <i [class]="mostrarSenha ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'"></i>
+      </button>
+    </div>
+    <div class="text-danger small mt-1" *ngIf="senhaModel.invalid && senhaModel.touched">
+      <div *ngIf="senhaModel.errors?.['required']">Senha é obrigatória.</div>
+      <div *ngIf="senhaModel.errors?.['minlength']">Mínimo de 6 caracteres.</div>
+    </div>
+  </div>
 
-            <button type="button"
-                    class="input-group-text bg-success text-white"
-                    (click)="mostrarSenha = !mostrarSenha">
-              <i [class]="mostrarSenha ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'"></i>
-            </button>
-          </div>
-        </div>
+  <div class="mb-3 text-end">
+    <a href="#" class="text-decoration-none small text-primary">Esqueceu sua senha?</a>
+  </div>
 
-        <div class="mb-3 text-end">
-          <a href="#" class="text-decoration-none small text-primary">Esqueceu sua senha?</a>
-        </div>
+  <button type="submit" 
+          class="btn btn-success w-100 mb-3 fw-semibold shadow-sm"
+          [disabled]="formLogin.invalid">
+    Entrar
+  </button>
 
-        <button type="submit" 
-                class="btn btn-success w-100 mb-3 fw-semibold shadow-sm"
-                [disabled]="!credenciais.email || !credenciais.senha">
-          Entrar
-        </button>
-        <div class="text-center text-muted my-2">— OU —</div>
+  <div class="text-center text-muted my-2">— OU —</div>
 
-        <a routerLink="/cadastro" class="btn btn-outline-success w-100 fw-medium">Cadastre-se agora</a>
-      </form>
+  <a routerLink="/cadastro" class="btn btn-outline-success w-100 fw-medium">Cadastre-se agora</a>
+</form>
     </div>
 
     <!-- Lado direito: ilustração -->
