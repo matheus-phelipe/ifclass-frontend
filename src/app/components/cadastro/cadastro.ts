@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { UsuarioService } from '../../service/usuario/usuario.service';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgModel } from '@angular/forms';
 import { Cadastro } from '../../model/usuario/cadastro.model';
 
 @Component({
@@ -53,5 +53,9 @@ export class CadastroComponent {
         alert('Erro ao cadastrar usuário');
       }
     });
+  }
+
+  isInvalidField(field: NgModel | undefined): boolean | null {
+    return !!field && field.invalid && (field.dirty || field.touched);
   }
 }

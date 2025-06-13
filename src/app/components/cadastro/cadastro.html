@@ -7,23 +7,35 @@
         <h5 class="mt-3">Faça seu cadastro</h5>
       </div>
 
-      <form (ngSubmit)="cadastrar()">
+      <form #formCadastro="ngForm" (ngSubmit)="cadastrar()" novalidate>
         <div class="mb-2" *ngFor="let campo of campos">
           <label [for]="campo.nome" class="form-label">{{ campo.label }}</label>
           <div class="input-group">
-            <input [(ngModel)]="usuario[campo.nome]" [name]="campo.nome" [type]="campo.tipo"
-              class="form-control" [placeholder]="campo.placeholder" required>
+           <input
+              #inputModel="ngModel"
+              [(ngModel)]="usuario[campo.nome]"
+              [name]="campo.nome"
+              [type]="campo.tipo"
+              class="form-control"
+              [placeholder]="campo.placeholder"
+              required
+              [attr.email]="campo.tipo === 'email' ? '' : null"
+              [minlength]="(campo.nome === 'senha' || campo.nome === 'confirmarSenha') ? 6 : null"
+              [attr.autocomplete]="(campo.nome === 'senha' || campo.nome === 'confirmarSenha') ? 'new-password' : null"
+            />
             <span class="input-group-text bg-success text-white">
               <i class="bi" [ngClass]="campo.icone"></i>
             </span>
           </div>
+
+          <div class="text-danger small mt-1" *ngIf="isInvalidField(inputModel)">
+            <div *ngIf="inputModel.errors?.['required']">{{ campo.label }} é obrigatório.</div>
+            <div *ngIf="inputModel.errors?.['email']">Por favor, insira um email válido.</div>
+            <div *ngIf="inputModel.errors?.['minlength']">Mínimo de 6 caracteres.</div>
+          </div>
         </div>
 
-        <button type="submit" class="btn btn-success w-100 mt-3">Cadastrar-se</button>
-
-        <div class="text-center mt-3 mb-1">— ou —</div>
-
-        <button type="button" class="btn btn-outline-success w-100" routerLink="/login">Login</button>
+        <button type="submit" class="btn btn-success w-100 mt-3" [disabled]="formCadastro.invalid">Cadastrar-se</button>
       </form>
     </div>
 

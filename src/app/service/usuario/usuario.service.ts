@@ -12,8 +12,4 @@ export class UsuarioService {
   salvar(usuario: any) {
     return this.http.post(this.apiUrl, usuario);
   }
-
-  logar(email: any, senha: any) {
-    return this.http.post(`${this.apiUrl}/login`, {email, senha});
-  }
 }

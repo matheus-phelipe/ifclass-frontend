@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, RouterModule } from '@angular/router';
 import { Login } from '../../model/usuario/login.model';
 import { UsuarioService } from '../../service/usuario/usuario.service';
+import { AuthService } from '../../service/auth/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -19,16 +20,16 @@ export class LoginComponent {
     senha:''
   };
 
-  constructor(private service: UsuarioService, private router: Router) {}
+  constructor(private service: UsuarioService, private router: Router, private authService: AuthService) {}
 
   login(){
-    this.service.logar(this.credenciais.email, this.credenciais.senha).subscribe({
-      next: () => {
-        alert('Login feito com sucesso!');
+    this.authService.login(this.credenciais.email, this.credenciais.senha).subscribe({
+      next: (res) => {
+        this.authService.salvarToken(res.token);
         this.router.navigate(['/home']);
       },
-      error: (err) =>{
-        alert('Email e/ou senha incorretos!');
+      error: () => {
+        alert('Credenciais inválidas');
       }
     });
   }
