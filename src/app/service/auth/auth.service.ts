@@ -26,4 +26,22 @@ export class AuthService {
   logout() {
     localStorage.removeItem('token');
   }
+
+  getRoles(): string[] {
+    const token = this.getToken();
+    if (!token) return [];
+
+    try {
+      const base64Payload = token.split('.')[1];
+      const payload = JSON.parse(atob(base64Payload));
+      return Array.isArray(payload.authorities) ? payload.authorities : [];
+    } catch (e) {
+      console.error('Erro ao decodificar token:', e);
+      return [];
+    }
+  }
+
+  hasRole(role: string): boolean {
+    return this.getRoles().includes(role);
+  }
 }

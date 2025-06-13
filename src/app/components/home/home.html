@@ -1,65 +1,136 @@
-<div class="container-fluid min-vh-100 d-flex flex-column bg-light">
-  <!-- Cabeçalho -->
-  <div class="row bg-success text-white py-4">
-    <div class="col text-center">
-      <h1 class="display-5 fw-bold"><img src="assets/ifclass.png" alt="Logo" width="100">Class</h1>
-      <p class="lead mb-0">Sistema de Aulas, Salas e Disciplinas</p>
+<div class="d-flex min-vh-100">
+  <!-- Sidebar -->
+  <div class="d-flex flex-column bg-success text-white p-3"
+       [ngClass]="{'collapsed-sidebar': !sidebarOpen}"
+       [class.w-auto]="!sidebarOpen"
+       [class.w-100]="sidebarOpen"
+       style="width: auto; max-width: 250px; transition: all 0.3s ease;">
+    
+    <!-- Header + Toggle -->
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <div class="d-flex align-items-center">
+        <img src="assets/ifclass.png" alt="Logo" class="img-fluid" style="max-height: 40px;">
+        <h5 class="ms-2 mb-0" *ngIf="sidebarOpen">Class</h5>
+      </div>
+      <button class="btn btn-outline-light btn-sm ms-2" (click)="toggleSidebar()">
+        <i class="bi" [ngClass]="sidebarOpen ? 'bi-chevron-left' : 'bi-list'"></i>
+      </button>
+    </div>
+
+    <!-- Menus -->
+    <div class="d-flex flex-column gap-2">
+      <div *ngIf="sidebarOpen" class="text-white-50 small">ALUNO</div>
+
+      <a routerLink="/aulas"
+         class="text-white text-decoration-none d-flex align-items-center"
+         [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
+        <i class="bi bi-calendar-week fs-5"></i>
+        <span *ngIf="sidebarOpen">Aulas do dia</span>
+      </a>
+
+      <a routerLink="/salas"
+         class="text-white text-decoration-none d-flex align-items-center"
+         [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
+        <i class="bi bi-door-open fs-5"></i>
+        <span *ngIf="sidebarOpen">Salas</span>
+      </a>
+
+      <a routerLink="/turmas"
+         class="text-white text-decoration-none d-flex align-items-center"
+         [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
+        <i class="bi bi-people fs-5"></i>
+        <span *ngIf="sidebarOpen">Turmas</span>
+      </a>
+
+      <a routerLink="/disciplinas"
+         class="text-white text-decoration-none d-flex align-items-center mb-2"
+         [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
+        <i class="bi bi-journal-bookmark fs-5"></i>
+        <span *ngIf="sidebarOpen">Disciplinas</span>
+      </a>
+
+      <!-- PROFESSOR -->
+      <ng-container *ngIf="isProfessor || isCoordenador || isAdmin">
+        <div *ngIf="sidebarOpen" class="text-white-50 small">PROFESSOR</div>
+
+        <a routerLink="/aulas/criar"
+           class="text-white text-decoration-none d-flex align-items-center mb-2"
+           [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
+          <i class="bi bi-plus-square fs-5"></i>
+          <span *ngIf="sidebarOpen">Criar aula</span>
+        </a>
+      </ng-container>
+
+      <!-- COORDENADOR -->
+      <ng-container *ngIf="isCoordenador || isAdmin">
+        <div *ngIf="sidebarOpen" class="text-white-50 small">COORDENADOR</div>
+
+        <a routerLink="/relacionar-sala"
+           class="text-white text-decoration-none d-flex align-items-center"
+           [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
+          <i class="bi bi-link fs-5"></i>
+          <span *ngIf="sidebarOpen">Relacionar sala/disciplina</span>
+        </a>
+
+        <a routerLink="/relacionar-turma"
+           class="text-white text-decoration-none d-flex align-items-center"
+           [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
+          <i class="bi bi-link fs-5"></i>
+          <span *ngIf="sidebarOpen">Relacionar turma/curso</span>
+        </a>
+
+        <a routerLink="/permissoes"
+           class="text-white text-decoration-none d-flex align-items-center mb-2"
+           [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
+          <i class="bi bi-person-gear fs-5"></i>
+          <span *ngIf="sidebarOpen">Gerenciar permissões</span>
+        </a>
+      </ng-container>
+
+      <!-- ADMIN -->
+      <ng-container *ngIf="isAdmin">
+        <div *ngIf="sidebarOpen" class="text-white-50 small">ADMINISTRADOR</div>
+
+        <a routerLink="/usuarios"
+           class="text-white text-decoration-none d-flex align-items-center"
+           [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
+          <i class="bi bi-people-fill fs-5"></i>
+          <span *ngIf="sidebarOpen">Gerenciar usuários</span>
+        </a>
+
+        <a routerLink="/configuracoes"
+           class="text-white text-decoration-none d-flex align-items-center"
+           [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
+          <i class="bi bi-gear fs-5"></i>
+          <span *ngIf="sidebarOpen">Configurações</span>
+        </a>
+      </ng-container>
+    </div>
+
+    <!-- Botão sair -->
+    <div class="mt-auto pt-3">
+      <button (click)="logout()" class="btn btn-outline-light btn-sm w-100 d-flex align-items-center"
+              [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
+        <i class="bi bi-box-arrow-right fs-5"></i>
+        <span *ngIf="sidebarOpen">Sair</span>
+      </button>
     </div>
   </div>
 
-  <!-- Conteúdo -->
-  <div class="row flex-grow-1 align-items-center justify-content-center">
-    <div class="col-md-10 col-lg-8 mt-5">
-      <div class="card shadow-lg rounded-4 border-0">
-        <div class="card-body p-5">
-          <h2 class="mb-4 text-center text-success">Bem-vindo ao IFClass!</h2>
-          <p class="text-center text-muted mb-4">Aqui você pode acompanhar suas aulas, verificar em qual sala ocorrerão e consultar sua turma e disciplina.</p>
+  <!-- Conteúdo principal -->
+  <div class="flex-grow-1 p-4 bg-light">
+    <div class="text-center mb-5">
+      <h2 class="text-success fw-bold">Bem-vindo ao IFClass!</h2>
+      <p class="text-muted">Aqui você pode acompanhar suas aulas, salas, turmas e disciplinas.</p>
+    </div>
 
-          <div class="row text-center">
-            <!-- Aulas -->
-            <div class="col-md-6 mb-4">
-              <div class="p-4 border rounded-4 bg-white shadow-sm h-100">
-                <i class="bi bi-calendar-week-fill display-4 text-success"></i>
-                <h5 class="mt-3 fw-semibold">Aulas do dia</h5>
-                <p class="text-muted">Confira quais aulas você tem hoje.</p>
-                <a routerLink="/aulas" class="btn btn-outline-success btn-sm mt-2">Ver aulas</a>
-              </div>
-            </div>
-
-            <!-- Salas -->
-            <div class="col-md-6 mb-4">
-              <div class="p-4 border rounded-4 bg-white shadow-sm h-100">
-                <i class="bi bi-door-open-fill display-4 text-success"></i>
-                <h5 class="mt-3 fw-semibold">Salas</h5>
-                <p class="text-muted">Veja em qual sala sua aula acontecerá.</p>
-                <a routerLink="/salas" class="btn btn-outline-success btn-sm mt-2">Ver salas</a>
-              </div>
-            </div>
-
-            <!-- Turmas -->
-            <div class="col-md-6 mb-4">
-              <div class="p-4 border rounded-4 bg-white shadow-sm h-100">
-                <i class="bi bi-people-fill display-4 text-success"></i>
-                <h5 class="mt-3 fw-semibold">Turma</h5>
-                <p class="text-muted">Informações sobre sua turma atual.</p>
-                <a routerLink="/turmas" class="btn btn-outline-success btn-sm mt-2">Ver turma</a>
-              </div>
-            </div>
-
-            <!-- Disciplinas -->
-            <div class="col-md-6 mb-4">
-              <div class="p-4 border rounded-4 bg-white shadow-sm h-100">
-                <i class="bi bi-journal-bookmark-fill display-4 text-success"></i>
-                <h5 class="mt-3 fw-semibold">Disciplinas</h5>
-                <p class="text-muted">Acompanhe suas disciplinas.</p>
-                <a routerLink="/disciplinas" class="btn btn-outline-success btn-sm mt-2">Ver disciplinas</a>
-              </div>
-            </div>
-          </div>
-
-        <div class="text-center mt-4">
-          <button (click)="logout()" class="btn btn-success px-4">Sair</button>
-        </div>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 text-center">
+      <div class="col" *ngFor="let item of menuCards">
+        <div class="p-4 border rounded-4 bg-white shadow-sm h-100">
+          <i class="{{ item.icon }} display-4 text-success"></i>
+          <h5 class="mt-3 fw-semibold">{{ item.title }}</h5>
+          <p class="text-muted">{{ item.text }}</p>
+          <a [routerLink]="item.link" class="btn btn-outline-success btn-sm mt-2">Ver</a>
         </div>
       </div>
     </div>
