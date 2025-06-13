@@ -18,16 +18,16 @@
               <input
                 [(ngModel)]="usuario[campo.nome]"
                 [name]="campo.nome"
-                [type]="(campo.nome === 'senha' || campo.nome === 'confirmarSenha') 
-                        ? (mostrarSenha[campo.nome] ? 'text' : 'password') 
-                        : campo.tipo"
+                #model="ngModel"
                 class="form-control"
                 [placeholder]="campo.placeholder"
-                required
-                [attr.minlength]="(campo.nome === 'senha' || campo.nome === 'confirmarSenha') ? 6 : null"
-                [attr.autocomplete]="(campo.nome === 'senha' || campo.nome === 'confirmarSenha') ? 'new-password' : null"
+                [attr.type]="(campo.nome === 'senha' || campo.nome === 'confirmarSenha') 
+                            ? (mostrarSenha[campo.nome] ? 'text' : 'password') 
+                            : campo.tipo"
+                [type]="campo.nome === 'email' ? 'text' : null"
+                [required]="true"
+                [minlength]="(campo.nome === 'senha' || campo.nome === 'confirmarSenha') ? 6 : null"
                 [pattern]="campo.nome === 'email' ? '^[\\w.-]+@([\\w-]+\\.)+(com|br)$' : ''"
-                #model="ngModel"
               />
 
               <span class="input-group-text bg-success text-white"
