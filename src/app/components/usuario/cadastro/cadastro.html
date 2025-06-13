@@ -14,7 +14,7 @@
           <div class="mb-3" *ngFor="let campo of campos">
             <label [for]="campo.nome" class="form-label fw-medium">{{ campo.label }}</label>
 
-            <div class="input-group">
+            <div class="input-group"> 
               <input
                 [(ngModel)]="usuario[campo.nome]"
                 [name]="campo.nome"
