@@ -9,7 +9,7 @@ export class UsuarioService {
 
   constructor(private http: HttpClient) {}
 
-  salvar(usuario: any) {
+  cadastrar(usuario: any) {
     return this.http.post(this.apiUrl, usuario);
   }
 }

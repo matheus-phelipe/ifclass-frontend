@@ -14,7 +14,7 @@ import { FormsModule, NgModel } from '@angular/forms';
   styleUrl: './cadastro.css'
 })
 export class CadastroComponent {
-  mensagemDoModal: string = 'Texto inicial';
+  mensagemDoModal: string = '';
   
   @ViewChild('meuModal') modal!: ModalComponent;
 
@@ -49,11 +49,13 @@ export class CadastroComponent {
       prontuario: this.usuario.prontuario
     };
 
-    this.service.salvar(payload).subscribe({
+    this.service.cadastrar(payload).subscribe({
       next: () => {
-        alert('Usuário cadastrado com sucesso!');
-        this.router.navigate(['/login']);
-      },
+        this.abrirModal("Usuário cadastrado com sucesso");
+        this.modal.closed.subscribe(() => {
+          this.router.navigate(['/login']);
+        });    
+        },
       error: (err) => {
         this.abrirModal("Erro ao cadastrar usuário!");
       }
