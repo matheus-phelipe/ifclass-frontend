@@ -5,6 +5,7 @@ import { authGuard } from './service/auth/auth.guard';
 import { CadastroComponent } from './components/usuario/cadastro/cadastro';
 import { Gerenciarusuarios } from './components/gerenciarusuarios/gerenciarusuarios';
 import { Gerenciarpermissoes } from './components/gerenciarpermissoes/gerenciarpermissoes';
+import { GerenciadorSalasComponent } from './components/gerenciador-salas/gerenciador-salas';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -19,12 +20,17 @@ export const routes: Routes = [
     path: 'usuarios',
     component: Gerenciarusuarios,
     canActivate: [authGuard],
-    data: { roles: ['ROLE_ADMIN'] }
+    data: { authorities: ['ROLE_ADMIN'] }
   },
   {
     path: 'permissoes',
     component: Gerenciarpermissoes,
     canActivate: [authGuard],
-    data: { roles: ['ROLE_ADMIN'] }
+    data: { authorities: ['ROLE_ADMIN', 'ROLE_COORDENADOR'] }
   },
+  {
+    path: 'salas',
+    component: GerenciadorSalasComponent,
+    canActivate: [authGuard]
+  }
 ];

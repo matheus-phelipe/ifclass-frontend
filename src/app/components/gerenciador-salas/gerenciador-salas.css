@@ -1,0 +1,26 @@
+.sala-container {
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  min-height: 80px; /* Garante uma altura mínima para as salas */
+}
+
+.sala-container:hover {
+  background-color: #e9f5ff; /* Um azul claro no hover */
+  border-color: #0d6efd !important;
+}
+
+.sala-container .btn-close {
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.sala-container:hover .btn-close {
+  opacity: 1;
+}
+
+.corredor-visual {
+  background-color: #f8f9fa;
+  border-left: 2px dashed #dee2e6;
+  border-right: 2px dashed #dee2e6;
+  min-height: 100%;
+}

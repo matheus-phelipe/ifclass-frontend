@@ -6,11 +6,10 @@ import { UsuarioService } from '../../service/usuario/usuario.service';
 import { CommonModule } from '@angular/common';
 import { ModalConfirmacaoComponent } from '../../shared/modal-confirmacao/modal-confirmacao';
 import { AlertComponent } from '../../shared/alert/alert';
-import { SidebarComponent } from '../../shared/sidebar/sidebar';
 
 @Component({
   selector: 'app-gerenciarpermissoes',
-  imports: [CommonModule, RouterModule, AlertComponent, ModalConfirmacaoComponent, SidebarComponent],
+  imports: [CommonModule, RouterModule, AlertComponent, ModalConfirmacaoComponent],
   templateUrl: './gerenciarpermissoes.html',
   styleUrl: './gerenciarpermissoes.css'
 })

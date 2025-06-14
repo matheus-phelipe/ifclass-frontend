@@ -62,7 +62,8 @@
               "buildTarget": "ifclass-frontend:build:production"
             },
             "development": {
-              "buildTarget": "ifclass-frontend:build:development"
+              "buildTarget": "ifclass-frontend:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"

@@ -1,0 +1,128 @@
+<div class="container my-5">
+    <header class="text-center mb-5">
+        <h1 class="fw-bold">Planta do Campus</h1>
+        <p class="text-muted">Visualize e gerencie os blocos e salas da instituição.</p>
+    </header>
+
+    <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ error }}
+        <button type="button" class="btn-close" (click)="error = null" aria-label="Close"></button>
+    </div>
+
+    <!-- PAINEL DO ADMINISTRADOR (controlado pelo seu AuthService) -->
+    <section *ngIf="isAdmin" class="card card-body mb-5 shadow-sm">
+        <h2 class="h4 border-bottom pb-3 mb-4">Painel de Controle</h2>
+        <div class="row g-4">
+            <!-- Formulário para Criar Bloco -->
+            <div class="col-md-6">
+                <form #blocoForm="ngForm" (ngSubmit)="handleCreateBloco()">
+                    <h3 class="h5">Criar Novo Bloco</h3>
+                    <div class="mb-3">
+                        <label for="blockName" class="form-label">Nome do Bloco</label>
+                        <input type="text" id="blockName" class="form-control" [(ngModel)]="novoBlocoNome" name="novoBlocoNome" placeholder="Ex: Bloco Didático I" required>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100" [disabled]="blocoForm.invalid">Adicionar Bloco</button>
+                </form>
+            </div>
+
+            <!-- Formulário para Criar Sala -->
+            <div class="col-md-6">
+                <form #salaForm="ngForm" (ngSubmit)="handleCreateSala()">
+                    <h3 class="h5">Adicionar Sala</h3>
+                    <div class="mb-3">
+                        <label for="blockSelect" class="form-label">Selecione o Bloco</label>
+                        <select id="blockSelect" class="form-select" [(ngModel)]="blocoSelecionadoId" name="blocoSelecionadoId" [disabled]="blocos.length === 0" required>
+                            <option *ngIf="blocos.length === 0" [ngValue]="null">Crie um bloco primeiro</option>
+                            <option *ngFor="let bloco of blocos" [value]="bloco.id">{{ bloco.nome }}</option>
+                        </select>
+                    </div>
+                    <div class="row g-2">
+                        <div class="col-sm-8">
+                            <label for="roomCode" class="form-label">Código da Sala</label>
+                            <input type="text" id="roomCode" class="form-control" [(ngModel)]="novaSalaCodigo" name="novaSalaCodigo" placeholder="Ex: S-203" required>
+                        </div>
+                        <div class="col-sm-4">
+                            <label for="roomCapacity" class="form-label">Capacidade</label>
+                            <input type="number" id="roomCapacity" class="form-control" [(ngModel)]="novaSalaCapacidade" name="novaSalaCapacidade" placeholder="Ex: 40" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 mt-3" [disabled]="salaForm.invalid">Adicionar Sala</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- EXIBIÇÃO DA PLANTA -->
+    <main>
+        <div *ngIf="isLoading" class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Carregando...</span>
+            </div>
+        </div>
+
+        <div *ngIf="!isLoading && !error && blocos.length === 0" class="text-center card card-body">
+            <h3 class="h5">Nenhum bloco encontrado.</h3>
+            <p class="text-muted" *ngIf="isAdmin">Use o painel de controle para começar a construir a planta.</p>
+            <p class="text-muted" *ngIf="!isAdmin">A planta do campus ainda não foi configurada.</p>
+        </div>
+        
+        <!-- NOVO: Estrutura de Acordeão para os blocos -->
+        <div class="accordion" id="blocosAccordion">
+            <div *ngFor="let bloco of blocos" class="accordion-item">
+                <h2 class="accordion-header" [id]="'heading' + bloco.id">
+                    <button class="accordion-button" type="button" 
+                            [class.collapsed]="activeBlocoId !== bloco.id" 
+                            (click)="toggleBloco(bloco.id)">
+                        <strong>{{ bloco.nome }}</strong>
+                    </button>
+                </h2>
+                <div [id]="'collapse' + bloco.id" 
+                    class="accordion-collapse collapse" 
+                    [class.show]="activeBlocoId === bloco.id">
+                    <div class="accordion-body">
+                        <div *ngIf="bloco.salas && bloco.salas.length > 0; else noRooms" class="corridor-layout">
+                            <div class="row justify-content-center">
+                                <!-- Coluna Esquerda -->
+                                <div class="col-5">
+                                    <div class="d-grid gap-3">
+                                        <div *ngFor="let sala of bloco.salasEsquerda" class="border rounded p-3 text-center h-100 d-flex flex-column justify-content-center position-relative sala-container">
+                                            <span class="fw-bold d-block">{{ sala.codigo }}</span>
+                                            <small class="text-muted">Cap: {{ sala.capacidade }}</small>
+                                            <button *ngIf="isAdmin" (click)="handleDeleteSala(bloco.id, sala.id)" class="btn btn-close btn-sm position-absolute top-0 end-0 m-1" aria-label="Close"></button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Corredor Visual -->
+                                <div class="col-2 d-flex align-items-stretch">
+                                    <div class="corredor-visual w-100"></div>
+                                </div>
+
+                                <!-- Coluna Direita -->
+                                <div class="col-5">
+                                    <div class="d-grid gap-3">
+                                        <div *ngFor="let sala of bloco.salasDireita" class="border rounded p-3 text-center h-100 d-flex flex-column justify-content-center position-relative sala-container">
+                                            <span class="fw-bold d-block">{{ sala.codigo }}</span>
+                                            <small class="text-muted">Cap: {{ sala.capacidade }}</small>
+                                            <button *ngIf="isAdmin" (click)="handleDeleteSala(bloco.id, sala.id)" class="btn btn-close btn-sm position-absolute top-0 end-0 m-1" aria-label="Close"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <ng-template #noRooms>
+                            <p class="text-center text-muted fst-italic">Nenhuma sala adicionada a este bloco.</p>
+                        </ng-template>
+
+                        <!-- Botão de excluir movido para dentro do acordeão -->
+                        <div *ngIf="isAdmin" class="mt-4 pt-3 border-top text-end">
+                            <button (click)="handleDeleteBloco(bloco.id)" class="btn btn-sm btn-outline-danger">
+                                Excluir Bloco "{{ bloco.nome }}"
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>

@@ -8,14 +8,12 @@ import { FormsModule } from '@angular/forms';
 import { ModalComponent } from '../../shared/modal/modal';
 import { AlertComponent } from '../../shared/alert/alert';
 import { ModalConfirmacaoComponent } from '../../shared/modal-confirmacao/modal-confirmacao';
-import { SidebarComponent } from '../../shared/sidebar/sidebar';
-
 
 declare var bootstrap: any;
 
 @Component({
   selector: 'app-gerenciarusuarios',
-  imports: [CommonModule, RouterModule, FormsModule, ModalComponent, AlertComponent, ModalConfirmacaoComponent, SidebarComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ModalComponent, AlertComponent, ModalConfirmacaoComponent],
   templateUrl: './gerenciarusuarios.html',
   styleUrl: './gerenciarusuarios.css'
 })

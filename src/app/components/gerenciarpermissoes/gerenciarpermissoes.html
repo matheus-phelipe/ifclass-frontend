@@ -1,12 +1,4 @@
-<div class="d-flex min-vh-100">
-  <app-sidebar
-    [isProfessor]="isProfessor"
-    [isCoordenador]="isCoordenador"
-    [isAdmin]="isAdmin"
-    (logoutClicked)="logout()">
-  </app-sidebar>
-
-  <!-- Conteúdo principal -->
+ <!-- Conteúdo principal -->
   <div class="flex-grow-1 p-4 bg-light">
     <div class="container-fluid">
       <h3 class="text-success fw-bold mb-4 text-center">Gerenciar permissões</h3>
@@ -54,7 +46,6 @@
           </div>
         </div>
     </div>
-  </div>
 </div>
 
 <app-alert #alerta></app-alert>
