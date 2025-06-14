@@ -1,19 +1,27 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { Usuario } from '../../model/usuario/usuario.model';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../service/auth/auth.service';
 import { UsuarioService } from '../../service/usuario/usuario.service';
 import { CommonModule } from '@angular/common';
+import { ModalConfirmacaoComponent } from '../../shared/modal-confirmacao/modal-confirmacao';
+import { AlertComponent } from '../../shared/alert/alert';
 
 @Component({
   selector: 'app-gerenciarpermissoes',
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, AlertComponent, ModalConfirmacaoComponent],
   templateUrl: './gerenciarpermissoes.html',
   styleUrl: './gerenciarpermissoes.css'
 })
 export class Gerenciarpermissoes {
   usuarios: Usuario[] = [];
   sidebarOpen = true;
+  usuarioParaAlterarStatus!: Usuario | null;
+  novaPermissao: string = '';
+  mensagemModalConfirmacao = '';
+
+  @ViewChild('modalConfirmPermissao') modalConfirmPermissao!: ModalConfirmacaoComponent;
+  @ViewChild('alerta') alerta!: AlertComponent;
 
   constructor(
     private router: Router,
@@ -47,14 +55,39 @@ export class Gerenciarpermissoes {
   }
 
   onRoleChange(usuario: Usuario, novoPapel: string) {
-    this.usuarioService.atualizarAuthorities(usuario.id, novoPapel).subscribe({
-      next: () => usuario.authorities = novoPapel,
-      error: () => alert("Erro ao atualizar papel.")
+    this.usuarioParaAlterarStatus = usuario;
+    this.novaPermissao = novoPapel;
+    this.mensagemModalConfirmacao = `Confirmar alteração do status para "${novoPapel}" do usuário ${usuario.nome}?`;
+    this.modalConfirmPermissao.open();
+  }
+
+  confirmarAlteracaoStatus() {
+    if (!this.usuarioParaAlterarStatus) return;
+
+    this.usuarioService.atualizarAuthorities(this.usuarioParaAlterarStatus.id, this.novaPermissao).subscribe({
+    next: () => {
+      this.mostrarAlerta('Permissão atualizada com sucesso!');
+    },
+      error: () => this.mostrarAlerta('Erro ao atualizar a permissão')
     });
+
+    this.modalConfirmPermissao.close();
+    this.usuarioParaAlterarStatus = null;
+    this.novaPermissao = '';
+  }
+
+  cancelarAlteracaoStatus() {
+    this.modalConfirmPermissao.close();
+    this.usuarioParaAlterarStatus = null;
+    this.novaPermissao = '';
   }
 
   temPapel(usuario: Usuario, papel: string): boolean {
     return usuario.authorities === papel;
+  }
+
+  mostrarAlerta(mensagem: string) {
+    this.alerta.show(mensagem, 3000); 
   }
 
   logout() {
