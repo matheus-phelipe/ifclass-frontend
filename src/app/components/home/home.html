@@ -1,18 +1,80 @@
-<!-- Conteúdo principal -->
-  <div class="flex-grow-1 p-4 bg-light">
-    <div class="text-center mb-5">
-      <h2 class="text-success fw-bold">Bem-vindo ao IFClass!</h2>
-      <p class="text-muted">Aqui você pode acompanhar suas aulas, salas, turmas e disciplinas.</p>
-    </div>
+<div class="container-fluid">
 
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 text-center">
-      <div class="col" *ngFor="let item of menuCards">
-        <div class="p-4 border rounded-4 bg-white shadow-sm h-100">
-          <i class="{{ item.icon }} display-4 text-success"></i>
-          <h5 class="mt-3 fw-semibold">{{ item.title }}</h5>
-          <p class="text-muted">{{ item.text }}</p>
-          <a [routerLink]="item.link" class="btn btn-outline-success btn-sm mt-2">Ver</a>
+  <!-- Cabeçalho de Boas-Vindas -->
+  <header class="mb-5">
+    <h1 class="display-5 fw-bold text-success">Bem-vindo, {{ nomeUsuario }}!</h1>
+    <p class="text-muted fs-5">Aqui está um resumo do seu dia no IFClass.</p>
+  </header>
+
+  <div class="row g-4">
+    <!-- Coluna Principal (70%) -->
+    <div class="col-lg-8">
+      
+      <!-- Widget de Próxima Aula -->
+      <div *ngIf="proximaAula" class="card-destaque h-100">
+        <div class="card-destaque-header">
+          <i class="bi bi-clock-history me-2"></i>
+          <span>Sua Próxima Aula</span>
+        </div>
+        <div class="card-destaque-body">
+          <h2 class="disciplina-titulo">{{ proximaAula.disciplina }}</h2>
+          <div class="detalhes-aula">
+            <span><i class="bi bi-person-video"></i> {{ proximaAula.professor }}</span>
+            <span><i class="bi bi-geo-alt-fill"></i> Sala {{ proximaAula.sala }} ({{ proximaAula.bloco }})</span>
+            <span><i class="bi bi-hourglass-split"></i> {{ proximaAula.horario }}</span>
+          </div>
+        </div>
+        <div class="card-destaque-footer">
+          <a routerLink="/aulas" class="btn btn-light">Ver grade completa</a>
         </div>
       </div>
+
+      <!-- Mensagem para admin/coordenador -->
+       <div *ngIf="(isAdmin || isCoordenador) && !proximaAula" class="card-destaque h-100">
+          <div class="card-destaque-body text-center">
+            <i class="bi bi-graph-up-arrow display-1 text-white mb-3"></i>
+            <h2 class="disciplina-titulo">Visão Geral do Campus</h2>
+            <p class="text-white-50">Utilize os menus de acesso rápido para gerenciar o sistema.</p>
+          </div>
+       </div>
+
     </div>
+
+    <!-- Coluna Lateral (30%) -->
+    <div class="col-lg-4">
+      
+      <!-- Widget de Avisos -->
+      <div class="card-lateral h-100">
+        <h5 class="card-lateral-titulo">
+          <i class="bi bi-megaphone-fill me-2"></i>
+          Avisos da Coordenação
+        </h5>
+        <ul class="lista-avisos">
+          <li *ngFor="let aviso of avisos">
+            <p class="aviso-titulo">{{ aviso.titulo }}</p>
+            <small class="aviso-data">{{ aviso.data }}</small>
+          </li>
+        </ul>
+        <a href="" class="ver-todos-link">Ver todos os avisos</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Seção de Ações Rápidas (Menu Antigo) -->
+  <div class="mt-5">
+    <h3 class="fw-bold text-muted mb-4">Acesso Rápido</h3>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 text-center">
+      <div class="col" *ngFor="let item of menuCards">
+        <a [routerLink]="item.link" class="card-acao">
+          <div class="card-acao-icon">
+            <i class="{{ item.icon }}"></i>
+          </div>
+          <h6 class="mt-3 fw-semibold">{{ item.title }}</h6>
+          <p class="card-acao-texto">{{ item.text }}</p>
+        </a>
+      </div>
+    </div>
+  </div>
+
 </div>
