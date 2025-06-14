@@ -26,14 +26,14 @@ export const ALL_MENU_CARDS: MenuCard[] = [
     title: 'Turma',
     text: 'Informações sobre sua turma atual.',
     link: '/turmas',
-    roles: ['ROLE_ALUNO', 'ROLE_COORDENADOR', 'ROLE_ADMIN']
+    roles: ['ROLE_ALUNO', 'ROLE_PROFESSOR', 'ROLE_COORDENADOR', 'ROLE_ADMIN']
   },
   {
     icon: 'bi bi-journal-bookmark-fill',
     title: 'Disciplinas',
     text: 'Acompanhe suas disciplinas.',
     link: '/disciplinas',
-    roles: ['ROLE_ALUNO', 'ROLE_COORDENADOR', 'ROLE_ADMIN']
+    roles: ['ROLE_ALUNO', 'ROLE_PROFESSOR', 'ROLE_COORDENADOR', 'ROLE_ADMIN']
   },
   {
     icon: 'bi bi-plus-square-fill',
