@@ -8,47 +8,51 @@
 
   <!-- Conteúdo principal -->
   <div class="flex-grow-1 p-4 bg-light">
-    <h3 class="text-success fw-bold mb-4 text-center">Gerenciar permissões</h3>
+    <div class="container-fluid">
+      <h3 class="text-success fw-bold mb-4 text-center">Gerenciar permissões</h3>
 
-    <div class="table-responsive shadow-sm rounded-4">
-      <table class="table table-hover align-middle text-center bg-white border rounded-4 overflow-hidden">
-        <thead class="table-success">
-          <tr>
-            <th class="text-start ps-4">Nome</th>
-            <th class="text-start">Email</th>
-            <th>Aluno</th>
-            <th>Professor</th>
-            <th>Coordenador</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let usuario of usuarios" class="border-top">
-            <td class="text-start ps-4 fw-semibold">{{ usuario.nome }}</td>
-            <td class="text-start">{{ usuario.email }}</td>
-            <td>
-               <input type="radio"
-                  class="form-check-input"
-                  name="papel-{{ usuario.id }}"
-                  [checked]="temPapel(usuario, 'ROLE_ALUNO')"
-                  (change)="onRoleChange(usuario, 'ROLE_ALUNO')">
-          </td>
-          <td>
-            <input type="radio"
-                  class="form-check-input"
-                  name="papel-{{ usuario.id }}"
-                  [checked]="temPapel(usuario, 'ROLE_PROFESSOR')"
-                  (change)="onRoleChange(usuario, 'ROLE_PROFESSOR')">
-          </td>
-          <td>
-            <input type="radio"
-                  class="form-check-input"
-                  name="papel-{{ usuario.id }}"
-                  [checked]="temPapel(usuario, 'ROLE_COORDENADOR')"
-                  (change)="onRoleChange(usuario, 'ROLE_COORDENADOR')">
-          </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+        <div class="table-responsive">
+          <table class="table table-hover table-borderless align-middle mb-0">
+              <thead class="table-success">
+                <tr>
+                  <th class="text-start ps-4">Nome</th>
+                  <th class="text-start">Email</th>
+                  <th>Aluno</th>
+                  <th>Professor</th>
+                  <th>Coordenador</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let usuario of usuarios" class="border-top">
+                  <td class="text-start ps-4 fw-semibold">{{ usuario.nome }}</td>
+                  <td class="text-start">{{ usuario.email }}</td>
+                  <td>
+                    <input type="radio"
+                        class="form-check-input"
+                        name="papel-{{ usuario.id }}"
+                        [checked]="temPapel(usuario, 'ROLE_ALUNO')"
+                        (change)="onRoleChange(usuario, 'ROLE_ALUNO')">
+                </td>
+                <td>
+                  <input type="radio"
+                        class="form-check-input"
+                        name="papel-{{ usuario.id }}"
+                        [checked]="temPapel(usuario, 'ROLE_PROFESSOR')"
+                        (change)="onRoleChange(usuario, 'ROLE_PROFESSOR')">
+                </td>
+                <td>
+                  <input type="radio"
+                        class="form-check-input"
+                        name="papel-{{ usuario.id }}"
+                        [checked]="temPapel(usuario, 'ROLE_COORDENADOR')"
+                        (change)="onRoleChange(usuario, 'ROLE_COORDENADOR')">
+                </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
     </div>
   </div>
 </div>
