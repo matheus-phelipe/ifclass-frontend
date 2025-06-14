@@ -24,31 +24,38 @@ export class App implements OnInit {
   isCoordenador = false;
   showMainLayout = false;
 
+  // Lista de rotas onde a sidebar NÃO deve aparecer.
+  private standaloneRoutes = ['/login', '/cadastro'];
+
   constructor(
     private authService: AuthService,
     private router: Router
   ) {
-    // **CORREÇÃO APLICADA AQUI**
-    // Definimos o estado inicial do layout imediatamente com base na URL atual.
-    // Isso garante que a página de login seja exibida corretamente na primeira carga.
-    this.showMainLayout = !this.router.url.includes('/login');
+    // Verifica a URL inicial de forma síncrona
+    this.updateLayout(this.router.url);
   }
 
   ngOnInit(): void {
-    // A assinatura continua sendo necessária para reagir a navegações futuras.
+    // Escuta as mudanças de rota para atualizar o layout
     this.router.events.pipe(
       filter((event: RouterEvent): event is NavigationEnd => event instanceof NavigationEnd)
     ).subscribe((event: NavigationEnd) => {
-      // Atualiza o layout com base na nova URL após cada navegação.
-      this.showMainLayout = !event.urlAfterRedirects.includes('/login');
-      
-      if (this.showMainLayout) {
-        this.checkUserRoles();
-      }
+      this.updateLayout(event.urlAfterRedirects);
     });
   }
 
-  checkUserRoles(): void {
+  private updateLayout(currentUrl: string): void {
+    // Verifica se a URL atual está na lista de rotas standalone.
+    // O método `some` retorna true se pelo menos uma rota da lista for encontrada na URL.
+    this.showMainLayout = !this.standaloneRoutes.some(route => currentUrl.includes(route));
+    
+    // Se for para mostrar o layout, verifica as permissões.
+    if (this.showMainLayout) {
+      this.checkUserRoles();
+    }
+  }
+
+  private checkUserRoles(): void {
     this.isAdmin = this.authService.hasRole('ROLE_ADMIN');
     this.isProfessor = this.authService.hasRole('ROLE_PROFESSOR');
     this.isCoordenador = this.authService.hasRole('ROLE_COORDENADOR');
