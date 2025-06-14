@@ -1,1 +1,165 @@
-<p>gerenciarpermissoes works!</p>
+<div class="d-flex min-vh-100">
+  <!-- Sidebar -->
+  <div class="d-flex flex-column bg-success text-white p-3"
+       [ngClass]="{'collapsed-sidebar': !sidebarOpen}"
+       [class.w-auto]="!sidebarOpen"
+       [class.w-100]="sidebarOpen"
+       style="width: auto; max-width: 250px; transition: all 0.3s ease;">
+    
+    <!-- Header + Toggle -->
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <div class="d-flex align-items-center">
+        <img src="assets/ifclass.png" alt="Logo" class="img-fluid" style="max-height: 40px;">
+        <h5 class="ms-2 mb-0" *ngIf="sidebarOpen">Class</h5>
+      </div>
+      <button class="btn btn-outline-light btn-sm ms-2" (click)="toggleSidebar()">
+        <i class="bi" [ngClass]="sidebarOpen ? 'bi-chevron-left' : 'bi-list'"></i>
+      </button>
+    </div>
+
+    <!-- Menus -->
+    <div class="d-flex flex-column gap-2">
+      <div *ngIf="sidebarOpen" class="text-white-50 small">ALUNO</div>
+
+      <a routerLink="/aulas"
+         class="text-white text-decoration-none d-flex align-items-center"
+         [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
+        <i class="bi bi-calendar-week fs-5"></i>
+        <span *ngIf="sidebarOpen">Aulas do dia</span>
+      </a>
+
+      <a routerLink="/salas"
+         class="text-white text-decoration-none d-flex align-items-center"
+         [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
+        <i class="bi bi-door-open fs-5"></i>
+        <span *ngIf="sidebarOpen">Salas</span>
+      </a>
+
+      <a routerLink="/turmas"
+         class="text-white text-decoration-none d-flex align-items-center"
+         [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
+        <i class="bi bi-people fs-5"></i>
+        <span *ngIf="sidebarOpen">Turmas</span>
+      </a>
+
+      <a routerLink="/disciplinas"
+         class="text-white text-decoration-none d-flex align-items-center mb-2"
+         [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
+        <i class="bi bi-journal-bookmark fs-5"></i>
+        <span *ngIf="sidebarOpen">Disciplinas</span>
+      </a>
+
+      <!-- PROFESSOR -->
+      <ng-container *ngIf="isProfessor || isCoordenador || isAdmin">
+        <div *ngIf="sidebarOpen" class="text-white-50 small">PROFESSOR</div>
+
+        <a routerLink="/aulas/criar"
+           class="text-white text-decoration-none d-flex align-items-center mb-2"
+           [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
+          <i class="bi bi-plus-square fs-5"></i>
+          <span *ngIf="sidebarOpen">Criar aula</span>
+        </a>
+      </ng-container>
+
+      <!-- COORDENADOR -->
+      <ng-container *ngIf="isCoordenador || isAdmin">
+        <div *ngIf="sidebarOpen" class="text-white-50 small">COORDENADOR</div>
+
+        <a routerLink="/relacionar-sala"
+           class="text-white text-decoration-none d-flex align-items-center"
+           [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
+          <i class="bi bi-link fs-5"></i>
+          <span *ngIf="sidebarOpen">Relacionar sala/disciplina</span>
+        </a>
+
+        <a routerLink="/relacionar-turma"
+           class="text-white text-decoration-none d-flex align-items-center"
+           [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
+          <i class="bi bi-link fs-5"></i>
+          <span *ngIf="sidebarOpen">Relacionar turma/curso</span>
+        </a>
+
+        <a routerLink="/permissoes"
+           class="text-white text-decoration-none d-flex align-items-center mb-2"
+           [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
+          <i class="bi bi-person-gear fs-5"></i>
+          <span *ngIf="sidebarOpen">Gerenciar permissões</span>
+        </a>
+      </ng-container>
+
+      <!-- ADMIN -->
+      <ng-container *ngIf="isAdmin">
+        <div *ngIf="sidebarOpen" class="text-white-50 small">ADMINISTRADOR</div>
+
+        <a routerLink="/usuarios"
+           class="text-white text-decoration-none d-flex align-items-center"
+           [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
+          <i class="bi bi-people-fill fs-5"></i>
+          <span *ngIf="sidebarOpen">Gerenciar usuários</span>
+        </a>
+
+        <a routerLink="/configuracoes"
+           class="text-white text-decoration-none d-flex align-items-center"
+           [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
+          <i class="bi bi-gear fs-5"></i>
+          <span *ngIf="sidebarOpen">Configurações</span>
+        </a>
+      </ng-container>
+    </div>
+
+    <!-- Botão sair -->
+    <div class="mt-auto pt-3">
+      <button (click)="logout()" class="btn btn-outline-light btn-sm w-100 d-flex align-items-center"
+              [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
+        <i class="bi bi-box-arrow-right fs-5"></i>
+        <span *ngIf="sidebarOpen">Sair</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Conteúdo principal -->
+  <div class="flex-grow-1 p-4 bg-light">
+    <h3 class="text-success fw-bold mb-4 text-center">Gerenciar Usuários</h3>
+
+    <div class="table-responsive shadow-sm rounded-4">
+      <table class="table table-hover align-middle text-center bg-white border rounded-4 overflow-hidden">
+        <thead class="table-success">
+          <tr>
+            <th class="text-start ps-4">Nome</th>
+            <th class="text-start">Email</th>
+            <th>Aluno</th>
+            <th>Professor</th>
+            <th>Coordenador</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let usuario of usuarios" class="border-top">
+            <td class="text-start ps-4 fw-semibold">{{ usuario.nome }}</td>
+            <td class="text-start">{{ usuario.email }}</td>
+            <td>
+               <input type="radio"
+                  class="form-check-input"
+                  name="papel-{{ usuario.id }}"
+                  [checked]="temPapel(usuario, 'ROLE_ALUNO')"
+                  (change)="onRoleChange(usuario, 'ROLE_ALUNO')">
+          </td>
+          <td>
+            <input type="radio"
+                  class="form-check-input"
+                  name="papel-{{ usuario.id }}"
+                  [checked]="temPapel(usuario, 'ROLE_PROFESSOR')"
+                  (change)="onRoleChange(usuario, 'ROLE_PROFESSOR')">
+          </td>
+          <td>
+            <input type="radio"
+                  class="form-check-input"
+                  name="papel-{{ usuario.id }}"
+                  [checked]="temPapel(usuario, 'ROLE_COORDENADOR')"
+                  (change)="onRoleChange(usuario, 'ROLE_COORDENADOR')">
+          </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
