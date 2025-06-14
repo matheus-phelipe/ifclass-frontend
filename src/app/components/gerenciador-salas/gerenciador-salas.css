@@ -1,26 +1,93 @@
-.sala-container {
+.accordion-item {
+  border: none;
+  border-radius: var(--raio-borda, 0.75rem); /* Usa a variável global com um fallback */
+  margin-bottom: 1rem;
+  overflow: hidden; 
+  /* A sombra e transição vêm da classe global .card, que o .accordion-item do Bootstrap herda indiretamente ou se comporta de forma similar */
+}
+
+.accordion-button {
+  font-weight: 600;
+  color: var(--bs-gray-700);
+  background-color: #f8f9fa;
+}
+
+.accordion-button:not(.collapsed) {
+  color: #fff;
+  background-color: var(--cor-primaria, #198754); /* Usando a variável global */
+  box-shadow: none;
+}
+
+.accordion-button:focus {
+  box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+  border-color: rgba(25, 135, 84, 0.25);
+}
+
+.accordion-button::after {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%236c757d'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+}
+
+.accordion-button:not(.collapsed)::after {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+}
+
+.accordion-body {
+  padding: 1.5rem;
+}
+
+/* Estilos do Mapa do Bloco */
+.bloco-mapa {
+  display: grid;
+  grid-template-columns: 1fr 50px 1fr;
+  gap: 1.25rem;
+  padding: 1.5rem;
+  background-color: #f1f3f5;
+  border: 1px solid #dee2e6;
+  border-radius: .5rem;
+}
+
+/* Estilo para cada Sala no mapa */
+.sala-mapa-item {
+  background-color: white;
+  border: 1px solid #ced4da;
+  border-radius: .5rem;
+  padding: 1rem;
+  min-height: 90px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
   transition: all 0.2s ease-in-out;
   cursor: pointer;
-  min-height: 80px; /* Garante uma altura mínima para as salas */
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
 }
 
-.sala-container:hover {
-  background-color: #e9f5ff; /* Um azul claro no hover */
-  border-color: #0d6efd !important;
+.sala-mapa-item:hover {
+  border-color: var(--cor-primaria, #198754); /* Usando a variável global */
+  box-shadow: 0 4px 12px rgba(25, 135, 84, 0.15);
+  transform: translateY(-3px);
 }
 
-.sala-container .btn-close {
+.sala-mapa-item .btn-close {
   opacity: 0;
   transition: opacity 0.2s ease-in-out;
 }
 
-.sala-container:hover .btn-close {
+.sala-mapa-item:hover .btn-close {
   opacity: 1;
 }
 
-.corredor-visual {
-  background-color: #f8f9fa;
-  border-left: 2px dashed #dee2e6;
-  border-right: 2px dashed #dee2e6;
-  min-height: 100%;
+/* Estilo para o Corredor */
+.corredor-mapa-item {
+  grid-column: 2 / span 1;
+  grid-row: 1 / -1; 
+  background-color: #e9ecef;
+  background-image: 
+    linear-gradient(45deg, #f1f3f5 25%, transparent 25%), 
+    linear-gradient(-45deg, #f1f3f5 25%, transparent 25%), 
+    linear-gradient(45deg, transparent 75%, #f1f3f5 75%), 
+    linear-gradient(-45deg, transparent 75%, #f1f3f5 75%);
+  background-size: 10px 10px;
+  border-radius: .25rem;
 }

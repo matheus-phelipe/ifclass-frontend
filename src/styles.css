@@ -1,1 +1,50 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+ 
+/* Definição de variáveis de cor e estilos globais para o corpo da página */
+:root {
+  --cor-primaria: #198754; /* O verde principal do seu tema */
+  --cor-primaria-hover: #146c43;
+  --cor-fundo: #f8f9fa; /* Um cinza bem claro para o fundo */
+  --cor-texto: #212529;
+  --raio-borda: 0.75rem; /* Raio de borda padronizado */
+  --sombra-suave: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--cor-fundo);
+  color: var(--cor-texto);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Estilos globais para melhorar todos os cards */
+.card {
+  border-radius: var(--raio-borda) !important;
+  border: none !important;
+  box-shadow: var(--sombra-suave) !important;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Estilos globais para melhorar todos os botões */
+.btn {
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+}
+
+/* Classe utilitária que você já tinha, agora no global */
+.border-dashed {
+    border-style: dashed !important;
+    border-width: 2px;
+}
