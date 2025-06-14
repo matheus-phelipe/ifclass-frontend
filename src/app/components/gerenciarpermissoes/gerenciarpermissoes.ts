@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Usuario } from '../../model/usuario/usuario.model';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../service/auth/auth.service';
@@ -6,26 +6,33 @@ import { UsuarioService } from '../../service/usuario/usuario.service';
 import { CommonModule } from '@angular/common';
 import { ModalConfirmacaoComponent } from '../../shared/modal-confirmacao/modal-confirmacao';
 import { AlertComponent } from '../../shared/alert/alert';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-gerenciarpermissoes',
-  imports: [CommonModule, RouterModule, AlertComponent, ModalConfirmacaoComponent],
+  standalone: true,
+  // **CORREÇÃO APLICADA AQUI**: Adicionado o FormsModule aos imports do componente.
+  imports: [CommonModule, FormsModule, AlertComponent, ModalConfirmacaoComponent],
   templateUrl: './gerenciarpermissoes.html',
-  styleUrl: './gerenciarpermissoes.css'
+  styleUrls: ['./gerenciarpermissoes.css']
 })
-export class Gerenciarpermissoes {
-  usuarios: Usuario[] = [];
-  sidebarOpen = true;
+export class Gerenciarpermissoes implements OnInit {
+  
+  usuarios: Usuario[] = []; 
+  usuariosFiltrados: Usuario[] = []; 
+  termoBusca = '';
+
+  // NOVO: Propriedade para o painel de detalhes
+  usuarioSelecionado: Usuario | null = null;
+
   usuarioParaAlterarStatus!: Usuario | null;
-  novaPermissao: string = '';
+  novaPermissao = '';
   mensagemModalConfirmacao = '';
 
   @ViewChild('modalConfirmPermissao') modalConfirmPermissao!: ModalConfirmacaoComponent;
   @ViewChild('alerta') alerta!: AlertComponent;
 
   constructor(
-    private router: Router,
-    private authService: AuthService,
     private usuarioService: UsuarioService
   ) {}
 
@@ -33,31 +40,49 @@ export class Gerenciarpermissoes {
     this.carregarUsuarios();
   }
 
-  get isAdmin() { return this.authService.hasRole('ROLE_ADMIN'); }
-  get isCoordenador() { return this.authService.hasRole('ROLE_COORDENADOR'); }
-  get isProfessor() { return this.authService.hasRole('ROLE_PROFESSOR'); }
-  get isAluno() { return this.authService.hasRole('ROLE_ALUNO'); }
-
   carregarUsuarios() {
     this.usuarioService.listarTodos().subscribe({
       next: (data) => {
-        this.usuarios = data.map(u => ({
-          ...u,
-          authority: u.authorities ?? '' // garante string
-        }));
+        this.usuarios = data;
+        this.usuariosFiltrados = data;
+        // Seleciona o primeiro usuário da lista para exibir no painel de detalhes
+        if (this.usuariosFiltrados.length > 0) {
+          this.selecionarUsuario(this.usuariosFiltrados[0]);
+        }
       },
       error: () => alert("Erro ao carregar usuários.")
     });
   }
+  
+  // Método para selecionar um usuário e exibi-lo no painel lateral
+  selecionarUsuario(usuario: Usuario): void {
+    this.usuarioSelecionado = usuario;
+  }
 
-  toggleSidebar() {
-    this.sidebarOpen = !this.sidebarOpen;
+  filtrarUsuarios(): void {
+    if (!this.termoBusca) {
+      this.usuariosFiltrados = this.usuarios;
+    } else {
+      this.usuariosFiltrados = this.usuarios.filter(usuario =>
+        usuario.nome.toLowerCase().includes(this.termoBusca.toLowerCase()) ||
+        usuario.email.toLowerCase().includes(this.termoBusca.toLowerCase())
+      );
+    }
+    // Se um usuário estava selecionado, mantém a seleção se ele ainda estiver na lista filtrada
+    if (this.usuarioSelecionado && !this.usuariosFiltrados.find(u => u.id === this.usuarioSelecionado?.id)) {
+        this.usuarioSelecionado = this.usuariosFiltrados.length > 0 ? this.usuariosFiltrados[0] : null;
+    } else if (!this.usuarioSelecionado && this.usuariosFiltrados.length > 0) {
+        this.usuarioSelecionado = this.usuariosFiltrados[0];
+    }
   }
 
   onRoleChange(usuario: Usuario, novoPapel: string) {
+    if (this.temPapel(usuario, novoPapel)) {
+      return;
+    }
     this.usuarioParaAlterarStatus = usuario;
     this.novaPermissao = novoPapel;
-    this.mensagemModalConfirmacao = `Confirmar alteração do status para "${novoPapel}" do usuário ${usuario.nome}?`;
+    this.mensagemModalConfirmacao = `Confirmar alteração do papel para "${novoPapel.replace('ROLE_', '')}" do usuário ${usuario.nome}?`;
     this.modalConfirmPermissao.open();
   }
 
@@ -65,15 +90,27 @@ export class Gerenciarpermissoes {
     if (!this.usuarioParaAlterarStatus) return;
 
     this.usuarioService.atualizarAuthorities(this.usuarioParaAlterarStatus.id, this.novaPermissao).subscribe({
-    next: () => {
-      this.mostrarAlerta('Permissão atualizada com sucesso!');
-    },
-      error: () => this.mostrarAlerta('Erro ao atualizar a permissão')
+      next: () => {
+        const index = this.usuarios.findIndex(u => u.id === this.usuarioParaAlterarStatus?.id);
+        if (index !== -1) {
+          // Atualiza o estado local para refletir a mudança imediatamente
+          this.usuarios[index].authorities = this.novaPermissao;
+          this.filtrarUsuarios();
+        }
+        this.mostrarAlerta('Permissão atualizada com sucesso!');
+        // Limpa o estado somente após a operação ser bem-sucedida
+        this.modalConfirmPermissao.close();
+        this.usuarioParaAlterarStatus = null;
+        this.novaPermissao = '';
+      },
+      error: () => {
+        this.mostrarAlerta('Erro ao atualizar a permissão');
+        // Limpa o estado também em caso de erro
+        this.modalConfirmPermissao.close();
+        this.usuarioParaAlterarStatus = null;
+        this.novaPermissao = '';
+      }
     });
-
-    this.modalConfirmPermissao.close();
-    this.usuarioParaAlterarStatus = null;
-    this.novaPermissao = '';
   }
 
   cancelarAlteracaoStatus() {
@@ -88,10 +125,5 @@ export class Gerenciarpermissoes {
 
   mostrarAlerta(mensagem: string) {
     this.alerta.show(mensagem, 3000); 
-  }
-
-  logout() {
-    this.authService.logout();
-    this.router.navigate(['/login']);
   }
 }

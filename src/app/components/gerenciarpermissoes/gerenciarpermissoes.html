@@ -1,58 +1,96 @@
- <!-- Conteúdo principal -->
-  <div class="flex-grow-1 p-4 bg-light">
-    <div class="container-fluid">
-      <h3 class="text-success fw-bold mb-4 text-center">Gerenciar permissões</h3>
+<div class="container-fluid">
+  <div class="page-header">
+    <h2 class="page-title">Gerenciar Permissões</h2>
+    <div class="search-container">
+      <i class="bi bi-search search-icon"></i>
+      <input 
+        type="text" 
+        class="form-control search-input" 
+        placeholder="Buscar por nome ou email..."
+        [(ngModel)]="termoBusca"
+        (input)="filtrarUsuarios()">
+    </div>
+  </div>
 
-      <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+  <!-- Layout de 2 colunas -->
+  <div class="row g-4">
+    <!-- Coluna da Tabela -->
+    <div class="col-lg-7">
+      <div class="table-container">
         <div class="table-responsive">
-          <table class="table table-hover table-borderless align-middle mb-0">
-              <thead class="table-success">
-                <tr>
-                  <th class="text-start ps-4">Nome</th>
-                  <th class="text-start">Email</th>
-                  <th>Aluno</th>
-                  <th>Professor</th>
-                  <th>Coordenador</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let usuario of usuarios" class="border-top">
-                  <td class="text-start ps-4 fw-semibold">{{ usuario.nome }}</td>
-                  <td class="text-start">{{ usuario.email }}</td>
-                  <td>
-                    <input type="radio"
-                        class="form-check-input"
-                        name="papel-{{ usuario.id }}"
-                        [checked]="temPapel(usuario, 'ROLE_ALUNO')"
-                        (change)="onRoleChange(usuario, 'ROLE_ALUNO')">
+          <table class="table align-middle">
+            <thead>
+              <tr>
+                <th>Usuário</th>
+                <th>Permissão</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Adicionado (click) e classe de seleção -->
+              <tr *ngFor="let usuario of usuariosFiltrados" 
+                  (click)="selecionarUsuario(usuario)"
+                  [class.selected-row]="usuario.id === usuarioSelecionado?.id">
+                <td>
+                  <div class="user-info">
+                    <div class="user-avatar">{{ usuario.nome.charAt(0) }}</div>
+                    <div>
+                      <div class="user-name">{{ usuario.nome }}</div>
+                      <div class="user-email">{{ usuario.email }}</div>
+                    </div>
+                  </div>
                 </td>
                 <td>
-                  <input type="radio"
-                        class="form-check-input"
-                        name="papel-{{ usuario.id }}"
-                        [checked]="temPapel(usuario, 'ROLE_PROFESSOR')"
-                        (change)="onRoleChange(usuario, 'ROLE_PROFESSOR')">
+                  <div class="roles-container">
+                    <span class="role-pill" [class.active]="temPapel(usuario, 'ROLE_ALUNO')" (click)="onRoleChange(usuario, 'ROLE_ALUNO')">Aluno</span>
+                    <span class="role-pill" [class.active]="temPapel(usuario, 'ROLE_PROFESSOR')" (click)="onRoleChange(usuario, 'ROLE_PROFESSOR')">Professor</span>
+                    <span class="role-pill" [class.active]="temPapel(usuario, 'ROLE_COORDENADOR')" (click)="onRoleChange(usuario, 'ROLE_COORDENADOR')">Coordenador</span>
+                  </div>
                 </td>
-                <td>
-                  <input type="radio"
-                        class="form-check-input"
-                        name="papel-{{ usuario.id }}"
-                        [checked]="temPapel(usuario, 'ROLE_COORDENADOR')"
-                        (change)="onRoleChange(usuario, 'ROLE_COORDENADOR')">
-                </td>
-                </tr>
-              </tbody>
-            </table>
+              </tr>
+              <tr *ngIf="usuariosFiltrados.length === 0">
+                <td colspan="2" class="text-center text-muted p-5">Nenhum usuário encontrado.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Coluna do Painel de Detalhes -->
+    <div class="col-lg-5">
+      <div class="details-panel" *ngIf="usuarioSelecionado">
+        <div class="details-header">
+          <div class="details-avatar">{{ usuarioSelecionado.nome.charAt(0) }}</div>
+          <h4 class="details-name">{{ usuarioSelecionado.nome }}</h4>
+          <p class="details-email">{{ usuarioSelecionado.email }}</p>
+        </div>
+        <div class="details-body">
+          <div class="detail-item">
+            <span class="detail-label">Prontuário</span>
+            <span class="detail-value">{{ usuarioSelecionado.prontuario || 'Não informado' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Permissão Atual</span>
+            <span class="detail-value detail-role">{{ (usuarioSelecionado.authorities || 'N/A').replace('ROLE_', '') }}</span>
+          </div>
+          <!-- Placeholder para futuras informações -->
+          <div class="detail-item">
+            <span class="detail-label">Último Acesso</span>
+            <span class="detail-value">Hoje</span>
           </div>
         </div>
+        <div class="details-footer">
+          <button class="btn btn-outline-success btn-sm">Ver Perfil Completo</button>
+        </div>
+      </div>
+       <!-- Mensagem se nenhum usuário estiver selecionado -->
+      <div class="details-panel placeholder-panel" *ngIf="!usuarioSelecionado">
+         <i class="bi bi-person-badge placeholder-icon"></i>
+         <p class="text-muted">Selecione um usuário para ver os detalhes</p>
+      </div>
     </div>
+  </div>
 </div>
 
 <app-alert #alerta></app-alert>
-
-<app-modal-confirmacao
-  #modalConfirmPermissao
-  [message]="mensagemModalConfirmacao"
-  (confirmed)="confirmarAlteracaoStatus()"
-  (canceled)="cancelarAlteracaoStatus()">
-</app-modal-confirmacao>
+<app-modal-confirmacao #modalConfirmPermissao [message]="mensagemModalConfirmacao" (confirmed)="confirmarAlteracaoStatus()" (canceled)="cancelarAlteracaoStatus()"></app-modal-confirmacao>
