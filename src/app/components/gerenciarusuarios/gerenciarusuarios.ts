@@ -19,12 +19,10 @@ declare var bootstrap: any;
 })
 export class Gerenciarusuarios implements OnInit {
   
-  // Listas para a tabela e filtragem
   usuarios: Usuario[] = [];
   usuariosFiltrados: Usuario[] = [];
   termoBusca = '';
 
-  // Propriedades para o painel de detalhes e modais
   usuarioSelecionado: Usuario | null = null;
   usuarioParaEditar: Usuario = {} as Usuario;
   usuarioParaRemover!: Usuario;
@@ -46,7 +44,6 @@ export class Gerenciarusuarios implements OnInit {
 
   ngOnInit(): void {
     this.carregarUsuarios();
-    // Inicializa o modal de edição do Bootstrap
     const modalElement = document.getElementById('editarUsuarioModal');
     if (modalElement) {
       this.editarUsuarioModal = new bootstrap.Modal(modalElement);
@@ -58,7 +55,6 @@ export class Gerenciarusuarios implements OnInit {
       next: (data) => {
         this.usuarios = data;
         this.usuariosFiltrados = data;
-        // Seleciona o primeiro usuário por padrão
         if (this.usuariosFiltrados.length > 0) {
           this.selecionarUsuario(this.usuariosFiltrados[0]);
         }
@@ -80,7 +76,6 @@ export class Gerenciarusuarios implements OnInit {
         usuario.email.toLowerCase().includes(this.termoBusca.toLowerCase())
       );
     }
-    // Lógica para manter a seleção ou selecionar o primeiro item da nova lista
     if (this.usuarioSelecionado && !this.usuariosFiltrados.find(u => u.id === this.usuarioSelecionado?.id)) {
         this.usuarioSelecionado = this.usuariosFiltrados.length > 0 ? this.usuariosFiltrados[0] : null;
     } else if (!this.usuarioSelecionado && this.usuariosFiltrados.length > 0) {
@@ -92,8 +87,12 @@ export class Gerenciarusuarios implements OnInit {
     if (this.temPapel(usuario, novoPapel)) return;
     this.usuarioParaAlterarStatus = usuario;
     this.novaPermissao = novoPapel;
-    this.mensagemModalConfirmacao = `Confirmar alteração do papel para "${novoPapel.replace('ROLE_', '')}" do usuário ${usuario.nome}?`;
-    this.modalConfirmPermissao.open();
+    
+    this.modalConfirmPermissao.open(
+        'primary',
+        'Confirmar Alteração',
+        `Deseja mesmo alterar o papel de ${usuario.nome} para "${novoPapel.replace('ROLE_', '')}"?`
+    );
   }
 
   confirmarAlteracaoStatus() {
@@ -134,8 +133,11 @@ export class Gerenciarusuarios implements OnInit {
 
   removerUsuario(usuario: Usuario) {
     this.usuarioParaRemover = usuario;
-    this.mensagemModalConfirmacao = `Tem certeza que deseja remover o usuário ${usuario.nome}? Essa ação não pode ser desfeita.`;
-    this.modalConfirm.open();
+    this.modalConfirm.open(
+        'danger',
+        'Confirmar Remoção',
+        `Tem certeza que deseja remover o usuário ${usuario.nome}? Essa ação não pode ser desfeita.`
+    );
   }
 
   confirmarRemocao() {

@@ -75,13 +75,15 @@ export class Gerenciarpermissoes implements OnInit {
   }
 
   onRoleChange(usuario: Usuario, novoPapel: string) {
-    if (this.temPapel(usuario, novoPapel)) {
-      return;
-    }
+    if (this.temPapel(usuario, novoPapel)) return;
     this.usuarioParaAlterarStatus = usuario;
     this.novaPermissao = novoPapel;
-    this.mensagemModalConfirmacao = `Confirmar alteração do papel para "${novoPapel.replace('ROLE_', '')}" do usuário ${usuario.nome}?`;
-    this.modalConfirmPermissao.open();
+    
+    this.modalConfirmPermissao.open(
+      'primary', // Usa o tipo 'primary' (azul) para uma ação padrão
+      'Confirmar Alteração',
+      `Deseja mesmo alterar o papel de ${usuario.nome} para "${novoPapel.replace('ROLE_', '')}"?`
+    );
   }
 
   confirmarAlteracaoStatus() {
