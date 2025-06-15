@@ -59,16 +59,18 @@ O frontend precisa saber onde o backend está rodando. Por padrão, ele busca `h
 Se o seu backend estiver em outra URL ou porta, edite o arquivo de ambiente:
 
 - Abra:  
-  `src/environments/environment.ts`  
-  (e `environment.prod.ts` para produção, se for o caso)
-
-- Ajuste a `apiUrl` para o endereço correto do seu backend. Exemplo:
+  `ifclass-frontend/proxy.conf.json`
+  
+- Ajuste o `target` para o endereço correto do seu backend. Exemplo:
 
 ```ts
-export const environment = {
-  production: false,
-  apiUrl: 'http://localhost:8080/api' // Ou a URL do seu backend
-};
+{
+  "/api": {
+    "target": "http://192.168.18.6:8080", //ou a url do seu backend
+    "secure": false,
+    "changeOrigin": true
+  }
+}
 ```
 
 ### 4️⃣ Rodar o Aplicativo
