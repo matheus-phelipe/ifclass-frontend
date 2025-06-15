@@ -1,59 +1,105 @@
-# IfclassFrontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.0.2.
+# 📚 IFClass Frontend: Interface do Usuário
 
-## Development server
+## 📖 Sobre o Projeto
 
-To start a local development server, run:
+O **IFClass Frontend** é a interface do usuário do sistema IFClass, responsável por todas as interações visuais e lógicas do lado do cliente. Ele se conecta ao backend para gerenciar dados e proporcionar uma experiência intuitiva e eficiente para os usuários do sistema de gestão de campus.
 
-```bash
-ng serve
-```
+### 🔑 Principais Módulos
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- **Dashboard Interativo:** Página inicial com informações personalizadas, como *Próxima Aula* e *Avisos da Coordenação*.
+- **Gerenciamento de Salas:** Interface para criar, editar e excluir blocos e salas, com **planta baixa interativa** que permite posicionamento visual e redimensionamento, com funcionalidades de pan e zoom.
+- **Gerenciamento de Usuários:** Tela completa para administrar usuários, incluindo busca, adição, remoção e gestão de permissões.
+- **Design Coeso:** Tema visual moderno e consistente em todas as telas para garantir ótima usabilidade e estética.
 
-## Code scaffolding
+## 🛠️ Tecnologias Utilizadas
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+- **Angular CLI:** v17.x (ou a versão que você usa)
+- **Angular:** Framework para construção de Single Page Applications (SPAs).
+- **TypeScript:** Superconjunto tipado de JavaScript.
+- **HTML5 / CSS3 (SCSS):** Estrutura e estilização.
+- **Bootstrap 5:** Framework CSS para desenvolvimento responsivo.
+- **ngx-panzoom:** Biblioteca Angular para funcionalidades de pan e zoom em SVG (planta baixa).
+- **Angular HttpClient:** Módulo para comunicação com a API do backend.
 
-```bash
-ng generate component component-name
-```
+## ✅ Pré-requisitos
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Para rodar o frontend localmente, você precisará de:
 
-```bash
-ng generate --help
-```
+- **Node.js** (versão 18.x ou superior)
+- **npm** (já incluso no Node.js)
+- Um editor de código (ex: VS Code)
+- (Opcional) **Git** para clonar o repositório
 
-## Building
+## 🚀 Configuração e Execução
 
-To build the project run:
+Siga os passos abaixo para executar o IFClass Frontend localmente:
 
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+### 1️⃣ Clonar o Repositório
 
 ```bash
-ng test
+git clone <URL_DO_SEU_REPOSITORIO_GIT>
+cd ifclass/frontend
 ```
 
-## Running end-to-end tests
+**Importante:** Certifique-se de estar no diretório `ifclass/frontend`.
 
-For end-to-end (e2e) testing, run:
+### 2️⃣ Instalar Dependências
+
+Dentro do diretório `frontend`, instale todas as dependências do Node.js:
 
 ```bash
-ng e2e
+npm install
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+### 3️⃣ Configurar Conexão com o Backend
 
-## Additional Resources
+O frontend precisa saber onde o backend está rodando. Por padrão, ele busca `http://localhost:8080`.
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Se o seu backend estiver em outra URL ou porta, edite o arquivo de ambiente:
+
+- Abra:  
+  `src/environments/environment.ts`  
+  (e `environment.prod.ts` para produção, se for o caso)
+
+- Ajuste a `apiUrl` para o endereço correto do seu backend. Exemplo:
+
+```ts
+export const environment = {
+  production: false,
+  apiUrl: 'http://localhost:8080/api' // Ou a URL do seu backend
+};
+```
+
+### 4️⃣ Rodar o Aplicativo
+
+Após instalar as dependências e configurar a URL da API, inicie o servidor de desenvolvimento do Angular:
+
+```bash
+ng serve --open
+```
+
+Este comando irá:
+
+- Compilar o projeto.
+- Iniciar um servidor em `http://localhost:4200`.
+- Abrir automaticamente o aplicativo no navegador.
+- Recarregar automaticamente ao salvar alterações.
+
+## 🏗️ Build para Produção
+
+Para gerar uma versão otimizada para implantação em ambiente de produção:
+
+```bash
+ng build --configuration production
+```
+
+Os arquivos estáticos serão criados na pasta `dist/frontend/`  
+(ou `dist/<nome_do_seu_projeto_angular>`).
+
+## ⚖️ Licença
+
+Este projeto frontend está sob a licença **[MIT License / Apache 2.0 / Sua Licença Aqui]**.
+
+> ✨ **Contribuições são bem-vindas!**  
+> Para reportar bugs ou sugerir melhorias, abra uma *issue* ou envie um *pull request*.
