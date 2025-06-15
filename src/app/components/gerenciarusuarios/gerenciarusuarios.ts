@@ -1,11 +1,10 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, OnInit } from '@angular/core';
 import { Usuario } from '../../model/usuario/usuario.model';
 import { UsuarioService } from '../../service/usuario/usuario.service';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../service/auth/auth.service';
 import { FormsModule } from '@angular/forms';
-import { ModalComponent } from '../../shared/modal/modal';
 import { AlertComponent } from '../../shared/alert/alert';
 import { ModalConfirmacaoComponent } from '../../shared/modal-confirmacao/modal-confirmacao';
 
@@ -13,24 +12,30 @@ declare var bootstrap: any;
 
 @Component({
   selector: 'app-gerenciarusuarios',
-  imports: [CommonModule, RouterModule, FormsModule, ModalComponent, AlertComponent, ModalConfirmacaoComponent],
+  standalone: true,
+  imports: [CommonModule, RouterModule, FormsModule, AlertComponent, ModalConfirmacaoComponent],
   templateUrl: './gerenciarusuarios.html',
-  styleUrl: './gerenciarusuarios.css'
+  styleUrls: ['./gerenciarusuarios.css']
 })
-export class Gerenciarusuarios {
+export class Gerenciarusuarios implements OnInit {
+  
+  // Listas para a tabela e filtragem
   usuarios: Usuario[] = [];
-  sidebarOpen = true;
-  usuarioSelecionado: Usuario = {} as Usuario; 
-  editarUsuarioModal: any; 
-  mensagemModalConfirmacao = '';
+  usuariosFiltrados: Usuario[] = [];
+  termoBusca = '';
+
+  // Propriedades para o painel de detalhes e modais
+  usuarioSelecionado: Usuario | null = null;
+  usuarioParaEditar: Usuario = {} as Usuario;
   usuarioParaRemover!: Usuario;
-  mensagemDoModal: string = 'Texto inicial';
   usuarioParaAlterarStatus!: Usuario | null;
-  novaPermissao: string = '';
+  novaPermissao = '';
+  mensagemModalConfirmacao = '';
+  
+  editarUsuarioModal: any; 
 
   @ViewChild('modalConfirm') modalConfirm!: ModalConfirmacaoComponent;
   @ViewChild('modalConfirmPermissao') modalConfirmPermissao!: ModalConfirmacaoComponent;
-  @ViewChild('meuModal') modal!: ModalComponent;
   @ViewChild('alerta') alerta!: AlertComponent;
 
   constructor(
@@ -41,110 +46,118 @@ export class Gerenciarusuarios {
 
   ngOnInit(): void {
     this.carregarUsuarios();
-
+    // Inicializa o modal de edição do Bootstrap
     const modalElement = document.getElementById('editarUsuarioModal');
-    this.editarUsuarioModal = new bootstrap.Modal(modalElement);
+    if (modalElement) {
+      this.editarUsuarioModal = new bootstrap.Modal(modalElement);
+    }
   }
-
-  get isAdmin() { return this.authService.hasRole('ROLE_ADMIN'); }
-  get isCoordenador() { return this.authService.hasRole('ROLE_COORDENADOR'); }
-  get isProfessor() { return this.authService.hasRole('ROLE_PROFESSOR'); }
-  get isAluno() { return this.authService.hasRole('ROLE_ALUNO'); }
 
   carregarUsuarios() {
     this.usuarioService.listarTodos().subscribe({
       next: (data) => {
-        this.usuarios = data.map(u => ({
-          ...u,
-          authority: u.authorities ?? '' // garante string
-        }));
+        this.usuarios = data;
+        this.usuariosFiltrados = data;
+        // Seleciona o primeiro usuário por padrão
+        if (this.usuariosFiltrados.length > 0) {
+          this.selecionarUsuario(this.usuariosFiltrados[0]);
+        }
       },
-      error: () => this.abrirModal("Erro ao carregar usuários.")
+      error: () => this.mostrarAlerta("Erro ao carregar usuários.", 'danger')
     });
   }
-
-  toggleSidebar() {
-    this.sidebarOpen = !this.sidebarOpen;
+  
+  selecionarUsuario(usuario: Usuario): void {
+    this.usuarioSelecionado = usuario;
   }
 
+  filtrarUsuarios(): void {
+    if (!this.termoBusca) {
+      this.usuariosFiltrados = this.usuarios;
+    } else {
+      this.usuariosFiltrados = this.usuarios.filter(usuario =>
+        usuario.nome.toLowerCase().includes(this.termoBusca.toLowerCase()) ||
+        usuario.email.toLowerCase().includes(this.termoBusca.toLowerCase())
+      );
+    }
+    // Lógica para manter a seleção ou selecionar o primeiro item da nova lista
+    if (this.usuarioSelecionado && !this.usuariosFiltrados.find(u => u.id === this.usuarioSelecionado?.id)) {
+        this.usuarioSelecionado = this.usuariosFiltrados.length > 0 ? this.usuariosFiltrados[0] : null;
+    } else if (!this.usuarioSelecionado && this.usuariosFiltrados.length > 0) {
+        this.usuarioSelecionado = this.usuariosFiltrados[0];
+    }
+  }
+  
   onRoleChange(usuario: Usuario, novoPapel: string) {
+    if (this.temPapel(usuario, novoPapel)) return;
     this.usuarioParaAlterarStatus = usuario;
     this.novaPermissao = novoPapel;
-    this.mensagemModalConfirmacao = `Confirmar alteração do status para "${novoPapel}" do usuário ${usuario.nome}?`;
+    this.mensagemModalConfirmacao = `Confirmar alteração do papel para "${novoPapel.replace('ROLE_', '')}" do usuário ${usuario.nome}?`;
     this.modalConfirmPermissao.open();
   }
 
   confirmarAlteracaoStatus() {
     if (!this.usuarioParaAlterarStatus) return;
-
     this.usuarioService.atualizarAuthorities(this.usuarioParaAlterarStatus.id, this.novaPermissao).subscribe({
-    next: () => {
-      this.mostrarAlerta('Permissão atualizada com sucesso!');
-    },
-      error: () => this.abrirModal('Erro ao atualizar a permissão')
+      next: () => {
+        const index = this.usuarios.findIndex(u => u.id === this.usuarioParaAlterarStatus?.id);
+        if (index !== -1) {
+          this.usuarios[index].authorities = this.novaPermissao;
+          this.filtrarUsuarios();
+        }
+        this.mostrarAlerta('Permissão atualizada com sucesso!');
+        this.modalConfirmPermissao.close();
+      },
+      error: () => this.mostrarAlerta('Erro ao atualizar a permissão', 'danger')
     });
-
-    this.modalConfirmPermissao.close();
-    this.usuarioParaAlterarStatus = null;
-    this.novaPermissao = '';
   }
-
+  
   cancelarAlteracaoStatus() {
     this.modalConfirmPermissao.close();
-    this.usuarioParaAlterarStatus = null;
-    this.novaPermissao = '';
-  }
-
-  temPapel(usuario: Usuario, papel: string): boolean {
-    return usuario.authorities === papel;
   }
 
   abrirModalEditar(usuario: Usuario) {
-    this.usuarioSelecionado = { ...usuario };
-    this.editarUsuarioModal.hide();
-    setTimeout(() => this.editarUsuarioModal.show(), 50);
+    this.usuarioParaEditar = { ...usuario };
+    this.editarUsuarioModal.show();
   }
 
   salvarEdicao() {
-    this.usuarioService.atualizarUsuario(this.usuarioSelecionado).subscribe(() => {
-      this.carregarUsuarios();
-      this.editarUsuarioModal.hide();
-      this.mostrarAlerta('Usuário atualizado com sucesso!');
-    }, () => {
-      this.mostrarAlerta('Erro ao atualizar usuário.');
+    this.usuarioService.atualizarUsuario(this.usuarioParaEditar).subscribe({
+        next: () => {
+          this.carregarUsuarios();
+          this.editarUsuarioModal.hide();
+          this.mostrarAlerta('Usuário atualizado com sucesso!');
+        },
+        error: () => this.mostrarAlerta('Erro ao atualizar usuário.', 'danger')
     });
   }
 
   removerUsuario(usuario: Usuario) {
     this.usuarioParaRemover = usuario;
-    this.mensagemModalConfirmacao = `Tem certeza que deseja remover o usuário ${usuario.nome}?`;
+    this.mensagemModalConfirmacao = `Tem certeza que deseja remover o usuário ${usuario.nome}? Essa ação não pode ser desfeita.`;
     this.modalConfirm.open();
   }
 
   confirmarRemocao() {
-    this.usuarioService.remover(this.usuarioParaRemover.id).subscribe(() => {
-      this.carregarUsuarios();
-      this.mostrarAlerta('Removido com sucesso!');
-    }, () => {
-      this.mostrarAlerta('Erro ao remover usuário.');
+    this.usuarioService.remover(this.usuarioParaRemover.id).subscribe({
+        next: () => {
+          this.carregarUsuarios();
+          this.mostrarAlerta('Usuário removido com sucesso!');
+          this.modalConfirm.close();
+        },
+        error: () => this.mostrarAlerta('Erro ao remover usuário.', 'danger')
     });
-  }
-
-  abrirModal(mensagem: string) {
-    this.mensagemDoModal = mensagem;
-    this.modal.open();
   }
   
   cancelarRemocao() {
     this.modalConfirm.close();
   }
 
-  mostrarAlerta(mensagem: string) {
-    this.alerta.show(mensagem, 3000); 
+  temPapel(usuario: Usuario, papel: string): boolean {
+    return usuario.authorities === papel;
   }
 
-  logout() {
-    this.authService.logout();
-    this.router.navigate(['/login']);
+  mostrarAlerta(mensagem: string, tipo: 'success' | 'danger' = 'success') {
+    this.alerta.show(mensagem, 3000, tipo); 
   }
 }

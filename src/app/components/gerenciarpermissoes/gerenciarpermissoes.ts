@@ -1,7 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Usuario } from '../../model/usuario/usuario.model';
-import { Router, RouterModule } from '@angular/router';
-import { AuthService } from '../../service/auth/auth.service';
 import { UsuarioService } from '../../service/usuario/usuario.service';
 import { CommonModule } from '@angular/common';
 import { ModalConfirmacaoComponent } from '../../shared/modal-confirmacao/modal-confirmacao';
@@ -11,7 +9,7 @@ import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-gerenciarpermissoes',
   standalone: true,
-  // **CORREÇÃO APLICADA AQUI**: Adicionado o FormsModule aos imports do componente.
+  // Adicionado o FormsModule aos imports do componente.
   imports: [CommonModule, FormsModule, AlertComponent, ModalConfirmacaoComponent],
   templateUrl: './gerenciarpermissoes.html',
   styleUrls: ['./gerenciarpermissoes.css']

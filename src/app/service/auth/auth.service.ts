@@ -27,7 +27,7 @@ export class AuthService {
     localStorage.removeItem('token');
   }
 
-  // NOVO MÉTODO: Pega o nome do usuário de dentro do token JWT.
+  // Pega o nome do usuário de dentro do token JWT.
   // A lógica é a mesma de getRoles(), mas pegamos um campo diferente.
   getNomeUsuario(): string | null {
     const token = this.getToken();
