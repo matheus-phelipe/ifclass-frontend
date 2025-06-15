@@ -14,7 +14,7 @@ O **IFClass Frontend** é a interface do usuário do sistema IFClass, responsáv
 
 ## 🛠️ Tecnologias Utilizadas
 
-- **Angular CLI:** v17.x (ou a versão que você usa)
+- **Angular CLI:** v17.x 
 - **Angular:** Framework para construção de Single Page Applications (SPAs).
 - **TypeScript:** Superconjunto tipado de JavaScript.
 - **HTML5 / CSS3 (SCSS):** Estrutura e estilização.
@@ -38,7 +38,7 @@ Siga os passos abaixo para executar o IFClass Frontend localmente:
 ### 1️⃣ Clonar o Repositório
 
 ```bash
-git clone <URL_DO_SEU_REPOSITORIO_GIT>
+git clone https://github.com/matheus-phelipe/ifclass-frontend.git
 cd ifclass/frontend
 ```
 
