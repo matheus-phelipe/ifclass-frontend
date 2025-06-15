@@ -1,0 +1,107 @@
+<div class="container-fluid">
+  <!-- Cabeçalho -->
+  <div class="page-header">
+    <h2 class="page-title">Gerenciar Cursos</h2>
+    <div class="search-container">
+      <i class="bi bi-search search-icon"></i>
+      <input 
+        type="text" 
+        class="form-control search-input" 
+        placeholder="Buscar por nome..."
+        [(ngModel)]="termoBusca"
+        (input)="filtrarCursos()">
+    </div>
+  </div>
+
+  <!-- Layout de 2 Colunas -->
+  <div class="row g-4">
+    <!-- Coluna da Tabela -->
+    <div class="col-lg-7">
+      <div class="table-container">
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead>
+              <tr>
+                <th>Curso</th>
+                <th class="text-center">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let curso of cursosFiltrados" 
+                  (click)="selecionarCurso(curso)"
+                  [class.selected-row]="curso.id === cursoSelecionado?.id">
+                <td>
+                  <div class="user-info">
+                    <div class="user-avatar">{{ curso.nome.charAt(0) }}</div>
+                    <div>
+                      <div class="user-name">{{ curso.nome }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="text-center">
+                   <div class="actions-container" (click)="$event.stopPropagation()">
+                      <button class="btn action-btn btn-edit" title="Editar Usuário" (click)="abrirModalEditar(curso)">
+                        <i class="bi bi-pencil-fill"></i>
+                      </button>
+                      <button class="btn action-btn btn-delete" title="Remover Usuário" (click)="removercurso(curso)">
+                        <i class="bi bi-trash3-fill"></i>
+                      </button>
+                   </div>
+                </td>
+              </tr>
+              <tr *ngIf="cursosFiltrados.length === 0">
+                <td colspan="3" class="text-center text-muted p-5">Nenhum curso encontrado.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Coluna do Painel de Detalhes -->
+    <div class="col-lg-5">
+      <div class="details-panel" *ngIf="cursoSelecionado">
+        <div class="details-header">
+          <div class="details-avatar">{{ cursoSelecionado.nome.charAt(0) }}</div>
+          <h4 class="details-name">{{ cursoSelecionado.nome }}</h4>
+        </div>
+      </div>
+      <div class="details-panel placeholder-panel" *ngIf="!cursoSelecionado">
+         <i class="bi bi-people-fill placeholder-icon"></i>
+         <p class="text-muted">Selecione um curso para ver os detalhes</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Edição (Bootstrap) -->
+<div class="modal fade" id="editarCursoModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-pencil-square me-2"></i>
+          Editar Curso
+        </h5>
+        <button type="button" class="btn-close" (click)="editarCursoModal.hide()" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body">
+        <form #editarCursoForm="ngForm" class="d-flex flex-column gap-3">
+          <div>
+            <label for="nome" class="form-label">Nome</label>
+            <input type="text" id="nome" class="form-control" [(ngModel)]="cursoParaEditar.nome" name="nome">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="editarCursoModal.hide()">Cancelar</button>
+        <button type="button" class="btn btn-success" (click)="salvarEdicao()">Salvar Alterações</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Seus componentes customizados -->
+<app-alert #alerta></app-alert>
+<app-modal-confirmacao #modalConfirm (confirmed)="confirmarRemocao()" (canceled)="cancelarRemocao()"></app-modal-confirmacao>

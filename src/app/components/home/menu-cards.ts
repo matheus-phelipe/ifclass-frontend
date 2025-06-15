@@ -22,6 +22,13 @@ export const ALL_MENU_CARDS: MenuCard[] = [
     roles: ['ROLE_ALUNO', 'ROLE_PROFESSOR', 'ROLE_COORDENADOR', 'ROLE_ADMIN']
   },
   {
+    icon: 'bi bi-door-open-fill',
+    title: 'Cursos',
+    text: 'Informações sobre seu curso atual.',
+    link: '/cursos',
+    roles: ['ROLE_ALUNO', 'ROLE_PROFESSOR', 'ROLE_COORDENADOR', 'ROLE_ADMIN']
+  },
+  {
     icon: 'bi bi-people-fill',
     title: 'Turma',
     text: 'Informações sobre sua turma atual.',
