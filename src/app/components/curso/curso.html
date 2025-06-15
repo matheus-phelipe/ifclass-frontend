@@ -13,6 +13,24 @@
     </div>
   </div>
 
+  <!-- PAINEL DO ADMINISTRADOR -->
+    <section *ngIf="isAdmin" class="card card-body mb-5 shadow-sm border-0 rounded-4">
+      <h2 class="h4 border-bottom pb-3 mb-4 text-success">Painel de Controle</h2>
+      <div class="row g-4">
+        <!-- Formulário de Curso -->
+        <div class="col-lg-5">
+            <form #cursoForm="ngForm" (ngSubmit)="criarCurso()">
+              <h3 class="h5">Criar Novo Curso</h3>
+              <div class="mb-3">
+                  <label for="cursoNome" class="form-label">Nome do Curso</label>
+                  <input type="text" id="cursoNome" class="form-control" [(ngModel)]="novoCursoNome" name="novoCursoNome" placeholder="Ex: Curso ADS" required>
+              </div>
+              <button type="submit" class="btn btn-success w-100" [disabled]="cursoForm.invalid">Adicionar Curso</button>
+            </form>
+        </div>
+      </div>
+    </section>
+ 
   <!-- Layout de 2 Colunas -->
   <div class="row g-4">
     <!-- Coluna da Tabela -->
@@ -23,7 +41,7 @@
             <thead>
               <tr>
                 <th>Curso</th>
-                <th class="text-center">Ações</th>
+                <th  *ngIf="isAdmin" class="text-center">Ações</th>
               </tr>
             </thead>
             <tbody>
@@ -38,7 +56,7 @@
                     </div>
                   </div>
                 </td>
-                <td class="text-center">
+                <td  *ngIf="isAdmin" class="text-center">
                    <div class="actions-container" (click)="$event.stopPropagation()">
                       <button class="btn action-btn btn-edit" title="Editar Usuário" (click)="abrirModalEditar(curso)">
                         <i class="bi bi-pencil-fill"></i>
@@ -100,7 +118,6 @@
     </div>
   </div>
 </div>
-
 
 <!-- Seus componentes customizados -->
 <app-alert #alerta></app-alert>

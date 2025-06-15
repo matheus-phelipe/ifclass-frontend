@@ -30,6 +30,10 @@ cursos: Cursos[] = [];
   mensagemModalConfirmacao = '';
   
   editarCursoModal: any; 
+  novoCursoNome = '';
+  public activeCursoId: number | null = null;
+  error: string | null = null;
+  isAdmin = false;
 
   @ViewChild('modalConfirm') modalConfirm!: ModalConfirmacaoComponent;
   @ViewChild('modalConfirmPermissao') modalConfirmPermissao!: ModalConfirmacaoComponent;
@@ -44,6 +48,7 @@ cursos: Cursos[] = [];
   ngOnInit(): void {
     this.carregarCursos();
     const modalElement = document.getElementById('editarCursoModal');
+    this.checkUserRole();
     if (modalElement) {
       this.editarCursoModal = new bootstrap.Modal(modalElement);
     }
@@ -116,9 +121,25 @@ cursos: Cursos[] = [];
         error: () => this.mostrarAlerta('Erro ao remover curso.', 'danger')
     });
   }
+
+  criarCurso(): void {
+    if (!this.novoCursoNome.trim()) return;
+    this.cursoService.cadastrar(this.novoCursoNome).subscribe({
+      next: (novoCurso) => {
+        this.novoCursoNome = '';
+        this.carregarCursos();
+        this.activeCursoId = novoCurso.id;
+      },
+      error: () => { this.error = 'Falha ao criar curso.'; }
+    });
+  }
   
   cancelarRemocao() {
     this.modalConfirm.close();
+  }
+
+  private checkUserRole(): void {
+    this.isAdmin = this.authService.hasRole('ROLE_ADMIN');
   }
 
   mostrarAlerta(mensagem: string, tipo: 'success' | 'danger' = 'success') {

@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Cursos } from '../../model/curso/curso.model';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -11,8 +12,9 @@ export class CursoService {
   constructor(private http: HttpClient) {}
 
    // Cadastrar novo curso
-  cadastrar(curso: any) {
-    return this.http.post(this.apiUrl, curso);
+  cadastrar(nome: string): Observable<Cursos> {
+      const novoCurso = { nome };
+      return this.http.post<Cursos>(this.apiUrl, novoCurso);
   }
 
   // Listar todos os cursos
