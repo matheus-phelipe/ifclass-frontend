@@ -1,9 +1,9 @@
+/* Estilos do Accordion (mantidos) */
 .accordion-item {
   border: none;
-  border-radius: var(--raio-borda, 0.75rem); /* Usa a variável global com um fallback */
+  border-radius: var(--raio-borda, 0.75rem);
   margin-bottom: 1rem;
-  overflow: hidden; 
-  /* A sombra e transição vêm da classe global .card, que o .accordion-item do Bootstrap herda indiretamente ou se comporta de forma similar */
+  overflow: hidden;
 }
 
 .accordion-button {
@@ -14,7 +14,7 @@
 
 .accordion-button:not(.collapsed) {
   color: #fff;
-  background-color: var(--cor-primaria, #198754); /* Usando a variável global */
+  background-color: var(--cor-primaria, #198754);
   box-shadow: none;
 }
 
@@ -35,59 +35,135 @@
   padding: 1.5rem;
 }
 
-/* Estilos do Mapa do Bloco */
-.bloco-mapa {
-  display: grid;
-  grid-template-columns: 1fr 50px 1fr;
-  gap: 1.25rem;
-  padding: 1.5rem;
-  background-color: #f1f3f5;
-  border: 1px solid #dee2e6;
-  border-radius: .5rem;
-}
+/* NOVOS ESTILOS PARA A PLANTA BAIXA */
 
-/* Estilo para cada Sala no mapa */
-.sala-mapa-item {
-  background-color: white;
-  border: 1px solid #ced4da;
-  border-radius: .5rem;
-  padding: 1rem;
-  min-height: 90px;
+.floorplan-wrapper {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  transition: all 0.2s ease-in-out;
+  gap: 1rem;
+}
+
+.selected-sala-info {
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 0;
+}
+
+.floorplan-container {
+  width: 100%;
+  height: 600px;
+  border: 1px solid #dee2e6;
+  border-radius: .5rem;
+  overflow: hidden;
+  background-color: #f1f3f5;
+  background-image:
+    linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px),
+    linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+  cursor: grab;
+}
+
+.floorplan-container:active {
+    cursor: grabbing;
+}
+
+.floorplan-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.sala-group {
   cursor: pointer;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
 }
 
-.sala-mapa-item:hover {
-  border-color: var(--cor-primaria, #198754); /* Usando a variável global */
-  box-shadow: 0 4px 12px rgba(25, 135, 84, 0.15);
-  transform: translateY(-3px);
+.sala-rect {
+  fill: #ffffff;
+  stroke: #adb5bd;
+  stroke-width: 2px;
+  rx: 4; /* Borda levemente arredondada */
+  ry: 4;
+  transition: all 0.2s ease-in-out;
 }
 
-.sala-mapa-item .btn-close {
-  opacity: 0;
-  transition: opacity 0.2s ease-in-out;
+.sala-group:hover .sala-rect {
+  fill: #e9ecef;
+  transform: scale(1.02);
+  transform-origin: center center;
 }
 
-.sala-mapa-item:hover .btn-close {
-  opacity: 1;
+.sala-rect.selected {
+  fill: #d1e7dd; /* Cor verde clara do Bootstrap (alert-success) */
+  stroke: var(--cor-primaria, #198754);
+  stroke-width: 3px;
 }
 
-/* Estilo para o Corredor */
-.corredor-mapa-item {
-  grid-column: 2 / span 1;
-  grid-row: 1 / -1; 
-  background-color: #e9ecef;
-  background-image: 
-    linear-gradient(45deg, #f1f3f5 25%, transparent 25%), 
-    linear-gradient(-45deg, #f1f3f5 25%, transparent 25%), 
-    linear-gradient(45deg, transparent 75%, #f1f3f5 75%), 
-    linear-gradient(-45deg, transparent 75%, #f1f3f5 75%);
-  background-size: 10px 10px;
-  border-radius: .25rem;
+.sala-text {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  pointer-events: none; /* Impede que o texto intercepte cliques */
+  fill: #212529;
+  font-size: 14px;
+}
+
+.sala-codigo {
+  font-weight: 600;
+}
+
+.sala-capacidade {
+  font-size: 12px;
+  fill: #6c757d;
+}
+
+.sala-group {
+  cursor: move; /* Muda o cursor para indicar que é móvel */
+}
+
+/* NOVO: Estilo para a sala sendo arrastada */
+.sala-group.dragging {
+    opacity: 0.7;
+    cursor: grabbing;
+}
+
+.sala-rect {
+  fill: #ffffff;
+  stroke: #adb5bd;
+  stroke-width: 2px;
+  rx: 4;
+  ry: 4;
+  transition: all 0.2s ease-in-out;
+}
+
+.sala-group:hover .sala-rect:not(.editing) {
+  fill: #e9ecef;
+  transform: scale(1.02);
+  transform-origin: center center;
+}
+
+.sala-rect.editing {
+  fill: #d1e7dd; /* Verde claro */
+  stroke: var(--cor-primaria, #198754);
+  stroke-width: 4px; /* Borda mais grossa para destaque */
+  stroke-dasharray: 8 4; /* Linha tracejada para indicar edição */
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { stroke-opacity: 1; }
+  50% { stroke-opacity: 0.6; }
+  100% { stroke-opacity: 1; }
+}
+
+.floorplan-container.is-dragging {
+  user-select: none;
+  cursor: grabbing;
+}
+
+.sala-group {
+  cursor: grab; /* Melhor cursor para indicar que é móvel */
+}
+
+/* Estilo para a sala sendo arrastada */
+.sala-group.dragging {
+    opacity: 0.7;
+    cursor: grabbing;
 }

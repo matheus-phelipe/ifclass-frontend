@@ -13,7 +13,8 @@
     <section *ngIf="isAdmin" class="card card-body mb-5 shadow-sm border-0 rounded-4">
       <h2 class="h4 border-bottom pb-3 mb-4 text-success">Painel de Controle</h2>
       <div class="row g-4">
-        <div class="col-md-6">
+        <!-- Formulário de Bloco -->
+        <div class="col-lg-5">
             <form #blocoForm="ngForm" (ngSubmit)="handleCreateBloco()">
               <h3 class="h5">Criar Novo Bloco</h3>
               <div class="mb-3">
@@ -23,27 +24,50 @@
               <button type="submit" class="btn btn-success w-100" [disabled]="blocoForm.invalid">Adicionar Bloco</button>
             </form>
         </div>
-        <div class="col-md-6">
-            <form #salaForm="ngForm" (ngSubmit)="handleCreateSala()">
-              <h3 class="h5">Adicionar Sala</h3>
+        
+        <!-- Formulário de Sala (dinâmico) -->
+        <div class="col-lg-7">
+            <form #salaForm="ngForm" (ngSubmit)="handleSubmitSala()">
+              <h3 class="h5">{{ editingSala ? 'Editar Sala' : 'Adicionar Nova Sala' }}</h3>
+              
               <div class="mb-3">
-                  <label for="blockSelect" class="form-label">Selecione o Bloco</label>
-                  <select id="blockSelect" class="form-select" [(ngModel)]="blocoSelecionadoId" name="blocoSelecionadoId" [disabled]="blocos.length === 0" required>
+                  <label for="blockSelect" class="form-label">Bloco</label>
+                  <select id="blockSelect" class="form-select" [(ngModel)]="blocoSelecionadoId" name="blocoSelecionadoId" [disabled]="blocos.length === 0 || !!editingSala" required>
                     <option *ngIf="blocos.length === 0" [ngValue]="null">Crie um bloco primeiro</option>
                     <option *ngFor="let bloco of blocos" [value]="bloco.id">{{ bloco.nome }}</option>
                   </select>
               </div>
-              <div class="row g-2">
+              
+              <div class="row g-2 mb-3">
                 <div class="col-sm-8">
                     <label for="roomCode" class="form-label">Código da Sala</label>
-                    <input type="text" id="roomCode" class="form-control" [(ngModel)]="novaSalaCodigo" name="novaSalaCodigo" placeholder="Ex: S-203" required>
+                    <input type="text" id="roomCode" class="form-control" [(ngModel)]="formSala.codigo" name="salaCodigo" required>
                 </div>
                 <div class="col-sm-4">
                     <label for="roomCapacity" class="form-label">Capacidade</label>
-                    <input type="number" id="roomCapacity" class="form-control" [(ngModel)]="novaSalaCapacidade" name="novaSalaCapacidade" placeholder="Ex: 40" required>
+                    <input type="number" id="roomCapacity" class="form-control" [(ngModel)]="formSala.capacidade" name="salaCapacidade" required>
                 </div>
               </div>
-              <button type="submit" class="btn btn-primary w-100 mt-3" [disabled]="salaForm.invalid">Adicionar Sala</button>
+
+              <h4 class="h6 mt-3 text-muted">Posicionamento e Dimensões</h4>
+              <div class="row g-2">
+                <div class="col-6 col-sm-3"><label for="roomPosX" class="form-label">Pos. X</label><input type="number" id="roomPosX" class="form-control" [(ngModel)]="formSala.posX" name="salaPosX" required></div>
+                <div class="col-6 col-sm-3"><label for="roomPosY" class="form-label">Pos. Y</label><input type="number" id="roomPosY" class="form-control" [(ngModel)]="formSala.posY" name="salaPosY" required></div>
+                <div class="col-6 col-sm-3"><label for="roomWidth" class="form-label">Largura</label><input type="number" id="roomWidth" class="form-control" [(ngModel)]="formSala.largura" name="salaLargura" required></div>
+                <div class="col-6 col-sm-3"><label for="roomHeight" class="form-label">Altura</label><input type="number" id="roomHeight" class="form-control" [(ngModel)]="formSala.altura" name="salaAltura" required></div>
+              </div>
+
+              <div class="d-flex flex-wrap gap-2 mt-3">
+                <button type="submit" class="btn btn-primary flex-grow-1" [disabled]="salaForm.invalid">
+                  {{ editingSala ? 'Atualizar Sala' : 'Adicionar Sala' }}
+                </button>
+                <button *ngIf="editingSala" type="button" class="btn btn-warning" (click)="resetPosition()" title="Resetar Posição">
+                  <i class="bi bi-arrow-counterclockwise"></i>
+                </button>
+                <button *ngIf="editingSala" type="button" class="btn btn-secondary" (click)="cancelarEdicao()">
+                  Cancelar
+                </button>
+              </div>
             </form>
         </div>
       </div>
@@ -51,56 +75,58 @@
 
     <!-- EXIBIÇÃO DA PLANTA -->
     <main>
-        <div *ngIf="isLoading" class="text-center p-5">
-            <div class="spinner-border text-success" style="width: 3rem; height: 3rem;" role="status"><span class="visually-hidden">Carregando...</span></div>
-        </div>
+      <div class="accordion" id="blocosAccordion">
+        <div *ngFor="let bloco of blocos" class="accordion-item shadow-sm">
+          <h2 class="accordion-header" [id]="'heading' + bloco.id">
+              <button class="accordion-button" type="button" [class.collapsed]="activeBlocoId !== bloco.id" (click)="toggleBloco(bloco.id!)">
+                  {{ bloco.nome }}
+              </button>
+          </h2>
+          <div [id]="'collapse' + bloco.id" class="accordion-collapse collapse" [class.show]="activeBlocoId === bloco.id">
+            <div class="accordion-body">
+              <div *ngIf="bloco.salas && bloco.salas.length > 0; else noRooms" class="floorplan-wrapper">
+                
+                <div class="alert alert-light text-center p-2 d-none d-md-block">
+                  <small><b>Dica:</b> Clique e arraste as salas para posicioná-las. Use o scroll do mouse para dar zoom.</small>
+                </div>
 
-        <div *ngIf="!isLoading && !error && blocos.length === 0" class="text-center card card-body p-5 rounded-4 border-dashed">
-            <h3 class="h5">Nenhum bloco encontrado.</h3>
-            <p class="text-muted" *ngIf="isAdmin">Use o painel de controle acima para começar a construir a planta.</p>
-            <p class="text-muted" *ngIf="!isAdmin">A planta do campus ainda não foi configurada.</p>
-        </div>
-        
-        <div class="accordion" id="blocosAccordion">
-            <div *ngFor="let bloco of blocos" class="accordion-item shadow-sm">
-                <h2 class="accordion-header" [id]="'heading' + bloco.id">
-                    <button class="accordion-button" type="button" [class.collapsed]="activeBlocoId !== bloco.id" (click)="toggleBloco(bloco.id)">
-                        {{ bloco.nome }}
-                    </button>
-                </h2>
-                <div [id]="'collapse' + bloco.id" class="accordion-collapse collapse" [class.show]="activeBlocoId === bloco.id">
-                    <div class="accordion-body">
+                <div *ngIf="editingSala" class="selected-sala-info alert alert-success">
+                  <strong>Editando Sala:</strong> {{ editingSala.codigo }}
+                  <button class="btn btn-sm btn-outline-danger float-end" (click)="handleDeleteSala(bloco.id!, editingSala.id!)">
+                      Excluir
+                  </button>
+                </div>
+                
+                <div class="floorplan-container" [class.is-dragging]="isDragging">
+                  <ngx-pan-zoom>
+                    <svg class="floorplan-svg" viewBox="0 0 1600 900">
+                      <g 
+                        *ngFor="let sala of bloco.salas" 
+                        (mousedown)="onMouseDown($event, sala)"
+                        class="sala-group"
+                        [class.dragging]="draggingSala?.id === sala.id">
                         
-                        <!-- ATUALIZADO: Layout de Mapa com CSS Grid e número de linhas dinâmico -->
-                        <div *ngIf="bloco.salasComLayout && bloco.salasComLayout.length > 0; else noRooms" 
-                             class="bloco-mapa" 
-                             [style.grid-template-rows]="bloco.gridRows">
-                            
-                            <div class="corredor-mapa-item"></div>
-                            
-                            <div *ngFor="let sala of bloco.salasComLayout"
-                                 class="sala-mapa-item"
-                                 [style.grid-area]="sala.gridArea">
-                                
-                                <span class="fw-bold d-block">{{ sala.codigo }}</span>
-                                <small class="text-muted">Cap: {{ sala.capacidade }}</small>
-                                
-                                <button *ngIf="isAdmin" (click)="handleDeleteSala(bloco.id, sala.id)" class="btn btn-close btn-sm position-absolute top-0 end-0 m-1" aria-label="Close"></button>
-                            </div>
-                        </div>
-
-                        <ng-template #noRooms>
-                            <p class="text-center text-muted fst-italic p-4">Nenhuma sala adicionada a este bloco.</p>
-                        </ng-template>
-
-                        <div *ngIf="isAdmin" class="mt-4 pt-3 border-top text-end">
-                            <button (click)="handleDeleteBloco(bloco.id)" class="btn btn-sm btn-outline-danger">
-                                Excluir Bloco "{{ bloco.nome }}"
-                            </button>
-                        </div>
-                    </div>
+                        <rect [attr.x]="sala.posX ?? 0" [attr.y]="sala.posY ?? 0" [attr.width]="sala.largura ?? 150" [attr.height]="sala.altura ?? 100" class="sala-rect" [class.editing]="editingSala?.id === sala.id"></rect>
+                        <text [attr.x]="(sala.posX ?? 0) + (sala.largura ?? 150) / 2" [attr.y]="(sala.posY ?? 0) + (sala.altura ?? 100) / 2" class="sala-text">
+                          <tspan class="sala-codigo">{{ sala.codigo }}</tspan>
+                          <tspan [attr.x]="(sala.posX ?? 0) + (sala.largura ?? 150) / 2" dy="1.2em" class="sala-capacidade">Cap: {{ sala.capacidade }}</tspan>
+                        </text>
+                      </g>
+                    </svg>
+                  </ngx-pan-zoom>
+                </div>
+              </div>
+              <ng-template #noRooms>
+                <p class="text-center text-muted fst-italic p-4">Nenhuma sala adicionada a este bloco.</p>
+              </ng-template>
+                <div *ngIf="isAdmin && !editingSala" class="mt-4 pt-3 border-top text-end">
+                    <button (click)="handleDeleteBloco(bloco.id!)" class="btn btn-sm btn-outline-danger">
+                        Excluir Bloco "{{ bloco.nome }}"
+                    </button>
                 </div>
             </div>
+          </div>
         </div>
+      </div>
     </main>
 </div>
