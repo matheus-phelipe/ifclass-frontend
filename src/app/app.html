@@ -1,25 +1,20 @@
-<!-- Se for para mostrar o layout principal, renderiza a sidebar e o conteúdo. -->
 <ng-container *ngIf="showMainLayout">
   <div class="d-flex min-vh-100">
-    
-    <!-- A Sidebar agora vive aqui, no componente principal -->
+
     <app-sidebar
       [isProfessor]="isProfessor"
       [isCoordenador]="isCoordenador"
       [isAdmin]="isAdmin"
       (logoutClicked)="logout()">
     </app-sidebar>
-  
-    <!-- O conteúdo da página da rota ativa (ex: gerenciar-salas) será renderizado aqui -->
-    <div class="flex-grow-1 p-4 bg-light">
+
+    <div class="flex-grow-1 p-4 bg-light d-flex flex-column" style="overflow-y: auto;">
       <router-outlet></router-outlet>
     </div>
 
   </div>
 </ng-container>
 
-<!-- Se NÃO for para mostrar o layout principal (ex: página de login), 
-     renderiza apenas o componente da rota, sem sidebar. -->
 <ng-container *ngIf="!showMainLayout">
   <router-outlet></router-outlet>
 </ng-container>
