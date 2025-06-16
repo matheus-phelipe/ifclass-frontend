@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener, ElementRef } from '@angular/core';
+import { Component, OnInit, HostListener, ElementRef, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Bloco } from '../../model/bloco/bloco.model';
@@ -41,7 +41,8 @@ export interface PanZoomConfig {
   standalone: true,  
   imports: [CommonModule, FormsModule, NgxPanZoomModule],
   templateUrl: './gerenciador-salas.html',
-  styleUrls: ['./gerenciador-salas.css']
+  styleUrls: ['./gerenciador-salas.css'],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class GerenciadorSalasComponent implements OnInit {
 
