@@ -2,12 +2,19 @@
  
 /* Definição de variáveis de cor e estilos globais para o corpo da página */
 :root {
-  --cor-primaria: #198754; /* O verde principal do seu tema */
+  --cor-primaria: #198754;
+  --cor-primaria-rgb: 25, 135, 84; /* Adicione ou verifique esta linha */
   --cor-primaria-hover: #146c43;
-  --cor-fundo: #f8f9fa; /* Um cinza bem claro para o fundo */
+  --cor-fundo: #f8f9fa;
+  --cor-fundo-secundario: #e6f0ed;
+  --cor-azul-claro: #E0F2F7;
+  --cor-azul-claro-rgb: 224, 242, 247; /* Adicione ou verifique esta linha */
   --cor-texto: #212529;
-  --raio-borda: 0.75rem; /* Raio de borda padronizado */
+  --raio-borda: 0.75rem;
   --sombra-suave: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --cor-erro: #dc3545;
+  --cor-erro-rgb: 220, 53, 69; /* Adicione ou verifique esta linha */
+  --cor-cinza-escuro-icon: #495057;
 }
 
 body {

@@ -1,18 +1,248 @@
-body, html {
+/* login.css e cadastro.css - Serão idênticos */
+
+.main-container {
+  position: relative;
+  width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  /* Fundo com gradiente suave para dar mais "cor" à base */
+  background: linear-gradient(135deg, var(--cor-fundo-secundario) 0%, var(--cor-fundo) 100%);
+  z-index: 1;
+}
+
+/* Fundo 3D com Pseudo-elementos e Animações */
+.background-3d {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
   height: 100%;
-  margin: 0;
-  padding: 0;
-  background-color: #f5f5f5; /* cinza claro geral */
+  perspective: 1000px; /* Reduzi ainda mais a perspectiva para evitar distorções e melhorar performance */
+  z-index: 0;
+  opacity: 0.85; /* Aumenta a opacidade geral do fundo 3D para ser mais visível */
+  pointer-events: none; /* Garante que não interfira com interações do mouse */
+  /* Avisa ao navegador que essas propriedades serão animadas para otimização */
+  will-change: transform, opacity, filter;
 }
 
-.login-box {
-  min-height: 80vh;
-  border: 1px solid #e0e0e0;
-  transition: all 0.3s ease-in-out;
+/* Elemento 3D 1 (um círculo com gradiente verde) */
+.background-3d::before {
+  content: '';
+  position: absolute;
+  /* Gradiente com maior opacidade para ser mais visível */
+  background: linear-gradient(45deg, rgba(var(--cor-primaria-rgb), 0.8) 0%, rgba(168, 216, 164, 0.7) 100%);
+  opacity: 1;
+  border-radius: 50%;
+  width: 400px;
+  height: 400px;
+  top: 10%;
+  left: 5%;
+  transform: translateZ(-150px) rotateX(20deg); /* Profundidade e rotação */
+  animation: subtleFloat 25s infinite ease-in-out alternate; /* Animação mais suave */
+  filter: blur(50px); /* Reduzi o blur para melhorar a performance e visibilidade */
+  box-shadow: 0 0 120px 60px rgba(var(--cor-primaria-rgb), 0.3); /* Brilho para destaque */
+  will-change: transform, filter;
 }
 
-.login-image {
-  background-color: #A8D8A4;
-  height: 80vh;
-  border-radius: 0.75rem;
+/* Elemento 3D 2 (um quadrado/retângulo com gradiente azul/verde) */
+.background-3d::after {
+  content: '';
+  position: absolute;
+  /* Gradiente com maior opacidade */
+  background: linear-gradient(135deg, rgba(var(--cor-azul-claro-rgb), 0.8) 0%, rgba(var(--cor-primaria-rgb), 0.7) 100%);
+  opacity: 1;
+  border-radius: 20%;
+  width: 500px;
+  height: 300px;
+  bottom: 15%;
+  right: 5%;
+  transform: translateZ(-250px) rotateY(-30deg); /* Profundidade e rotação */
+  animation: subtleFloatReverse 30s infinite ease-in-out alternate-reverse; /* Animação suave e reversa */
+  filter: blur(70px); /* Reduzi o blur */
+  box-shadow: 0 0 150px 70px rgba(0, 150, 255, 0.25); /* Brilho */
+  will-change: transform, filter;
+}
+
+/* Animação mais suave e eficiente */
+@keyframes subtleFloat {
+  0% {
+    transform: translate(0, 0) scale(1) translateZ(-150px) rotate(0deg);
+  }
+  50% {
+    transform: translate(15px, 15px) scale(1.005) translateZ(-160px) rotate(3deg);
+  }
+  100% {
+    transform: translate(0, 0) scale(1) translateZ(-150px) rotate(0deg);
+  }
+}
+
+/* Animação reversa para o segundo elemento */
+@keyframes subtleFloatReverse {
+  0% {
+    transform: translate(0, 0) scale(1) translateZ(-250px) rotate(0deg);
+  }
+  50% {
+    transform: translate(-15px, -15px) scale(1.005) translateZ(-260px) rotate(-3deg);
+  }
+  100% {
+    transform: translate(0, 0) scale(1) translateZ(-250px) rotate(0deg);
+  }
+}
+
+/* Wrapper para centralizar o card de login/cadastro */
+.login-wrapper, .cadastro-wrapper {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 900px;
+  padding: 20px;
+}
+
+/* Card de Login/Cadastro */
+.login-card, .cadastro-card {
+  background-color: #ffffff;
+  border-radius: var(--raio-borda);
+  box-shadow: var(--sombra-suave);
+  padding: 40px;
+  width: 100%;
+  max-width: 450px;
+  position: relative;
+  z-index: 1;
+  animation: fadeIn 0.8s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.login-card .text-center img, .cadastro-card .text-center img {
+  margin: 0 5px;
+}
+
+/* Estilo para os inputs modernos */
+.modern-input-group .form-control {
+  border-radius: var(--raio-borda) 0 0 var(--raio-borda);
+  border-color: #ced4da;
+  padding: 10px 15px;
+  transition: all 0.3s ease;
+}
+
+.modern-input-group .form-control:focus {
+  border-color: var(--cor-primaria);
+  box-shadow: 0 0 0 0.25rem rgba(var(--cor-primaria-rgb), 0.25);
+}
+
+.modern-input-group .input-group-text {
+  background-color: var(--cor-primaria);
+  color: white;
+  border: 1px solid var(--cor-primaria);
+  border-radius: 0 var(--raio-borda) var(--raio-borda) 0;
+  padding: 10px 15px;
+}
+
+/* Botão de toggle de senha */
+.modern-input-group .toggle-password {
+  background-color: #f8f9fa;
+  border-color: #ced4da;
+  color: var(--cor-cinza-escuro-icon);
+  border-left: none;
+  border-radius: 0 var(--raio-borda) var(--raio-borda) 0;
+  transition: all 0.2s ease;
+}
+
+.modern-input-group .toggle-password:hover {
+  background-color: #e9ecef;
+  color: var(--cor-texto);
+}
+
+/* Estilo para o separador "OU" */
+.divider-text {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #6c757d;
+}
+.divider-text::before,
+.divider-text::after {
+  content: '';
+  flex-grow: 1;
+  height: 1px;
+  background-color: #dee2e6;
+  margin: 0 10px;
+}
+
+/* Estilos de validação para inputs com modern-input-group */
+.modern-input-group.is-invalid .form-control,
+.modern-input-group .form-control.is-invalid {
+  border-color: var(--cor-erro) !important;
+  box-shadow: 0 0 0 0.25rem rgba(var(--cor-erro-rgb), 0.25) !important;
+  background-image: var(--bs-form-invalid-icon, url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e")) !important;
+  background-repeat: no-repeat !important;
+  background-position: right calc(0.375em + 0.1875rem) center !important;
+  background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem) !important;
+}
+
+.modern-input-group.is-invalid .input-group-text,
+.modern-input-group .form-control.is-invalid + .input-group-text {
+  border-color: var(--cor-erro) !important;
+  background-color: var(--cor-erro) !important;
+  color: white !important;
+}
+
+/* Botões */
+.btn-primary {
+  background-color: var(--cor-primaria) !important;
+  border-color: var(--cor-primaria) !important;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: var(--cor-primaria-hover) !important;
+  border-color: var(--cor-primaria-hover) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(var(--cor-primaria-rgb), 0.2);
+}
+
+.btn-outline-primary {
+  color: var(--cor-primaria) !important;
+  border-color: var(--cor-primaria) !important;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--cor-primaria) !important;
+  color: white !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(var(--cor-primaria-rgb), 0.1);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .login-card, .cadastro-card {
+    padding: 30px 20px;
+    margin: 20px;
+  }
+  .background-3d::before {
+    width: 200px;
+    height: 200px;
+    filter: blur(40px);
+  }
+  .background-3d::after {
+    width: 300px;
+    height: 180px;
+    filter: blur(60px);
+  }
 }

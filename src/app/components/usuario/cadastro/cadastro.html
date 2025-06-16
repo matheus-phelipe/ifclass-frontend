@@ -1,67 +1,61 @@
-<div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center bg-light">
-  <div class="container">
-    <div class="row w-100 justify-content-center align-items-center">
-      
-      <!-- Formulário -->
-      <div class="col-md-5 col-lg-5 bg-white rounded-4 shadow-sm p-4 login-box ">
-        <div class="text-center mb-4">
-          <img src="assets/ifclass.png" alt="Logo" width="100">
-          <img src="assets/Class.png" alt="Logo" width="100">
-          <h5 class="mt-3 fw-semibold text-dark">Faça seu cadastro</h5>
-        </div>
+<div class="main-container">
+  <div class="background-3d"></div>
 
-        <form #formCadastro="ngForm" (ngSubmit)="cadastrar()" novalidate>
-          <div class="mb-3" *ngFor="let campo of campos">
-            <label [for]="campo.nome" class="form-label fw-medium">{{ campo.label }}</label>
+  <div class="cadastro-wrapper"> <div class="cadastro-card"> <div class="text-center mb-4">
+        <img src="assets/ifclass.png" alt="Logo IF" width="80">
+        <img src="assets/Class.png" alt="Logo Class" width="80">
+        <h3 class="mt-3 fw-bold text-dark">Crie sua conta!</h3> <p class="text-muted">Preencha os campos abaixo para se cadastrar na plataforma.</p>
+      </div>
 
-            <div class="input-group">
-              <input
-                [(ngModel)]="usuario[campo.nome]"
-                [name]="campo.nome"
-                #model="ngModel"
-                class="form-control"
-                [placeholder]="campo.placeholder"
-                [attr.type]="(campo.nome === 'senha' || campo.nome === 'confirmarSenha') 
-                            ? (mostrarSenha[campo.nome] ? 'text' : 'password') 
-                            : campo.tipo"
-                [type]="campo.nome === 'email' ? 'text' : null"
-                [required]="true"
-                [minlength]="(campo.nome === 'senha' || campo.nome === 'confirmarSenha') ? 6 : null"
-                [pattern]="campo.nome === 'email' ? '^[\\w.-]+@([\\w-]+\\.)+(com|br)$' : ''"
-              />
+      <form #formCadastro="ngForm" (ngSubmit)="cadastrar()" novalidate>
+        <div class="mb-3" *ngFor="let campo of campos">
+          <label [for]="campo.nome" class="form-label fw-medium">{{ campo.label }}</label>
 
-              <span class="input-group-text bg-success text-white"
+          <div class="input-group modern-input-group"
+               [class.is-invalid]="isInvalidField(model)"> <input
+              [(ngModel)]="usuario[campo.nome]"
+              [name]="campo.nome"
+              #model="ngModel"
+              class="form-control"
+              [placeholder]="campo.placeholder"
+              [attr.type]="(campo.nome === 'senha' || campo.nome === 'confirmarSenha') 
+                          ? (mostrarSenha[campo.nome] ? 'text' : 'password') 
+                          : campo.tipo"
+              [type]="campo.nome === 'email' ? 'text' : null"
+              [required]="true"
+              [minlength]="(campo.nome === 'senha' || campo.nome === 'confirmarSenha') ? 6 : null"
+              [pattern]="campo.nome === 'email' ? '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$' : ''" />
+
+            <button type="button"
+                    class="btn btn-outline-secondary toggle-password"
                     *ngIf="campo.nome === 'senha' || campo.nome === 'confirmarSenha'"
-                    (click)="toggleMostrarSenha(campo.nome)" style="cursor: pointer;">
-                <i class="bi" [ngClass]="mostrarSenha[campo.nome] ? 'bi-eye-slash-fill' : 'bi-eye-fill'"></i>
-              </span>
+                    (click)="toggleMostrarSenha(campo.nome)">
+              <i class="bi" [ngClass]="mostrarSenha[campo.nome] ? 'bi-eye-slash' : 'bi-eye'"></i>
+            </button>
 
-              <span class="input-group-text bg-success text-white"
-                    *ngIf="campo.nome !== 'senha' && campo.nome !== 'confirmarSenha'">
-                <i class="bi" [ngClass]="campo.icone"></i>
-              </span>
-            </div>
-
-            <div class="text-danger small mt-1" *ngIf="isInvalidField(model)">
-              <div *ngIf="model.errors?.['required']">{{ campo.label }} é obrigatório.</div>
-              <div *ngIf="model.errors?.['pattern']">Formato de e-mail inválido. Use .com ou .br</div>
-              <div *ngIf="model.errors?.['minlength']">Mínimo de 6 caracteres.</div>
-            </div>
+            <span class="input-group-text"
+                  *ngIf="campo.nome !== 'senha' && campo.nome !== 'confirmarSenha'">
+              <i class="bi" [ngClass]="campo.icone"></i>
+            </span>
           </div>
 
-          <button type="submit" class="btn btn-success w-100 mt-3 fw-semibold shadow-sm" [disabled]="formCadastro.invalid">
-            Cadastrar-se
-          </button>
+          <div class="text-danger small mt-1" *ngIf="isInvalidField(model)">
+            <div *ngIf="model.errors?.['required']">{{ campo.label }} é obrigatório.</div>
+            <div *ngIf="model.errors?.['pattern']">Formato de e-mail inválido.</div>
+            <div *ngIf="model.errors?.['minlength']">Mínimo de 6 caracteres.</div>
+          </div>
+        </div>
 
-          <div class="text-center text-muted my-2">— OU —</div>
+        <button type="submit" class="btn btn-primary w-100 mt-3 fw-semibold shadow-sm" [disabled]="formCadastro.invalid">
+          Cadastrar-se
+        </button>
 
-          <a routerLink="/login" class="btn btn-outline-success w-100 fw-medium">Login</a>
-        </form>
-      </div>
+        <div class="text-center text-muted my-2">
+          <span class="divider-text">OU</span>
+        </div>
 
-      <div class="col-md-7 col-lg-7 d-none d-md-flex align-items-center justify-content-center login-image">
-        <img src="assets/painelifclass.png" alt="Ilustração" class="img-fluid" style="max-width: 90%;">
-      </div>
+        <a routerLink="/login" class="btn btn-outline-primary w-100 fw-medium">Já tenho uma conta</a>
+      </form>
     </div>
   </div>
 </div>
