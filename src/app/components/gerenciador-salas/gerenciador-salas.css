@@ -24,11 +24,11 @@
 }
 
 .accordion-button::after {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%236c757d'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox=\'0 0 16 16\' fill='%236c757d'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
 }
 
 .accordion-button:not(.collapsed)::after {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox=\'0 0 16 16\' fill='%23ffffff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
 }
 
 .accordion-body {
@@ -50,7 +50,7 @@
 
 .floorplan-container {
   width: 100%;
-  height: 600px;
+  height: 600px; /* Altura padrão para desktop */
   border: 1px solid #dee2e6;
   border-radius: .5rem;
   overflow: hidden;
@@ -59,7 +59,16 @@
     linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px),
     linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px);
   background-size: 20px 20px;
-  cursor: grab;
+  /* NOVO: Propriedade para melhorar o touch */
+  touch-action: none; /* Impede o scroll padrão do navegador em dispositivos touch */
+  user-select: none; /* Impede seleção de texto */
+}
+
+/* Ajuste de altura para telas menores */
+@media (max-width: 767.98px) { /* Para telas menores que md (768px) */
+  .floorplan-container {
+    height: 400px; /* Altura reduzida no celular para não ocupar demais a tela */
+  }
 }
 
 .floorplan-container:active {
@@ -72,50 +81,8 @@
 }
 
 .sala-group {
-  cursor: pointer;
-}
-
-.sala-rect {
-  fill: #ffffff;
-  stroke: #adb5bd;
-  stroke-width: 2px;
-  rx: 4; /* Borda levemente arredondada */
-  ry: 4;
-  transition: all 0.2s ease-in-out;
-}
-
-.sala-group:hover .sala-rect {
-  fill: #e9ecef;
-  transform: scale(1.02);
-  transform-origin: center center;
-}
-
-.sala-rect.selected {
-  fill: #d1e7dd; /* Cor verde clara do Bootstrap (alert-success) */
-  stroke: var(--cor-primaria, #198754);
-  stroke-width: 3px;
-}
-
-.sala-text {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  text-anchor: middle;
-  dominant-baseline: middle;
-  pointer-events: none; /* Impede que o texto intercepte cliques */
-  fill: #212529;
-  font-size: 14px;
-}
-
-.sala-codigo {
-  font-weight: 600;
-}
-
-.sala-capacidade {
-  font-size: 12px;
-  fill: #6c757d;
-}
-
-.sala-group {
-  cursor: move; /* Muda o cursor para indicar que é móvel */
+  /* Adicionado transições para um efeito mais suave */
+  transition: transform 0.2s ease-in-out, fill 0.2s ease-in-out;
 }
 
 /* NOVO: Estilo para a sala sendo arrastada */
@@ -133,6 +100,7 @@
   transition: all 0.2s ease-in-out;
 }
 
+/* Hover para ADMIN */
 .sala-group:hover .sala-rect:not(.editing) {
   fill: #e9ecef;
   transform: scale(1.02);
@@ -158,12 +126,22 @@
   cursor: grabbing;
 }
 
+/* Cursores para Admin e Usuário */
 .sala-group {
-  cursor: grab; /* Melhor cursor para indicar que é móvel */
+  cursor: grab; /* Cursor padrão para admin (arrastável) */
+}
+.sala-group.clickable-for-user {
+    cursor: default; /* Remove o cursor 'grab' para usuários, deixando padrão ou text*/
+}
+.sala-group.clickable-for-user:hover {
+    cursor: default; /* Garante que não apareça o grab no hover para user */
+}
+.sala-group.clickable-for-user .sala-rect:hover { /* Estilo de hover para usuário, mas sem indicar arrastar */
+    fill: #e0f2f1; /* Um verde bem claro no hover */
+    transform: scale(1.005); /* Um pequeno scale, menos que para admin */
 }
 
-/* Estilo para a sala sendo arrastada */
-.sala-group.dragging {
-    opacity: 0.7;
-    cursor: grabbing;
+/* Ajustes de cores para os novos painéis de informação */
+.text-primary {
+  color: var(--bs-primary) !important; /* Azul padrão do Bootstrap */
 }
