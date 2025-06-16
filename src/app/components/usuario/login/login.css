@@ -1,4 +1,4 @@
-/* login.css e cadastro.css - Serão idênticos */
+/* login.css e cadastro.css - Serão idênticos e ultra otimizados */
 
 .main-container {
   position: relative;
@@ -8,42 +8,42 @@
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  /* Fundo com gradiente suave para dar mais "cor" à base */
   background: linear-gradient(135deg, var(--cor-fundo-secundario) 0%, var(--cor-fundo) 100%);
   z-index: 1;
 }
 
-/* Fundo 3D com Pseudo-elementos e Animações */
+/* Fundo 3D com Pseudo-elementos e Animações - ALTAMENTE OTIMIZADO */
 .background-3d {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  perspective: 1000px; /* Reduzi ainda mais a perspectiva para evitar distorções e melhorar performance */
+  perspective: 800px; /* Perspectiva ainda menor para leveza */
   z-index: 0;
-  opacity: 0.85; /* Aumenta a opacidade geral do fundo 3D para ser mais visível */
-  pointer-events: none; /* Garante que não interfira com interações do mouse */
-  /* Avisa ao navegador que essas propriedades serão animadas para otimização */
-  will-change: transform, opacity, filter;
+  opacity: 0.9; /* Um pouco mais opaco para compensar menos blur */
+  pointer-events: none;
+  /* Garante que a animação seja processada pela GPU */
+  transform: translateZ(0); /* Força aceleração de hardware no elemento pai */
+  will-change: transform, opacity; /* Foco apenas em transform e opacity */
 }
 
 /* Elemento 3D 1 (um círculo com gradiente verde) */
 .background-3d::before {
   content: '';
   position: absolute;
-  /* Gradiente com maior opacidade para ser mais visível */
-  background: linear-gradient(45deg, rgba(var(--cor-primaria-rgb), 0.8) 0%, rgba(168, 216, 164, 0.7) 100%);
+  background: linear-gradient(45deg, rgba(var(--cor-primaria-rgb), 0.9) 0%, rgba(168, 216, 164, 0.8) 100%); /* Ainda mais opaco */
   opacity: 1;
   border-radius: 50%;
-  width: 400px;
-  height: 400px;
-  top: 10%;
-  left: 5%;
-  transform: translateZ(-150px) rotateX(20deg); /* Profundidade e rotação */
-  animation: subtleFloat 25s infinite ease-in-out alternate; /* Animação mais suave */
-  filter: blur(50px); /* Reduzi o blur para melhorar a performance e visibilidade */
-  box-shadow: 0 0 120px 60px rgba(var(--cor-primaria-rgb), 0.3); /* Brilho para destaque */
+  width: 350px; /* Reduzi o tamanho para menos pixels para renderizar */
+  height: 350px;
+  top: 15%;
+  left: 10%;
+  /* Foco em translação e um Z sutil. Sem rotações pesadas. */
+  transform: translate3d(0, 0, -100px); /* Usa translate3d para garantir GPU */
+  animation: ultraSubtleFloat 30s infinite ease-in-out alternate; /* Animação mais longa e suave */
+  filter: blur(30px); /* Blur significativamente reduzido para performance */
+  box-shadow: 0 0 80px 40px rgba(var(--cor-primaria-rgb), 0.2); /* Brilho leve */
   will-change: transform, filter;
 }
 
@@ -51,48 +51,50 @@
 .background-3d::after {
   content: '';
   position: absolute;
-  /* Gradiente com maior opacidade */
-  background: linear-gradient(135deg, rgba(var(--cor-azul-claro-rgb), 0.8) 0%, rgba(var(--cor-primaria-rgb), 0.7) 100%);
+  background: linear-gradient(135deg, rgba(var(--cor-azul-claro-rgb), 0.9) 0%, rgba(var(--cor-primaria-rgb), 0.8) 100%); /* Ainda mais opaco */
   opacity: 1;
   border-radius: 20%;
-  width: 500px;
-  height: 300px;
-  bottom: 15%;
-  right: 5%;
-  transform: translateZ(-250px) rotateY(-30deg); /* Profundidade e rotação */
-  animation: subtleFloatReverse 30s infinite ease-in-out alternate-reverse; /* Animação suave e reversa */
-  filter: blur(70px); /* Reduzi o blur */
-  box-shadow: 0 0 150px 70px rgba(0, 150, 255, 0.25); /* Brilho */
+  width: 450px; /* Reduzi o tamanho */
+  height: 250px;
+  bottom: 20%;
+  right: 10%;
+  /* Foco em translação e um Z sutil. Sem rotações pesadas. */
+  transform: translate3d(0, 0, -200px); /* Usa translate3d para garantir GPU */
+  animation: ultraSubtleFloatReverse 35s infinite ease-in-out alternate-reverse; /* Animação mais longa e suave */
+  filter: blur(40px); /* Blur significativamente reduzido */
+  box-shadow: 0 0 100px 50px rgba(0, 150, 255, 0.15);
   will-change: transform, filter;
 }
 
-/* Animação mais suave e eficiente */
-@keyframes subtleFloat {
+/* Animações ultra suaves e eficientes (foco apenas em translate) */
+@keyframes ultraSubtleFloat {
   0% {
-    transform: translate(0, 0) scale(1) translateZ(-150px) rotate(0deg);
+    transform: translate3d(0, 0, -100px);
   }
   50% {
-    transform: translate(15px, 15px) scale(1.005) translateZ(-160px) rotate(3deg);
+    transform: translate3d(10px, 10px, -105px); /* Movimento mínimo */
   }
   100% {
-    transform: translate(0, 0) scale(1) translateZ(-150px) rotate(0deg);
+    transform: translate3d(0, 0, -100px);
   }
 }
 
-/* Animação reversa para o segundo elemento */
-@keyframes subtleFloatReverse {
+@keyframes ultraSubtleFloatReverse {
   0% {
-    transform: translate(0, 0) scale(1) translateZ(-250px) rotate(0deg);
+    transform: translate3d(0, 0, -200px);
   }
   50% {
-    transform: translate(-15px, -15px) scale(1.005) translateZ(-260px) rotate(-3deg);
+    transform: translate3d(-10px, -10px, -205px); /* Movimento mínimo */
   }
   100% {
-    transform: translate(0, 0) scale(1) translateZ(-250px) rotate(0deg);
+    transform: translate3d(0, 0, -200px);
   }
 }
 
-/* Wrapper para centralizar o card de login/cadastro */
+
+/* Os estilos do login-wrapper, login-card, modern-input-group, validação e botões permanecem os mesmos */
+/* ... Cole o restante do CSS (login-wrapper, login-card, modern-input-group, validação, botões, responsividade) daqui para baixo ... */
+
 .login-wrapper, .cadastro-wrapper {
   position: relative;
   z-index: 10;
@@ -104,7 +106,6 @@
   padding: 20px;
 }
 
-/* Card de Login/Cadastro */
 .login-card, .cadastro-card {
   background-color: #ffffff;
   border-radius: var(--raio-borda);
@@ -132,7 +133,6 @@
   margin: 0 5px;
 }
 
-/* Estilo para os inputs modernos */
 .modern-input-group .form-control {
   border-radius: var(--raio-borda) 0 0 var(--raio-borda);
   border-color: #ced4da;
@@ -153,7 +153,6 @@
   padding: 10px 15px;
 }
 
-/* Botão de toggle de senha */
 .modern-input-group .toggle-password {
   background-color: #f8f9fa;
   border-color: #ced4da;
@@ -168,7 +167,6 @@
   color: var(--cor-texto);
 }
 
-/* Estilo para o separador "OU" */
 .divider-text {
   display: flex;
   align-items: center;
@@ -184,7 +182,6 @@
   margin: 0 10px;
 }
 
-/* Estilos de validação para inputs com modern-input-group */
 .modern-input-group.is-invalid .form-control,
 .modern-input-group .form-control.is-invalid {
   border-color: var(--cor-erro) !important;
@@ -202,7 +199,6 @@
   color: white !important;
 }
 
-/* Botões */
 .btn-primary {
   background-color: var(--cor-primaria) !important;
   border-color: var(--cor-primaria) !important;
@@ -229,20 +225,19 @@
   box-shadow: 0 6px 15px rgba(var(--cor-primaria-rgb), 0.1);
 }
 
-/* Responsividade */
 @media (max-width: 768px) {
   .login-card, .cadastro-card {
     padding: 30px 20px;
     margin: 20px;
   }
   .background-3d::before {
-    width: 200px;
-    height: 200px;
-    filter: blur(40px);
+    width: 180px; /* Menor em telas pequenas */
+    height: 180px;
+    filter: blur(25px); /* Menos blur */
   }
   .background-3d::after {
-    width: 300px;
-    height: 180px;
-    filter: blur(60px);
+    width: 280px; /* Menor em telas pequenas */
+    height: 160px;
+    filter: blur(35px); /* Menos blur */
   }
 }
