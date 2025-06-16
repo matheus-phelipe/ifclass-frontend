@@ -6,6 +6,7 @@ import { CadastroComponent } from './components/usuario/cadastro/cadastro';
 import { Gerenciarusuarios } from './components/gerenciarusuarios/gerenciarusuarios';
 import { Gerenciarpermissoes } from './components/gerenciarpermissoes/gerenciarpermissoes';
 import { GerenciadorSalasComponent } from './components/gerenciador-salas/gerenciador-salas';
+import { CursosComponent } from './components/cursos/cursos';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -31,6 +32,11 @@ export const routes: Routes = [
   {
     path: 'salas',
     component: GerenciadorSalasComponent,
+    canActivate: [authGuard]
+  },
+  {
+    path: 'cursos',
+    component: CursosComponent,
     canActivate: [authGuard]
   }
 ];

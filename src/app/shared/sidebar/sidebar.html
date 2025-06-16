@@ -37,6 +37,13 @@
         <span *ngIf="sidebarOpen">Salas</span>
       </a>
 
+      <a routerLink="/cursos"
+         class="text-white text-decoration-none d-flex align-items-center"
+         [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
+        <i class="bi bi-mortarboard-fill"></i>
+        <span *ngIf="sidebarOpen">Cursos</span>
+      </a>
+
       <a routerLink="/turmas"
          class="text-white text-decoration-none d-flex align-items-center"
          [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
