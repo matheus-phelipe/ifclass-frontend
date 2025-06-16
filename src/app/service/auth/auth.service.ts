@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment.development';
+import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -72,6 +73,16 @@ export class AuthService {
     const userRoles = this.getRoles();
     // Retorna true se pelo menos uma das 'authorities' exigidas estiver presente nas 'userRoles'
     return authorities.some(auth => userRoles.includes(auth));
+  }
+
+  requestPasswordReset(email: string): Observable<any> {
+    // Envia o email para o back-end
+    return this.http.post(`${this.API}/request-password-reset`, { email });
+  }
+
+  resetPassword(token: string, newPassword: string): Observable<any> {
+    // Envia o token e a nova senha para o back-end
+    return this.http.post(`${this.API}/reset-password`, { token, newPassword });
   }
 }
 

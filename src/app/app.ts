@@ -25,7 +25,7 @@ export class App implements OnInit {
   showMainLayout = false;
 
   // Lista de rotas onde a sidebar NÃO deve aparecer.
-  private standaloneRoutes = ['/login', '/cadastro'];
+  private standaloneRoutes = ['/login', '/cadastro', '/resetar-senha'];
 
   constructor(
     private authService: AuthService,

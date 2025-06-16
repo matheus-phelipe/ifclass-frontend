@@ -7,6 +7,7 @@ import { Gerenciarusuarios } from './components/gerenciarusuarios/gerenciarusuar
 import { Gerenciarpermissoes } from './components/gerenciarpermissoes/gerenciarpermissoes';
 import { GerenciadorSalasComponent } from './components/gerenciador-salas/gerenciador-salas';
 import { CursosComponent } from './components/cursos/cursos';
+import { ResetarSenhaComponent } from './components/usuario/resetar-senha/resetar-senha';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -38,5 +39,9 @@ export const routes: Routes = [
     path: 'cursos',
     component: CursosComponent,
     canActivate: [authGuard]
+  },
+  {
+    path: 'resetar-senha',
+    component: ResetarSenhaComponent
   }
 ];

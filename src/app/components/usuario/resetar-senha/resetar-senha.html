@@ -1,0 +1,115 @@
+<div class="main-container">
+  <div class="background-3d"></div>
+
+  <div class="login-wrapper">
+    <div class="login-card">
+      <div class="text-center mb-4">
+        <img src="assets/ifclass.png" alt="Logo IF" width="80">
+        <img src="assets/Class.png" alt="Logo Class" width="80">
+        
+        <div *ngIf="!showResetForm">
+          <h3 class="mt-3 fw-bold text-dark">Redefinir Senha</h3>
+          <p class="text-muted">Informe seu e-mail para receber as instruções de redefinição.</p>
+
+          <form (ngSubmit)="sendResetLink()" #requestForm="ngForm" novalidate>
+            <div class="mb-3">
+              <label for="emailRequest" class="form-label fw-medium">Email:</label>
+              <div class="input-group modern-input-group"
+                   [class.is-invalid]="emailModel.invalid && emailModel.touched">
+                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                <input
+                  [(ngModel)]="email"
+                  name="emailRequest"
+                  type="email"
+                  id="emailRequest"
+                  class="form-control"
+                  placeholder="seu.email@exemplo.com"
+                  required
+                  pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                  #emailModel="ngModel"
+                >
+              </div>
+              <div class="text-danger small mt-1" *ngIf="emailModel.invalid && emailModel.touched">
+                <div *ngIf="emailModel.errors?.['required']">Email é obrigatório.</div>
+                <div *ngIf="emailModel.errors?.['pattern']">Formato de email inválido.</div>
+              </div>
+            </div>
+
+            <button type="submit"
+                    class="btn btn-primary w-100 mb-3 fw-semibold shadow-sm"
+                    [disabled]="requestForm.invalid">
+              Enviar Link de Redefinição
+            </button>
+            <div class="text-center text-muted my-2">
+              <a routerLink="/login" class="text-decoration-none small text-primary fw-medium">Voltar para o Login</a>
+            </div>
+          </form>
+        </div>
+
+        <div *ngIf="showResetForm">
+          <h3 class="mt-3 fw-bold text-dark">Definir Nova Senha</h3>
+          <p class="text-muted">Crie uma nova senha para sua conta.</p>
+
+          <form (ngSubmit)="resetPasswordConfirmed()" #resetPasswordForm="ngForm" novalidate>
+            <div class="mb-3">
+              <label for="newPassword" class="form-label fw-medium">Nova Senha:</label>
+              <div class="input-group modern-input-group"
+                   [class.is-invalid]="newPasswordModel.invalid && newPasswordModel.touched">
+                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                <input
+                  [(ngModel)]="newPassword"
+                  name="newPassword"
+                  type="password"
+                  id="newPassword"
+                  class="form-control"
+                  placeholder="Sua nova senha"
+                  required
+                  minlength="6"
+                  #newPasswordModel="ngModel"
+                >
+              </div>
+              <div class="text-danger small mt-1" *ngIf="newPasswordModel.invalid && newPasswordModel.touched">
+                <div *ngIf="newPasswordModel.errors?.['required']">Nova senha é obrigatória.</div>
+                <div *ngIf="newPasswordModel.errors?.['minlength']">Mínimo de 6 caracteres.</div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="confirmNewPassword" class="form-label fw-medium">Confirmar Nova Senha:</label>
+              <div class="input-group modern-input-group"
+                   [class.is-invalid]="confirmNewPasswordModel.invalid && confirmNewPasswordModel.touched || (newPassword !== confirmNewPassword && confirmNewPasswordModel.touched)">
+                <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                <input
+                  [(ngModel)]="confirmNewPassword"
+                  name="confirmNewPassword"
+                  type="password"
+                  id="confirmNewPassword"
+                  class="form-control"
+                  placeholder="Confirme sua nova senha"
+                  required
+                  #confirmNewPasswordModel="ngModel"
+                >
+              </div>
+              <div class="text-danger small mt-1" *ngIf="confirmNewPasswordModel.invalid && confirmNewPasswordModel.touched">
+                <div *ngIf="confirmNewPasswordModel.errors?.['required']">Confirmação de senha é obrigatória.</div>
+              </div>
+              <div class="text-danger small mt-1" *ngIf="newPassword !== confirmNewPassword && confirmNewPasswordModel.touched">
+                As senhas não coincidem.
+              </div>
+            </div>
+
+            <button type="submit"
+                    class="btn btn-primary w-100 mb-3 fw-semibold shadow-sm"
+                    [disabled]="resetPasswordForm.invalid || newPassword !== confirmNewPassword">
+              Redefinir Senha
+            </button>
+            <div class="text-center text-muted my-2">
+              <a routerLink="/login" class="text-decoration-none small text-primary fw-medium">Voltar para o Login</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<app-modal #meuModal id="meuModal" title="Alerta" [message]="mensagemDoModal"></app-modal>
