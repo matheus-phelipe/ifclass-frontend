@@ -1,28 +1,28 @@
 // login.ts
-import { ModalComponent } from './../../../shared/modal/modal';
+import { AlertComponent } from './../../../shared/alert/alert'; // Importe AlertComponent
+// Remova: import { ModalComponent } from './../../../shared/modal/modal';
 import { AuthService } from './../../../service/auth/auth.service';
 import { UsuarioService } from './../../../service/usuario/usuario.service';
 import { Login } from './../../../model/usuario/login.model';
 import { CommonModule } from '@angular/common';
-import { Component, ViewChild, OnInit } from '@angular/core'; // Importe OnInit
+import { Component, ViewChild, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterModule, RouterLink, AlertComponent], // Adicionado AlertComponent
   templateUrl: './login.html',
-  styleUrl: './login.css'
+  styleUrls: ['./login.css'] // Corrigido para styleUrls
 })
-
-// Implemente OnInit
 export class LoginComponent implements OnInit {
-  mensagemDoModal: string = 'Texto inicial';
+  // Remova: mensagemDoModal: string = 'Texto inicial';
   mostrarSenha: boolean = false;
-  lembrarMe: boolean = false; // Nova propriedade para o checkbox
+  lembrarMe: boolean = false;
 
-  @ViewChild('meuModal') modal!: ModalComponent;
+  // Remova: @ViewChild('meuModal') modal!: ModalComponent;
+  @ViewChild('alerta') alerta!: AlertComponent; // Adicionado para exibir alertas
 
   credenciais: Login = {
     email: '',
@@ -31,9 +31,7 @@ export class LoginComponent implements OnInit {
 
   constructor(private service: UsuarioService, private router: Router, private authService: AuthService) {}
 
-  // Adicione o método ngOnInit
   ngOnInit(): void {
-    // Tenta carregar o email salvo no localStorage
     const savedEmail = localStorage.getItem('rememberedEmail');
     const rememberMeFlag = localStorage.getItem('rememberMeFlag');
 
@@ -43,12 +41,11 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  login(){
+  login() {
     this.authService.login(this.credenciais.email, this.credenciais.senha).subscribe({
       next: (res) => {
         this.authService.salvarToken(res.token);
 
-        // Lógica para "Lembrar-me"
         if (this.lembrarMe) {
           localStorage.setItem('rememberedEmail', this.credenciais.email);
           localStorage.setItem('rememberMeFlag', 'true');
@@ -57,16 +54,19 @@ export class LoginComponent implements OnInit {
           localStorage.setItem('rememberMeFlag', 'false');
         }
 
-        this.router.navigate(['/home']);
+        // --- LÓGICA DE REDIRECIONAMENTO ADAPTADA ---
+        const roles = this.authService.getRoles();
+        
+        if (roles.includes('ROLE_ALUNO') && roles.length === 1) {
+          this.router.navigate(['/aluno/mapa']);
+        } else {
+          // Para todos os outros (Admin, Coordenador, etc.)
+          this.router.navigate(['/app/home']);
+        }
       },
       error: () => {
-        this.abrirModal('Credenciais inválidas');
+        this.alerta.show('Credenciais inválidas.', 3000, 'danger');
       }
     });
-  }
-
-  abrirModal(mensagem: string) {
-    this.mensagemDoModal = mensagem;
-    this.modal.open();
   }
 }

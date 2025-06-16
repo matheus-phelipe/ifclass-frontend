@@ -4,7 +4,7 @@
   [ngStyle]="{'min-width': sidebarOpen ? '250px' : 'auto'}"
 >
   <div class="sidebar-header">
-    <a routerLink="/home" class="text-white text-decoration-none d-flex align-items-center">
+    <a routerLink="/app/home" class="text-white text-decoration-none d-flex align-items-center">
       <img src="assets/ifclass.png" alt="Logo" class="sidebar-logo img-fluid">
       <h5 class="sidebar-title mb-0" *ngIf="sidebarOpen">Class</h5>
     </a>
@@ -14,42 +14,30 @@
   </div>
 
   <div class="d-flex flex-column gap-2 flex-grow-1">
-    <div *ngIf="sidebarOpen" class="sidebar-menu-category">ALUNO</div>
+    <ng-container *ngIf="isProfessor || isCoordenador || isAdmin">
+      <div *ngIf="sidebarOpen" class="sidebar-menu-category">GERAL</div>
 
-    <a routerLink="/aulas"
-       class="sidebar-nav-link"
-       [ngClass]="{'justify-content-center': !sidebarOpen}">
-      <i class="bi bi-calendar-week"></i>
-      <span *ngIf="sidebarOpen">Aulas do dia</span>
-    </a>
-
-    <a routerLink="/salas"
-       class="sidebar-nav-link"
-       [ngClass]="{'justify-content-center': !sidebarOpen}">
-      <i class="bi bi-door-open"></i>
-      <span *ngIf="sidebarOpen">Salas</span>
-    </a>
-
-    <a routerLink="/cursos"
-       class="sidebar-nav-link"
-       [ngClass]="{'justify-content-center': !sidebarOpen}">
-      <i class="bi bi-mortarboard-fill"></i>
-      <span *ngIf="sidebarOpen">Cursos</span>
-    </a>
-
-    <a routerLink="/turmas"
-       class="sidebar-nav-link"
-       [ngClass]="{'justify-content-center': !sidebarOpen}">
-      <i class="bi bi-people"></i>
-      <span *ngIf="sidebarOpen">Turmas</span>
-    </a>
-
-    <a routerLink="/disciplinas"
-       class="sidebar-nav-link"
-       [ngClass]="{'justify-content-center': !sidebarOpen}">
-      <i class="bi bi-journal-bookmark"></i>
-      <span *ngIf="sidebarOpen">Disciplinas</span>
-    </a>
+      <a routerLink="/app/aulas" class="sidebar-nav-link" [ngClass]="{'justify-content-center': !sidebarOpen}">
+        <i class="bi bi-calendar-week"></i>
+        <span *ngIf="sidebarOpen">Aulas do dia</span>
+      </a>
+      <a routerLink="/app/salas" class="sidebar-nav-link" [ngClass]="{'justify-content-center': !sidebarOpen}">
+        <i class="bi bi-door-open"></i>
+        <span *ngIf="sidebarOpen">Salas</span>
+      </a>
+      <a routerLink="/app/cursos" class="sidebar-nav-link" [ngClass]="{'justify-content-center': !sidebarOpen}">
+        <i class="bi bi-mortarboard-fill"></i>
+        <span *ngIf="sidebarOpen">Cursos</span>
+      </a>
+      <a routerLink="/app/turmas" class="sidebar-nav-link" [ngClass]="{'justify-content-center': !sidebarOpen}">
+        <i class="bi bi-people"></i>
+        <span *ngIf="sidebarOpen">Turmas</span>
+      </a>
+      <a routerLink="/app/disciplinas" class="sidebar-nav-link" [ngClass]="{'justify-content-center': !sidebarOpen}">
+        <i class="bi bi-journal-bookmark"></i>
+        <span *ngIf="sidebarOpen">Disciplinas</span>
+      </a>
+    </ng-container>
 
     <ng-container *ngIf="isProfessor || isCoordenador || isAdmin">
       <div *ngIf="sidebarOpen" class="sidebar-menu-category">PROFESSOR</div>
@@ -79,7 +67,7 @@
         <span *ngIf="sidebarOpen">Relacionar turma/curso</span>
       </a>
 
-      <a routerLink="/permissoes"
+      <a routerLink="/app/permissoes"
          class="sidebar-nav-link"
          [ngClass]="{'justify-content-center': !sidebarOpen}">
         <i class="bi bi-person-gear"></i>
@@ -90,7 +78,7 @@
     <ng-container *ngIf="isAdmin">
       <div *ngIf="sidebarOpen" class="sidebar-menu-category">ADMINISTRADOR</div>
 
-      <a routerLink="/usuarios"
+      <a routerLink="/app/usuarios"
          class="sidebar-nav-link"
          [ngClass]="{'justify-content-center': !sidebarOpen}">
         <i class="bi bi-people-fill"></i>
