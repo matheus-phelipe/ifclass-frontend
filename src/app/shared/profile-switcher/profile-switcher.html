@@ -1,0 +1,19 @@
+<div class="dropdown" *ngIf="availableRoles.length > 1">
+  <button class="btn btn-light dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <i class="bi bi-person-circle me-2"></i>
+    <span>
+      <span class="d-none d-md-inline">{{ nomeUsuario }}</span>
+      <small class="d-block text-success fw-bold">Visão: {{ formatRoleName(activeRole!) }}</small>
+    </span>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li *ngFor="let role of availableRoles">
+      <a class="dropdown-item d-flex justify-content-between align-items-center" 
+         (click)="switchProfile(role)"
+         [class.active]="role === activeRole">
+        {{ formatRoleName(role) }}
+        <i *ngIf="role === activeRole" class="bi bi-check-lg text-success"></i>
+      </a>
+    </li>
+  </ul>
+</div>

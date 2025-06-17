@@ -1,15 +1,17 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { AuthService } from '../../service/auth/auth.service';
 import { ALL_MENU_CARDS, MenuCard } from './menu-cards';
 import { ProximaAula } from '../../model/aula/proximaaula.model';
 import { Aviso } from '../../model/aviso/aviso.model';
+import { ProfileSwitcherComponent } from '../../shared/profile-switcher/profile-switcher';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, ProfileSwitcherComponent],
   templateUrl: './home.html',
   styleUrl: './home.css'
 })
@@ -21,26 +23,41 @@ export class Home implements OnInit {
   avisos: Aviso[] = [];
   menuCards: MenuCard[] = [];
   
-  constructor(private router: Router, private authService: AuthService) {}
+  private roleSubscription!: Subscription;
+
+  constructor(private authService: AuthService) {}
 
   ngOnInit(): void {
-    // Carrega o nome do usuário (idealmente viria do payload do token JWT)
-    this.nomeUsuario = this.authService.getNomeUsuario() || 'Usuário'; // Você precisará criar o método getNomeUsuario() no seu AuthService
+    this.nomeUsuario = this.authService.getNomeUsuario() || 'Usuário';
 
-    // Filtra os cards de menu com base nas permissões
-    this.menuCards = ALL_MENU_CARDS.filter(card =>
-      card.roles.some(role => this.authService.hasRole(role))
-    );
+    // Assina as mudanças de perfil para atualizar os cards dinamicamente
+    this.roleSubscription = this.authService.activeRole$.subscribe(() => {
+      this.filterMenuCards();
+      this.carregarDadosDashboard();
+    });
 
-    // Carrega os dados do dashboard (aqui usamos dados de exemplo)
+    // Carga inicial
+    this.filterMenuCards();
     this.carregarDadosDashboard();
   }
 
-  carregarDadosDashboard(): void {
-    // **DADOS DE EXEMPLO (MOCK)**
-    // No sistema real, estes dados viriam de chamadas de serviço ao seu backend.
+  ngOnDestroy(): void {
+    if (this.roleSubscription) {
+      this.roleSubscription.unsubscribe();
+    }
+  }
 
-    // Exemplo para um aluno ou professor
+  filterMenuCards(): void {
+    this.menuCards = ALL_MENU_CARDS.filter(card =>
+      card.roles.some(role => this.authService.isRoleActiveOrHigher(role))
+    );
+  }
+
+  carregarDadosDashboard(): void {
+    // Limpa a próxima aula antes de verificar novamente
+    this.proximaAula = null;
+
+    // Exemplo para um aluno ou professor (baseado no perfil ativo)
     if (this.isAluno || this.isProfessor) {
       this.proximaAula = {
         disciplina: 'Cálculo I',
@@ -60,8 +77,8 @@ export class Home implements OnInit {
   }
 
   // Getters para controle de permissão
-  get isAdmin() { return this.authService.hasRole('ROLE_ADMIN'); }
-  get isCoordenador() { return this.authService.hasRole('ROLE_COORDENADOR'); }
-  get isProfessor() { return this.authService.hasRole('ROLE_PROFESSOR'); }
-  get isAluno() { return this.authService.hasRole('ROLE_ALUNO'); }
+  get isAdmin() { return this.authService.isRoleActiveOrHigher('ROLE_ADMIN'); }
+  get isCoordenador() { return this.authService.isRoleActiveOrHigher('ROLE_COORDENADOR'); }
+  get isProfessor() { return this.authService.isRoleActiveOrHigher('ROLE_PROFESSOR'); }
+  get isAluno() { return this.authService.isRoleActiveOrHigher('ROLE_ALUNO'); }
 }

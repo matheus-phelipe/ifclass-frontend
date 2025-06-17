@@ -1,24 +1,26 @@
 import { NovoCursoDTO, Curso } from './../../model/cursos/curso.model';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../service/auth/auth.service';
 import { CursoService } from '../../service/curso/curso.service';
+import { ProfileSwitcherComponent } from '../../shared/profile-switcher/profile-switcher';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-cursos',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, ProfileSwitcherComponent],
   templateUrl: './cursos.html',
   styleUrls: ['./cursos.css'] // Corrigido para styleUrls
 })
-export class CursosComponent implements OnInit {
+export class CursosComponent implements OnInit, OnDestroy {
   public cursos: Curso[] = [];
   public isLoading = true;
   public error: string | null = null;
   public isAdmin = false;
   public isCoordenador = false;
-
+  private roleSubscription!: Subscription;
   public mostrandoFormulario = false;
   public novoCurso: NovoCursoDTO = {
     nome: '',
@@ -42,8 +44,20 @@ export class CursosComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    // 5. Assinar as mudanças de perfil ativo
+    this.roleSubscription = this.authService.activeRole$.subscribe(() => {
+      this.checkUserRoles();
+    });
+    // Carga inicial
     this.checkUserRoles();
     this.carregarCursos();
+  }
+
+  ngOnDestroy(): void {
+    // 6. Cancelar a inscrição ao sair da página
+    if (this.roleSubscription) {
+      this.roleSubscription.unsubscribe();
+    }
   }
 
   // Métodos para Título e Subtítulo Dinâmicos
@@ -56,8 +70,8 @@ export class CursosComponent implements OnInit {
   }
 
   checkUserRoles(): void {
-    this.isAdmin = this.authService.hasRole('ROLE_ADMIN');
-    this.isCoordenador = this.authService.hasRole('ROLE_COORDENADOR');
+    this.isAdmin = this.authService.isRoleActiveOrHigher('ROLE_ADMIN');
+    this.isCoordenador = this.authService.isRoleActiveOrHigher('ROLE_COORDENADOR');
   }
 
   carregarCursos(): void {

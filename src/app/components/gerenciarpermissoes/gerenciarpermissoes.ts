@@ -1,20 +1,24 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Usuario } from '../../model/usuario/usuario.model';
 import { UsuarioService } from '../../service/usuario/usuario.service';
 import { CommonModule } from '@angular/common';
 import { ModalConfirmacaoComponent } from '../../shared/modal-confirmacao/modal-confirmacao';
 import { AlertComponent } from '../../shared/alert/alert';
 import { FormsModule } from '@angular/forms';
+import { ProfileSwitcherComponent } from '../../shared/profile-switcher/profile-switcher';
+import { Subscription } from 'rxjs';
+import { AuthService } from '../../service/auth/auth.service';
 
 @Component({
   selector: 'app-gerenciarpermissoes',
   standalone: true,
-  imports: [CommonModule, FormsModule, AlertComponent],
+  imports: [CommonModule, FormsModule, AlertComponent, ProfileSwitcherComponent],
   templateUrl: './gerenciarpermissoes.html',
   styleUrls: ['./gerenciarpermissoes.css']
 })
-export class Gerenciarpermissoes implements OnInit {
-  
+export class Gerenciarpermissoes implements OnInit, OnDestroy {
+  private roleSubscription!: Subscription;
+  podeGerenciar = false;
   usuarios: Usuario[] = []; 
   usuariosFiltrados: Usuario[] = []; 
   termoBusca = '';
@@ -24,11 +28,27 @@ export class Gerenciarpermissoes implements OnInit {
   @ViewChild('alerta') alerta!: AlertComponent;
 
   constructor(
-    private usuarioService: UsuarioService
+    private usuarioService: UsuarioService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
+    // Assina as mudanças de perfil
+    this.roleSubscription = this.authService.activeRole$.subscribe(() => {
+      this.checkUserRole();
+    });
+    this.checkUserRole(); // Carga inicial
     this.carregarUsuarios();
+  }
+
+  ngOnDestroy(): void {
+    if (this.roleSubscription) {
+      this.roleSubscription.unsubscribe();
+    }
+  }
+
+  checkUserRole(): void {
+    this.podeGerenciar = this.authService.isRoleActiveOrHigher('ROLE_COORDENADOR');
   }
 
   carregarUsuarios() {
@@ -67,6 +87,11 @@ export class Gerenciarpermissoes implements OnInit {
   }
 
   onRoleChange(usuario: Usuario, papel: string) {
+    if (!this.podeGerenciar) {
+      this.mostrarAlerta('Você não tem permissão para alterar papéis.', 'danger');
+      return;
+    }
+    
     const permissoesAtuais = [...(usuario.authorities || [])];
     const index = permissoesAtuais.indexOf(papel);
 

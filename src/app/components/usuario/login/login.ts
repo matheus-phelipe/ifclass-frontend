@@ -43,29 +43,31 @@ export class LoginComponent implements OnInit {
 
   login() {
     this.authService.login(this.credenciais.email, this.credenciais.senha).subscribe({
-      next: (res) => {
-        this.authService.salvarToken(res.token);
+      next: (response) => {
+        this.authService.salvarToken(response.token);
 
-        if (this.lembrarMe) {
-          localStorage.setItem('rememberedEmail', this.credenciais.email);
-          localStorage.setItem('rememberMeFlag', 'true');
-        } else {
-          localStorage.removeItem('rememberedEmail');
-          localStorage.setItem('rememberMeFlag', 'false');
-        }
+        const availableRoles = this.authService.getAvailableRoles();
 
-        // --- LÓGICA DE REDIRECIONAMENTO ADAPTADA ---
-        const roles = this.authService.getRoles();
-        
-        if (roles.includes('ROLE_ALUNO') && roles.length === 1) {
+        // REGRA: Se tem a permissão de ALUNO e outra permissão (ex: PROFESSOR)
+        if (availableRoles.includes('ROLE_ALUNO') && availableRoles.length > 1) {
+          // Define ALUNO como o perfil ativo inicial
+          this.authService.setActiveRole('ROLE_ALUNO');
+          // Redireciona para a tela do aluno
           this.router.navigate(['/aluno/mapa']);
         } else {
-          // Para todos os outros (Admin, Coordenador, etc.)
+          // REGRA: Para todos os outros casos (só admin, só professor, etc.)
+          // Define o primeiro perfil da lista como ativo
+          const primaryRole = availableRoles.length > 0 ? availableRoles[0] : null;
+          if (primaryRole) {
+            this.authService.setActiveRole(primaryRole);
+          }
+          // Redireciona para a home principal
           this.router.navigate(['/app/home']);
         }
       },
-      error: () => {
-        this.alerta.show('Credenciais inválidas.', 3000, 'danger');
+      error: (err) => {
+        // Trate o erro de login aqui
+        console.error('Falha no login', err);
       }
     });
   }

@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit } from '@angular/core';
+import { Component, ViewChild, OnInit, OnDestroy } from '@angular/core';
 import { Usuario } from '../../model/usuario/usuario.model';
 import { UsuarioService } from '../../service/usuario/usuario.service';
 import { CommonModule } from '@angular/common';
@@ -7,32 +7,36 @@ import { AuthService } from '../../service/auth/auth.service';
 import { FormsModule } from '@angular/forms';
 import { AlertComponent } from '../../shared/alert/alert';
 import { ModalConfirmacaoComponent } from '../../shared/modal-confirmacao/modal-confirmacao';
+import { ProfileSwitcherComponent } from '../../shared/profile-switcher/profile-switcher';
+import { Subscription } from 'rxjs';
 
 declare var bootstrap: any;
 
 @Component({
   selector: 'app-gerenciarusuarios',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, AlertComponent, ModalConfirmacaoComponent],
+  imports: [CommonModule, RouterModule, FormsModule, AlertComponent, ModalConfirmacaoComponent, ProfileSwitcherComponent],
   templateUrl: './gerenciarusuarios.html',
   styleUrls: ['./gerenciarusuarios.css']
 })
-export class Gerenciarusuarios implements OnInit {
+export class Gerenciarusuarios implements OnInit, OnDestroy {
   
   usuarios: Usuario[] = [];
   usuariosFiltrados: Usuario[] = [];
   termoBusca = '';
 
   usuarioSelecionado: Usuario | null = null;
-usuarioParaEditar: Usuario = {
-    id: 0,
-    nome: '',
-    email: '',
-    prontuario: '',
-    authorities: []
-  };
+  usuarioParaEditar: Usuario = {
+      id: 0,
+      nome: '',
+      email: '',
+      prontuario: '',
+      authorities: []
+    };
   
+  isAdmin = false;
   usuarioParaRemover!: Usuario;
+  private roleSubscription!: Subscription;
   
   // Variáveis para alteração de permissão
   usuarioParaAlterarPermissao!: Usuario;
@@ -50,12 +54,29 @@ usuarioParaEditar: Usuario = {
     private usuarioService: UsuarioService
   ) {}
 
-  ngOnInit(): void {
+   ngOnInit(): void {
+    // Assina as mudanças de perfil para atualizar a flag de permissão
+    this.roleSubscription = this.authService.activeRole$.subscribe(() => {
+      this.checkUserRole();
+    });
+
+    this.checkUserRole(); // Carga inicial
     this.carregarUsuarios();
+
     const modalElement = document.getElementById('editarUsuarioModal');
     if (modalElement) {
       this.editarUsuarioModal = new bootstrap.Modal(modalElement);
     }
+  }
+
+  ngOnDestroy(): void {
+    if (this.roleSubscription) {
+      this.roleSubscription.unsubscribe();
+    }
+  }
+
+  checkUserRole(): void {
+    this.isAdmin = this.authService.isRoleActiveOrHigher('ROLE_ADMIN');
   }
 
   carregarUsuarios() {
@@ -99,6 +120,11 @@ usuarioParaEditar: Usuario = {
    * para uma experiência de usuário mais fluida.
    */
   onRoleChange(usuario: Usuario, papel: string) {
+    if (!this.isAdmin) {
+      this.mostrarAlerta('Você não tem permissão para alterar papéis.', 'danger');
+      return;
+    }
+
     const permissoesAtuais = [...(usuario.authorities || [])];
     const index = permissoesAtuais.indexOf(papel);
 
@@ -125,7 +151,8 @@ usuarioParaEditar: Usuario = {
   }
 
   abrirModalEditar(usuario: Usuario) {
-    this.usuarioParaEditar = JSON.parse(JSON.stringify(usuario)); // Deep copy
+    if (!this.isAdmin) return;
+    this.usuarioParaEditar = JSON.parse(JSON.stringify(usuario));
     this.editarUsuarioModal.show();
   }
 
@@ -148,12 +175,9 @@ usuarioParaEditar: Usuario = {
   }
 
   removerUsuario(usuario: Usuario) {
+    if (!this.isAdmin) return;
     this.usuarioParaRemover = usuario;
-    this.modalConfirm.open(
-        'danger',
-        'Confirmar Remoção',
-        `Tem certeza que deseja remover o usuário ${usuario.nome}? Essa ação não pode ser desfeita.`
-    );
+    this.modalConfirm.open('danger', 'Confirmar Remoção', `Tem certeza que deseja remover o usuário ${usuario.nome}?`);
   }
 
   confirmarRemocao() {

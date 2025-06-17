@@ -8,6 +8,7 @@ import { BlocoService } from '../../../service/bloco/bloco.service';
 import { NgxPanZoomModule } from 'ngx-panzoom'; 
 import { AuthService } from '../../../service/auth/auth.service';
 import { FormsModule } from '@angular/forms';
+import { ProfileSwitcherComponent } from '../../../shared/profile-switcher/profile-switcher';
 
 export interface PanZoomConfig {
   zoomFactor?: number;
@@ -40,7 +41,7 @@ export interface PanZoomConfig {
 @Component({
   selector: 'app-mapa-aluno',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgxPanZoomModule],
+  imports: [CommonModule, FormsModule, NgxPanZoomModule, ProfileSwitcherComponent],
   templateUrl: './mapa-aluno.html',
   styleUrls: ['./mapa-aluno.css'], // Crie um CSS se precisar
   schemas: [CUSTOM_ELEMENTS_SCHEMA]

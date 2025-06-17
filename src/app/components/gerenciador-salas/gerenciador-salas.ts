@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener, ElementRef, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Component, OnInit, HostListener, ElementRef, CUSTOM_ELEMENTS_SCHEMA, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Bloco } from '../../model/bloco/bloco.model';
@@ -6,6 +6,8 @@ import { Sala } from '../../model/bloco/sala.model';
 import { BlocoService } from '../../service/bloco/bloco.service';
 import { AuthService } from '../../service/auth/auth.service';
 import { NgxPanZoomModule } from 'ngx-panzoom';
+import { Subscription } from 'rxjs';
+import { ProfileSwitcherComponent } from '../../shared/profile-switcher/profile-switcher';
 
 // Re-definir a interface PanZoomConfig (COMPLETA)
 export interface PanZoomConfig {
@@ -39,12 +41,12 @@ export interface PanZoomConfig {
 @Component({
   selector: 'app-gerenciador-salas',
   standalone: true,  
-  imports: [CommonModule, FormsModule, NgxPanZoomModule],
+  imports: [CommonModule, FormsModule, NgxPanZoomModule, ProfileSwitcherComponent],
   templateUrl: './gerenciador-salas.html',
   styleUrls: ['./gerenciador-salas.css'],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class GerenciadorSalasComponent implements OnInit {
+export class GerenciadorSalasComponent implements OnInit, OnDestroy {
 
   public blocos: Bloco[] = [];
   isLoading = true;
@@ -59,6 +61,8 @@ export class GerenciadorSalasComponent implements OnInit {
   private dragOffset = { x: 0, y: 0 };
   private svgElement: SVGSVGElement | null = null;
   private hasMoved = false; // Flag para diferenciar clique de arrastar
+
+  private roleSubscription!: Subscription;
 
   public panZoomConfig: PanZoomConfig = {
     zoomFactor: 0.15,      // Mais suave
@@ -100,8 +104,18 @@ export class GerenciadorSalasComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.roleSubscription = this.authService.activeRole$.subscribe(() => {
+      this.checkUserRole();
+    });
+    // Carga inicial
     this.checkUserRole();
     this.carregarBlocos();
+  }
+
+  ngOnDestroy(): void {
+    if (this.roleSubscription) {
+      this.roleSubscription.unsubscribe();
+    }
   }
 
   getPageTitle(): string {
@@ -113,7 +127,7 @@ export class GerenciadorSalasComponent implements OnInit {
   }
 
   private checkUserRole(): void {
-    this.isAdmin = this.authService.hasRole('ROLE_ADMIN');
+    this.isAdmin = this.authService.isRoleActiveOrHigher('ROLE_ADMIN');
   }
 
   // --- Lógica de Drag and Drop (Apenas para Admin) ---
