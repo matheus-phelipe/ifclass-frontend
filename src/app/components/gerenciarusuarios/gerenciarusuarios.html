@@ -1,138 +1,140 @@
-<div class="container-fluid">
-  <div class="page-header d-flex justify-content-between align-items-start">
-    <div>
-      <h2 class="page-title">Gerenciar Usuários</h2>
-    </div>
-    <app-profile-switcher></app-profile-switcher>
-  </div>
-  
-  <div class="search-container mb-4">
-      <i class="bi bi-search search-icon"></i>
-      <input 
-        type="text" 
-        class="form-control search-input" 
-        placeholder="Buscar por nome ou email..."
-        [(ngModel)]="termoBusca"
-        (input)="filtrarUsuarios()">
-    </div>
+<ng-container *ngIf="{ canManage: (authService.isAdmin$ | async) } as perms">
 
-  <div class="row g-4">
-    <div class="col-lg-7">
-      <div class="table-container">
-        <div class="table-responsive">
-          <table class="table align-middle">
-            <thead>
-              <tr>
-                <th>Usuário</th>
-                <th>Permissões</th>
-                <th class="text-center">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let usuario of usuariosFiltrados" 
-                  (click)="selecionarUsuario(usuario)"
-                  [class.selected-row]="usuario.id === usuarioSelecionado?.id">
-                <td>
-                  <div class="user-info">
-                    <div class="user-avatar">{{ usuario.nome.charAt(0) }}</div>
-                    <div>
-                      <div class="user-name">{{ usuario.nome }}</div>
-                      <div class="user-email">{{ usuario.email }}</div>
+  <div class="container-fluid">
+    <div class="page-header d-flex justify-content-between align-items-start">
+      <div>
+        <h2 class="page-title">Gerenciar Usuários</h2>
+      </div>
+      <app-profile-switcher></app-profile-switcher>
+    </div>
+    
+    <div class="search-container mb-4">
+        <i class="bi bi-search search-icon"></i>
+        <input 
+          type="text" 
+          class="form-control search-input" 
+          placeholder="Buscar por nome ou email..."
+          [(ngModel)]="termoBusca"
+          (input)="filtrarUsuarios()">
+      </div>
+
+    <div class="row g-4">
+      <div class="col-lg-7">
+        <div class="table-container">
+          <div class="table-responsive">
+            <table class="table align-middle">
+              <thead>
+                <tr>
+                  <th>Usuário</th>
+                  <th>Permissões</th>
+                  <th class="text-center">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let usuario of usuariosFiltrados" 
+                    (click)="selecionarUsuario(usuario)"
+                    [class.selected-row]="usuario.id === usuarioSelecionado?.id">
+                  <td>
+                    <div class="user-info">
+                      <div class="user-avatar">{{ usuario.nome.charAt(0) }}</div>
+                      <div>
+                        <div class="user-name">{{ usuario.nome }}</div>
+                        <div class="user-email">{{ usuario.email }}</div>
+                      </div>
                     </div>
-                  </div>
-                </td>
-                <td>
-                  <div class="roles-container">
-                    <span class="role-pill" [class.active]="temPapel(usuario, 'ROLE_ALUNO')" (click)="$event.stopPropagation(); onRoleChange(usuario, 'ROLE_ALUNO')">Aluno</span>
-                    <span class="role-pill" [class.active]="temPapel(usuario, 'ROLE_PROFESSOR')" (click)="$event.stopPropagation(); onRoleChange(usuario, 'ROLE_PROFESSOR')">Professor</span>
-                    <span class="role-pill" [class.active]="temPapel(usuario, 'ROLE_COORDENADOR')" (click)="$event.stopPropagation(); onRoleChange(usuario, 'ROLE_COORDENADOR')">Coordenador</span>
-                    <span class="role-pill" [class.active]="temPapel(usuario, 'ROLE_ADMIN')" (click)="$event.stopPropagation(); onRoleChange(usuario, 'ROLE_ADMIN')">Admin</span>
-                  </div>
-                </td>
-                <td class="text-center">
-                   <div class="actions-container" (click)="$event.stopPropagation()">
-                      <button class="btn action-btn btn-edit" title="Editar Usuário" (click)="abrirModalEditar(usuario)">
-                        <i class="bi bi-pencil-fill"></i>
-                      </button>
-                      <button class="btn action-btn btn-delete" title="Remover Usuário" (click)="removerUsuario(usuario)">
-                        <i class="bi bi-trash3-fill"></i>
-                      </button>
-                   </div>
-                </td>
-              </tr>
-              <tr *ngIf="usuariosFiltrados.length === 0">
-                <td colspan="3" class="text-center text-muted p-5">Nenhum usuário encontrado.</td>
-              </tr>
-            </tbody>
-          </table>
+                  </td>
+                  <td>
+                    <div class="roles-container">
+                      <span class="role-pill" [class.active]="temPapel(usuario, 'ROLE_ALUNO')" (click)="$event.stopPropagation(); onRoleChange(usuario, 'ROLE_ALUNO')">Aluno</span>
+                      <span class="role-pill" [class.active]="temPapel(usuario, 'ROLE_PROFESSOR')" (click)="$event.stopPropagation(); onRoleChange(usuario, 'ROLE_PROFESSOR')">Professor</span>
+                      <span class="role-pill" [class.active]="temPapel(usuario, 'ROLE_COORDENADOR')" (click)="$event.stopPropagation(); onRoleChange(usuario, 'ROLE_COORDENADOR')">Coordenador</span>
+                      <span class="role-pill" [class.active]="temPapel(usuario, 'ROLE_ADMIN')" (click)="$event.stopPropagation(); onRoleChange(usuario, 'ROLE_ADMIN')">Admin</span>
+                    </div>
+                  </td>
+                  <td class="text-center">
+                    <div class="actions-container" (click)="$event.stopPropagation()">
+                        <button class="btn action-btn btn-edit" title="Editar Usuário" (click)="abrirModalEditar(usuario)">
+                          <i class="bi bi-pencil-fill"></i>
+                        </button>
+                        <button class="btn action-btn btn-delete" title="Remover Usuário" (click)="removerUsuario(usuario)">
+                          <i class="bi bi-trash3-fill"></i>
+                        </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr *ngIf="usuariosFiltrados.length === 0">
+                  <td colspan="3" class="text-center text-muted p-5">Nenhum usuário encontrado.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="col-lg-5">
-      <div class="details-panel" *ngIf="usuarioSelecionado">
-        <div class="details-header">
-          <div class="details-avatar">{{ usuarioSelecionado.nome.charAt(0) }}</div>
-          <h4 class="details-name">{{ usuarioSelecionado.nome }}</h4>
-          <p class="details-email">{{ usuarioSelecionado.email }}</p>
+      <div class="col-lg-5">
+        <div class="details-panel" *ngIf="usuarioSelecionado">
+          <div class="details-header">
+            <div class="details-avatar">{{ usuarioSelecionado.nome.charAt(0) }}</div>
+            <h4 class="details-name">{{ usuarioSelecionado.nome }}</h4>
+            <p class="details-email">{{ usuarioSelecionado.email }}</p>
+          </div>
+          <div class="details-body">
+            <div class="detail-item">
+              <span class="detail-label">Prontuário</span>
+              <span class="detail-value">{{ usuarioSelecionado.prontuario || 'Não informado' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Permissões</span>
+              <span class="detail-value detail-role">{{ formatarPermissoes(usuarioSelecionado.authorities) }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">ID do Usuário</span>
+              <span class="detail-value">#{{ usuarioSelecionado.id }}</span>
+            </div>
+          </div>
         </div>
-        <div class="details-body">
-          <div class="detail-item">
-            <span class="detail-label">Prontuário</span>
-            <span class="detail-value">{{ usuarioSelecionado.prontuario || 'Não informado' }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Permissões</span>
-            <span class="detail-value detail-role">{{ formatarPermissoes(usuarioSelecionado.authorities) }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">ID do Usuário</span>
-            <span class="detail-value">#{{ usuarioSelecionado.id }}</span>
-          </div>
+        <div class="details-panel placeholder-panel" *ngIf="!usuarioSelecionado">
+          <i class="bi bi-people-fill placeholder-icon"></i>
+          <p class="text-muted">Selecione um usuário para ver os detalhes</p>
         </div>
-      </div>
-      <div class="details-panel placeholder-panel" *ngIf="!usuarioSelecionado">
-         <i class="bi bi-people-fill placeholder-icon"></i>
-         <p class="text-muted">Selecione um usuário para ver os detalhes</p>
       </div>
     </div>
   </div>
-</div>
 
-<div class="modal fade" id="editarUsuarioModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">
-          <i class="bi bi-pencil-square me-2"></i>
-          Editar Usuário
-        </h5>
-        <button type="button" class="btn-close" (click)="editarUsuarioModal.hide()" aria-label="Fechar"></button>
-      </div>
-      <div class="modal-body" *ngIf="usuarioParaEditar">
-        <form #editarUsuarioForm="ngForm" class="d-flex flex-column gap-3">
-          <div>
-            <label for="nome" class="form-label">Nome</label>
-            <input type="text" id="nome" class="form-control" [(ngModel)]="usuarioParaEditar.nome" name="nome">
-          </div>
-          <div>
-            <label for="email" class="form-label">Email</label>
-            <input type="email" id="email" class="form-control" [(ngModel)]="usuarioParaEditar.email" name="email">
-          </div>
-          <div>
-            <label class="form-label">Prontuário</label>
-            <input type="text" class="form-control" [(ngModel)]="usuarioParaEditar.prontuario" name="prontuario">
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="editarUsuarioModal.hide()">Cancelar</button>
-        <button type="button" class="btn btn-success" (click)="salvarEdicao()">Salvar Alterações</button>
+  <div class="modal fade" id="editarUsuarioModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="bi bi-pencil-square me-2"></i>
+            Editar Usuário
+          </h5>
+          <button type="button" class="btn-close" (click)="editarUsuarioModal.hide()" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body" *ngIf="usuarioParaEditar">
+          <form #editarUsuarioForm="ngForm" class="d-flex flex-column gap-3">
+            <div>
+              <label for="nome" class="form-label">Nome</label>
+              <input type="text" id="nome" class="form-control" [(ngModel)]="usuarioParaEditar.nome" name="nome">
+            </div>
+            <div>
+              <label for="email" class="form-label">Email</label>
+              <input type="email" id="email" class="form-control" [(ngModel)]="usuarioParaEditar.email" name="email">
+            </div>
+            <div>
+              <label class="form-label">Prontuário</label>
+              <input type="text" class="form-control" [(ngModel)]="usuarioParaEditar.prontuario" name="prontuario">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="editarUsuarioModal.hide()">Cancelar</button>
+          <button type="button" class="btn btn-success" (click)="salvarEdicao()">Salvar Alterações</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
-
+</ng-container>
 
 <app-alert #alerta></app-alert>
 <app-modal-confirmacao #modalConfirm (confirmed)="confirmarRemocao()" (canceled)="cancelarRemocao()"></app-modal-confirmacao>

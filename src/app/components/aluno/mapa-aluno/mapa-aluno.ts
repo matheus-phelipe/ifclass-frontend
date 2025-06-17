@@ -48,10 +48,9 @@ export interface PanZoomConfig {
 })
 export class MapaAlunoComponent implements OnInit {
 
-   public blocos: Bloco[] = [];
+  public blocos: Bloco[] = [];
   isLoading = true;
   error: string | null = null;
-  isAdmin = false;
   public activeBlocoId: number | null = null;
   public editingSala: Sala | null = null;
 
@@ -98,31 +97,18 @@ export class MapaAlunoComponent implements OnInit {
 
   constructor(
     private blocoService: BlocoService,
-    private authService: AuthService,
-    private el: ElementRef // Usado para querySelector
+    public authService: AuthService,
+    private el: ElementRef 
   ) {}
 
   ngOnInit(): void {
-    this.checkUserRole();
     this.carregarBlocos();
-  }
-
-  getPageTitle(): string {
-    return this.isAdmin ? 'Planta do Campus' : 'Mapa do Campus';
-  }
-
-  getPageSubtitle(): string {
-    return this.isAdmin ? 'Visualize e gerencie os blocos e salas da instituição.' : 'Explore o mapa dos blocos e salas da instituição.';
-  }
-
-  private checkUserRole(): void {
-    this.isAdmin = this.authService.hasRole('ROLE_ADMIN');
   }
 
   // --- Lógica de Drag and Drop (Apenas para Admin) ---
 
   onMouseDown(event: MouseEvent, sala: Sala): void {
-    if (!this.isAdmin) return; // Garante que só admin pode iniciar drag
+    if (!this.authService.isRoleActiveOrHigher('ROLE_ADMIN')) return; // Garante que só admin pode iniciar drag
     event.stopPropagation(); // Evita que o evento se propague para o pan-zoom
     event.preventDefault(); // Evita o comportamento padrão do navegador
 
@@ -172,7 +158,7 @@ export class MapaAlunoComponent implements OnInit {
     if (this.hasMoved) { // Se a sala foi arrastada
         this.updateSalaPosition(this.draggingSala);
     } else { // Se foi apenas um clique (não houve movimento significativo)
-        if (this.isAdmin) { // E se for admin, então selecione a sala
+        if (this.authService.isRoleActiveOrHigher('ROLE_ADMIN')) { // E se for admin, então selecione a sala
             this.selectSala(this.draggingSala);
         }
     }
@@ -213,7 +199,7 @@ export class MapaAlunoComponent implements OnInit {
 
   selectSala(sala: Sala): void {
     // A seleção para edição só é permitida se for admin.
-    if (!this.isAdmin) return;
+    if (!this.authService.isRoleActiveOrHigher('ROLE_ADMIN')) return;
     this.editingSala = sala;
     this.formSala = {
       codigo: sala.codigo,

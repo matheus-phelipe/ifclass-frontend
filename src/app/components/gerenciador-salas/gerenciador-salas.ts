@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener, ElementRef, CUSTOM_ELEMENTS_SCHEMA, OnDestroy } from '@angular/core';
+import { Component, OnInit, HostListener, ElementRef, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Bloco } from '../../model/bloco/bloco.model';
@@ -6,7 +6,6 @@ import { Sala } from '../../model/bloco/sala.model';
 import { BlocoService } from '../../service/bloco/bloco.service';
 import { AuthService } from '../../service/auth/auth.service';
 import { NgxPanZoomModule } from 'ngx-panzoom';
-import { Subscription } from 'rxjs';
 import { ProfileSwitcherComponent } from '../../shared/profile-switcher/profile-switcher';
 
 // Re-definir a interface PanZoomConfig (COMPLETA)
@@ -46,12 +45,11 @@ export interface PanZoomConfig {
   styleUrls: ['./gerenciador-salas.css'],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class GerenciadorSalasComponent implements OnInit, OnDestroy {
+export class GerenciadorSalasComponent implements OnInit {
 
   public blocos: Bloco[] = [];
   isLoading = true;
   error: string | null = null;
-  isAdmin = false;
   public activeBlocoId: number | null = null;
   public editingSala: Sala | null = null;
 
@@ -61,8 +59,6 @@ export class GerenciadorSalasComponent implements OnInit, OnDestroy {
   private dragOffset = { x: 0, y: 0 };
   private svgElement: SVGSVGElement | null = null;
   private hasMoved = false; // Flag para diferenciar clique de arrastar
-
-  private roleSubscription!: Subscription;
 
   public panZoomConfig: PanZoomConfig = {
     zoomFactor: 0.15,      // Mais suave
@@ -99,41 +95,18 @@ export class GerenciadorSalasComponent implements OnInit, OnDestroy {
 
   constructor(
     private blocoService: BlocoService,
-    private authService: AuthService,
+    public authService: AuthService,
     private el: ElementRef // Usado para querySelector
   ) {}
 
   ngOnInit(): void {
-    this.roleSubscription = this.authService.activeRole$.subscribe(() => {
-      this.checkUserRole();
-    });
-    // Carga inicial
-    this.checkUserRole();
     this.carregarBlocos();
-  }
-
-  ngOnDestroy(): void {
-    if (this.roleSubscription) {
-      this.roleSubscription.unsubscribe();
-    }
-  }
-
-  getPageTitle(): string {
-    return this.isAdmin ? 'Planta do Campus' : 'Mapa do Campus';
-  }
-
-  getPageSubtitle(): string {
-    return this.isAdmin ? 'Visualize e gerencie os blocos e salas da instituição.' : 'Explore o mapa dos blocos e salas da instituição.';
-  }
-
-  private checkUserRole(): void {
-    this.isAdmin = this.authService.isRoleActiveOrHigher('ROLE_ADMIN');
   }
 
   // --- Lógica de Drag and Drop (Apenas para Admin) ---
 
   onMouseDown(event: MouseEvent, sala: Sala): void {
-    if (!this.isAdmin) return; // Garante que só admin pode iniciar drag
+    if (!this.authService.isRoleActiveOrHigher('ROLE_ADMIN')) return; // Garante que só admin pode iniciar drag
     event.stopPropagation(); // Evita que o evento se propague para o pan-zoom
     event.preventDefault(); // Evita o comportamento padrão do navegador
 
@@ -183,7 +156,7 @@ export class GerenciadorSalasComponent implements OnInit, OnDestroy {
     if (this.hasMoved) { // Se a sala foi arrastada
         this.updateSalaPosition(this.draggingSala);
     } else { // Se foi apenas um clique (não houve movimento significativo)
-        if (this.isAdmin) { // E se for admin, então selecione a sala
+        if (this.authService.isRoleActiveOrHigher('ROLE_ADMIN')) { // E se for admin, então selecione a sala
             this.selectSala(this.draggingSala);
         }
     }
@@ -224,7 +197,7 @@ export class GerenciadorSalasComponent implements OnInit, OnDestroy {
 
   selectSala(sala: Sala): void {
     // A seleção para edição só é permitida se for admin.
-    if (!this.isAdmin) return;
+    if (!this.authService.isRoleActiveOrHigher('ROLE_ADMIN')) return;
     this.editingSala = sala;
     this.formSala = {
       codigo: sala.codigo,

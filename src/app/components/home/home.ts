@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core'; // OnDestroy ainda é necessário para a inscrição dos cards
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../service/auth/auth.service';
 import { ALL_MENU_CARDS, MenuCard } from './menu-cards';
@@ -13,11 +13,10 @@ import { Subscription } from 'rxjs';
   standalone: true,
   imports: [CommonModule, RouterModule, ProfileSwitcherComponent],
   templateUrl: './home.html',
-  styleUrl: './home.css'
+  styleUrls: ['./home.css']
 })
-export class Home implements OnInit {
+export class Home implements OnInit, OnDestroy {
   
-  // Propriedades para o Dashboard
   nomeUsuario = '';
   proximaAula: ProximaAula | null = null;
   avisos: Aviso[] = [];
@@ -25,20 +24,15 @@ export class Home implements OnInit {
   
   private roleSubscription!: Subscription;
 
-  constructor(private authService: AuthService) {}
+  constructor(public authService: AuthService) {}
 
   ngOnInit(): void {
     this.nomeUsuario = this.authService.getNomeUsuario() || 'Usuário';
 
-    // Assina as mudanças de perfil para atualizar os cards dinamicamente
     this.roleSubscription = this.authService.activeRole$.subscribe(() => {
       this.filterMenuCards();
       this.carregarDadosDashboard();
     });
-
-    // Carga inicial
-    this.filterMenuCards();
-    this.carregarDadosDashboard();
   }
 
   ngOnDestroy(): void {
@@ -48,17 +42,22 @@ export class Home implements OnInit {
   }
 
   filterMenuCards(): void {
-    this.menuCards = ALL_MENU_CARDS.filter(card =>
-      card.roles.some(role => this.authService.isRoleActiveOrHigher(role))
-    );
+    const activeRole = this.authService.getActiveRole();
+    if (!activeRole) {
+      this.menuCards = [];
+      return;
+    }
+    
+    this.menuCards = ALL_MENU_CARDS.filter(card => card.roles.includes(activeRole));
   }
 
-  carregarDadosDashboard(): void {
-    // Limpa a próxima aula antes de verificar novamente
+   carregarDadosDashboard(): void {
     this.proximaAula = null;
 
-    // Exemplo para um aluno ou professor (baseado no perfil ativo)
-    if (this.isAluno || this.isProfessor) {
+    const activeRole = this.authService.getActiveRole();
+    const podeVerAula = activeRole === 'ROLE_ALUNO' || activeRole === 'ROLE_PROFESSOR';
+
+    if (podeVerAula) {
       this.proximaAula = {
         disciplina: 'Cálculo I',
         professor: 'Dr. Newton',
@@ -68,17 +67,10 @@ export class Home implements OnInit {
       };
     }
 
-    // Exemplo de avisos para todos
     this.avisos = [
       { id: 1, titulo: 'Manutenção do sistema na próxima sexta-feira.', data: '12/06/2025' },
       { id: 2, titulo: 'Inscrições para atividades complementares abertas.', data: '10/06/2025' },
       { id: 3, titulo: 'Palestra sobre IA na educação no auditório.', data: '08/06/2025' }
     ];
   }
-
-  // Getters para controle de permissão
-  get isAdmin() { return this.authService.isRoleActiveOrHigher('ROLE_ADMIN'); }
-  get isCoordenador() { return this.authService.isRoleActiveOrHigher('ROLE_COORDENADOR'); }
-  get isProfessor() { return this.authService.isRoleActiveOrHigher('ROLE_PROFESSOR'); }
-  get isAluno() { return this.authService.isRoleActiveOrHigher('ROLE_ALUNO'); }
 }

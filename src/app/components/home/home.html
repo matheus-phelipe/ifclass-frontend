@@ -33,7 +33,7 @@
       </div>
 
       <!-- Mensagem para admin/coordenador -->
-       <div *ngIf="(isAdmin || isCoordenador) && !proximaAula" class="card-destaque h-100">
+       <div *ngIf="((authService.isAdmin$ | async) || (authService.isCoordenador$ | async)) && !proximaAula" class="card-destaque h-100">
           <div class="card-destaque-body text-center">
             <i class="bi bi-graph-up-arrow display-1 text-white mb-3"></i>
             <h2 class="disciplina-titulo">Visão Geral do Campus</h2>

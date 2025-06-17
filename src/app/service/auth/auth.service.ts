@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment.development';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, map } from 'rxjs';
 
 const ACTIVE_ROLE_KEY = 'activeRole';
 const TOKEN_KEY = 'token';
@@ -20,18 +20,32 @@ export class AuthService {
   private activeRoleSubject = new BehaviorSubject<string | null>(this.getActiveRole());
   public activeRole$ = this.activeRoleSubject.asObservable();
 
-  constructor(private http: HttpClient) {}
+  public isAdmin$: Observable<boolean> | undefined;
+  public isCoordenador$: Observable<boolean> | undefined;
+  public isProfessor$: Observable<boolean> | undefined;
+  
+  constructor(private http: HttpClient) {
+    this.isAdmin$ = this.activeRoleSubject.pipe(
+      map(role => this.isRoleActiveOrHigher('ROLE_ADMIN'))
+    );
+    this.isCoordenador$ = this.activeRoleSubject.pipe(
+      map(role => this.isRoleActiveOrHigher('ROLE_COORDENADOR'))
+    );
+    this.isProfessor$ = this.activeRoleSubject.pipe(
+      map(role => this.isRoleActiveOrHigher('ROLE_PROFESSOR'))
+    );
+  }
 
   login(email: string, senha: string ) {
     return this.http.post<{ token: string }>(`${this.API}/login`, {email, senha});
   }
 
-  salvarToken(token: string) {
-    localStorage.setItem('token', token);
+  salvarToken(token: string): void {
+    localStorage.setItem(TOKEN_KEY, token);
   }
 
   getToken(): string | null {
-    return localStorage.getItem('token');
+    return localStorage.getItem(TOKEN_KEY);
   }
 
   isAuthenticated(): boolean {
@@ -142,13 +156,11 @@ export class AuthService {
     return this.getAvailableRoles().includes(role);
   }
 
-  isRoleActiveOrHigher(requiredRole: string): boolean {
+  public isRoleActiveOrHigher(requiredRole: string): boolean {
     const activeRole = this.getActiveRole();
     if (!activeRole) return false;
-
     const activeLevel = roleHierarchy[activeRole] || 0;
     const requiredLevel = roleHierarchy[requiredRole] || 0;
-
     return activeLevel >= requiredLevel;
   }
 }

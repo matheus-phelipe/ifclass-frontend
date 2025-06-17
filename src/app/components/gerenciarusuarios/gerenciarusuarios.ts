@@ -1,14 +1,13 @@
-import { Component, ViewChild, OnInit, OnDestroy } from '@angular/core';
+import { Component, ViewChild, OnInit } from '@angular/core';
 import { Usuario } from '../../model/usuario/usuario.model';
 import { UsuarioService } from '../../service/usuario/usuario.service';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { AuthService } from '../../service/auth/auth.service';
 import { FormsModule } from '@angular/forms';
 import { AlertComponent } from '../../shared/alert/alert';
 import { ModalConfirmacaoComponent } from '../../shared/modal-confirmacao/modal-confirmacao';
 import { ProfileSwitcherComponent } from '../../shared/profile-switcher/profile-switcher';
-import { Subscription } from 'rxjs';
 
 declare var bootstrap: any;
 
@@ -19,7 +18,7 @@ declare var bootstrap: any;
   templateUrl: './gerenciarusuarios.html',
   styleUrls: ['./gerenciarusuarios.css']
 })
-export class Gerenciarusuarios implements OnInit, OnDestroy {
+export class Gerenciarusuarios implements OnInit {
   
   usuarios: Usuario[] = [];
   usuariosFiltrados: Usuario[] = [];
@@ -34,9 +33,7 @@ export class Gerenciarusuarios implements OnInit, OnDestroy {
       authorities: []
     };
   
-  isAdmin = false;
   usuarioParaRemover!: Usuario;
-  private roleSubscription!: Subscription;
   
   // Variáveis para alteração de permissão
   usuarioParaAlterarPermissao!: Usuario;
@@ -49,34 +46,17 @@ export class Gerenciarusuarios implements OnInit, OnDestroy {
   @ViewChild('alerta') alerta!: AlertComponent;
 
   constructor(
-    private router: Router,
-    private authService: AuthService,
+    public authService: AuthService,
     private usuarioService: UsuarioService
   ) {}
 
    ngOnInit(): void {
-    // Assina as mudanças de perfil para atualizar a flag de permissão
-    this.roleSubscription = this.authService.activeRole$.subscribe(() => {
-      this.checkUserRole();
-    });
-
-    this.checkUserRole(); // Carga inicial
     this.carregarUsuarios();
 
     const modalElement = document.getElementById('editarUsuarioModal');
     if (modalElement) {
       this.editarUsuarioModal = new bootstrap.Modal(modalElement);
     }
-  }
-
-  ngOnDestroy(): void {
-    if (this.roleSubscription) {
-      this.roleSubscription.unsubscribe();
-    }
-  }
-
-  checkUserRole(): void {
-    this.isAdmin = this.authService.isRoleActiveOrHigher('ROLE_ADMIN');
   }
 
   carregarUsuarios() {
@@ -120,7 +100,7 @@ export class Gerenciarusuarios implements OnInit, OnDestroy {
    * para uma experiência de usuário mais fluida.
    */
   onRoleChange(usuario: Usuario, papel: string) {
-    if (!this.isAdmin) {
+    if (!this.authService.isRoleActiveOrHigher('ROLE_ADMIN')) {
       this.mostrarAlerta('Você não tem permissão para alterar papéis.', 'danger');
       return;
     }
@@ -151,7 +131,7 @@ export class Gerenciarusuarios implements OnInit, OnDestroy {
   }
 
   abrirModalEditar(usuario: Usuario) {
-    if (!this.isAdmin) return;
+    if (!this.authService.isRoleActiveOrHigher('ROLE_ADMIN')) return;
     this.usuarioParaEditar = JSON.parse(JSON.stringify(usuario));
     this.editarUsuarioModal.show();
   }
@@ -175,7 +155,7 @@ export class Gerenciarusuarios implements OnInit, OnDestroy {
   }
 
   removerUsuario(usuario: Usuario) {
-    if (!this.isAdmin) return;
+    if (!this.authService.isRoleActiveOrHigher('ROLE_ADMIN')) return;
     this.usuarioParaRemover = usuario;
     this.modalConfirm.open('danger', 'Confirmar Remoção', `Tem certeza que deseja remover o usuário ${usuario.nome}?`);
   }
