@@ -47,12 +47,14 @@ export class LoginComponent implements OnInit {
         this.authService.salvarToken(response.token);
 
         const availableRoles = this.authService.getAvailableRoles();
+        const isStudent = availableRoles.includes('ROLE_ALUNO');
 
         // REGRA: Se tem a permissão de ALUNO e outra permissão (ex: PROFESSOR)
-        if (availableRoles.includes('ROLE_ALUNO') && availableRoles.length > 1) {
-          // Define ALUNO como o perfil ativo inicial
+        if (isStudent) {
+          // Se o usuário TEM A PERMISSÃO DE ALUNO, o destino inicial SEMPRE será a visão de aluno.
+          // Isso cobre tanto o caso "só aluno" quanto "aluno + outras permissões".
+          // O Profile Switcher aparecerá para o usuário com múltiplos papéis.
           this.authService.setActiveRole('ROLE_ALUNO');
-          // Redireciona para a tela do aluno
           this.router.navigate(['/aluno/mapa']);
         } else {
           // REGRA: Para todos os outros casos (só admin, só professor, etc.)
