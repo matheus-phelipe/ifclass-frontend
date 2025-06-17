@@ -17,12 +17,10 @@ import { Router, RouterLink, RouterModule } from '@angular/router';
   styleUrls: ['./login.css'] // Corrigido para styleUrls
 })
 export class LoginComponent implements OnInit {
-  // Remova: mensagemDoModal: string = 'Texto inicial';
   mostrarSenha: boolean = false;
   lembrarMe: boolean = false;
 
-  // Remova: @ViewChild('meuModal') modal!: ModalComponent;
-  @ViewChild('alerta') alerta!: AlertComponent; // Adicionado para exibir alertas
+  @ViewChild('alerta') alerta!: AlertComponent;
 
   credenciais: Login = {
     email: '',
@@ -68,9 +66,12 @@ export class LoginComponent implements OnInit {
         }
       },
       error: (err) => {
-        // Trate o erro de login aqui
-        console.error('Falha no login', err);
+        this.mostrarAlerta('Credenciais inválidas!', 'danger');
       }
     });
+  }
+
+   mostrarAlerta(mensagem: string, tipo: 'success' | 'danger' = 'success') {
+    this.alerta.show(mensagem, 3000, tipo); 
   }
 }

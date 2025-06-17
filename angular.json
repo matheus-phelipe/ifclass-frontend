@@ -29,7 +29,10 @@
             ],
             "scripts": [
               "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
-            ]          
+            ],
+             "allowedCommonJsDependencies": [
+              "sweetalert2"
+            ]            
           },
           "configurations": {
             "production": {
