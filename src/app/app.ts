@@ -1,11 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router, RouterOutlet, NavigationEnd, Event as RouterEvent } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { filter, Subscription } from 'rxjs'; // CORRIGIDO: Importação para RxJS v7+
-import { SidebarComponent } from './shared/sidebar/sidebar';
+import { filter, Subscription } from 'rxjs';
 import { AuthService } from './service/auth/auth.service';
-import { LoaderComponent } from './shared/loader/loader.component';
+import { UsuarioService } from './service/usuario/usuario.service';
 import { LoaderService } from './shared/loader/loader.service';
+import { SidebarComponent } from './shared/sidebar/sidebar';
+import { LoaderComponent } from './shared/loader/loader.component';
 
 @Component({
   selector: 'app-root',
@@ -31,28 +32,33 @@ export class App implements OnInit {
   private standaloneRoutes = ['/login', '/cadastro', '/resetar-senha', '/aluno/mapa'];
   private roleSubscription!: Subscription;
 
-  loaderVisible;
+  get loaderVisible$() {
+    return this.loaderService.loading$;
+  }
 
   constructor(
     private authService: AuthService,
     private router: Router,
-    private loaderService: LoaderService
+    private loaderService: LoaderService,
+    private usuarioService: UsuarioService,
+    private cdr: ChangeDetectorRef
   ) {
-    this.loaderVisible = this.loaderService.loading$;
     this.updateLayout(this.router.url);
   }
 
-   ngOnInit(): void {
+  ngOnInit(): void {
     // Escuta as mudanças de rota para ATUALIZAR O LAYOUT (mostrar/esconder sidebar)
     this.router.events.pipe(
       filter((event: RouterEvent): event is NavigationEnd => event instanceof NavigationEnd)
     ).subscribe((event: NavigationEnd) => {
       this.updateLayoutVisibility(event.urlAfterRedirects);
+      this.cdr.detectChanges();
     });
 
     // Escuta as mudanças de PERFIL ATIVO para ATUALIZAR AS PERMISSÕES DA SIDEBAR
     this.roleSubscription = this.authService.activeRole$.subscribe(() => {
       this.checkUserRoles();
+      this.cdr.detectChanges();
     });
 
     // Verificações iniciais
@@ -82,7 +88,7 @@ export class App implements OnInit {
     }
   }
 
-   private checkUserRoles(): void {
+  private checkUserRoles(): void {
     this.isAdmin = this.authService.isRoleActiveOrHigher('ROLE_ADMIN');
     this.isProfessor = this.authService.isRoleActiveOrHigher('ROLE_PROFESSOR');
     this.isCoordenador = this.authService.isRoleActiveOrHigher('ROLE_COORDENADOR');

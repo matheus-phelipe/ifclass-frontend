@@ -24,7 +24,7 @@
               [type]="campo.nome === 'email' ? 'text' : null"
               [required]="true"
               [minlength]="(campo.nome === 'senha' || campo.nome === 'confirmarSenha') ? 6 : null"
-              [pattern]="campo.nome === 'email' ? '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$' : ''" />
+              [pattern]="campo.nome === 'email' ? '^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$' : ''" />
 
             <button type="button"
                     class="btn btn-outline-secondary toggle-password"

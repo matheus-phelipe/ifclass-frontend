@@ -8,7 +8,7 @@
       <img src="assets/ifclass.png" alt="Logo" class="sidebar-logo img-fluid">
       <h5 class="sidebar-title mb-0" *ngIf="sidebarOpen">Class</h5>
     </a>
-    <button class="sidebar-toggle-btn" (click)="toggleSidebar()">
+    <button class="sidebar-toggle-btn" (click)="toggleSidebar()" aria-label="Alternar menu lateral">
       <i class="bi" [ngClass]="sidebarOpen ? 'bi-chevron-left' : 'bi-list'"></i>
     </button>
   </div>
@@ -96,7 +96,8 @@
 
   <div class="mt-auto pt-3">
     <button (click)="logout()" class="sidebar-logout-btn w-100 d-flex align-items-center"
-            [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
+            [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}"
+            aria-label="Sair do sistema">
       <i class="bi bi-box-arrow-right"></i>
       <span *ngIf="sidebarOpen">Sair</span>
     </button>
