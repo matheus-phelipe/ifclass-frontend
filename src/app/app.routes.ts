@@ -1,47 +1,72 @@
-import { LoginComponent } from './components/usuario/login/login';
+
 import { Routes } from '@angular/router';
-import { Home } from './components/home/home';
 import { authGuard } from './service/auth/auth.guard';
+import { LoginComponent } from './components/usuario/login/login';
 import { CadastroComponent } from './components/usuario/cadastro/cadastro';
+import { ResetarSenhaComponent } from './components/usuario/resetar-senha/resetar-senha';
+import { Home } from './components/home/home';
 import { Gerenciarusuarios } from './components/gerenciarusuarios/gerenciarusuarios';
 import { Gerenciarpermissoes } from './components/gerenciarpermissoes/gerenciarpermissoes';
 import { GerenciadorSalasComponent } from './components/gerenciador-salas/gerenciador-salas';
 import { CursosComponent } from './components/cursos/cursos';
-import { ResetarSenhaComponent } from './components/usuario/resetar-senha/resetar-senha';
+import { MapaAlunoComponent } from './components/aluno/mapa-aluno/mapa-aluno';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  // Rotas públicas
   { path: 'login', component: LoginComponent },
   { path: 'cadastro', component: CadastroComponent },
+  { path: 'resetar-senha', component: ResetarSenhaComponent },
+
+  // --- Layout e Rotas do Aluno ---
   {
-    path: 'home',
-    component: Home,
-    canActivate: [authGuard] // protege a rota
-  },
-  {
-    path: 'usuarios',
-    component: Gerenciarusuarios,
+    path: 'aluno',
     canActivate: [authGuard],
-    data: { authorities: ['ROLE_ADMIN'] }
+    data: { authorities: ['ROLE_ALUNO', 'ROLE_ADMIN'] },
+    children: [
+      { path: 'mapa', component: MapaAlunoComponent },
+      { path: '', redirectTo: 'mapa', pathMatch: 'full' }
+    ]
   },
-  {
-    path: 'permissoes',
-    component: Gerenciarpermissoes,
-    canActivate: [authGuard],
-    data: { authorities: ['ROLE_ADMIN', 'ROLE_COORDENADOR'] }
+
+  // --- Layout e Rotas Principais (Admin, Coordenador, Professor) ---
+    {
+    path: 'app',
+    children: [
+      {
+        path: 'home',
+        component: Home,
+        canActivate: [authGuard], 
+        data: { authorities: ['ROLE_PROFESSOR', 'ROLE_ADMIN', 'ROLE_COORDENADOR'] }
+      },
+      {
+        path: 'usuarios',
+        component: Gerenciarusuarios,
+        canActivate: [authGuard],
+        data: { authorities: ['ROLE_ADMIN'] }
+      },
+      {
+        path: 'permissoes',
+        component: Gerenciarpermissoes,
+        canActivate: [authGuard],
+        data: { authorities: ['ROLE_ADMIN', 'ROLE_COORDENADOR'] }
+      },
+      {
+        path: 'salas',
+        component: GerenciadorSalasComponent,
+        canActivate: [authGuard], 
+        data: { authorities: ['ROLE_PROFESSOR', 'ROLE_ADMIN', 'ROLE_COORDENADOR'] }
+      },
+      {
+        path: 'cursos',
+        component: CursosComponent,
+        canActivate: [authGuard], 
+        data: { authorities: ['ROLE_PROFESSOR', 'ROLE_ADMIN', 'ROLE_COORDENADOR'] }
+      },
+      { path: '', redirectTo: 'home', pathMatch: 'full' }
+    ]
   },
-  {
-    path: 'salas',
-    component: GerenciadorSalasComponent,
-    canActivate: [authGuard]
-  },
-  {
-    path: 'cursos',
-    component: CursosComponent,
-    canActivate: [authGuard]
-  },
-  {
-    path: 'resetar-senha',
-    component: ResetarSenhaComponent
-  }
+
+  // Rota de fallback
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: '**', redirectTo: 'login' }
 ];

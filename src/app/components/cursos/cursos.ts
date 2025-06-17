@@ -4,60 +4,43 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../service/auth/auth.service';
 import { CursoService } from '../../service/curso/curso.service';
+import { ProfileSwitcherComponent } from '../../shared/profile-switcher/profile-switcher';
 
 @Component({
   selector: 'app-cursos',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, ProfileSwitcherComponent],
   templateUrl: './cursos.html',
-  styleUrls: ['./cursos.css'] // Corrigido para styleUrls
+  styleUrls: ['./cursos.css']
 })
 export class CursosComponent implements OnInit {
   public cursos: Curso[] = [];
   public isLoading = true;
   public error: string | null = null;
-  public isAdmin = false;
-  public isCoordenador = false;
-
+  
   public mostrandoFormulario = false;
-  public novoCurso: NovoCursoDTO = {
-    nome: '',
-    codigo: '',
-    cargaHoraria: 0,
-    departamento: '',
-    descricao: ''
-  };
+  public novoCurso: NovoCursoDTO = { nome: '', codigo: '', cargaHoraria: 0, departamento: '', descricao: '' };
   public cursoEmEdicao: Curso | null = null;
-
   public termoBusca = '';
-
   public cursoParaDeletar: Curso | null = null;
   public cursoDetalhes: Curso | null = null;
-
   public departamentosDisponiveis: string[] = ['Computação', 'Matemática', 'Física', 'Química', 'Engenharia', 'Outros'];
 
   constructor(
     private cursoService: CursoService,
-    private authService: AuthService
+    public authService: AuthService
   ) { }
 
   ngOnInit(): void {
-    this.checkUserRoles();
     this.carregarCursos();
   }
-
-  // Métodos para Título e Subtítulo Dinâmicos
+  
   getPageTitle(): string {
-    return (this.isAdmin || this.isCoordenador) ? 'Gerenciar Cursos' : 'Catálogo de Cursos';
+    return 'Cursos';
   }
 
   getPageSubtitle(): string {
-    return (this.isAdmin || this.isCoordenador) ? 'Visualize, crie e edite os cursos oferecidos pela instituição.' : 'Explore todos os cursos disponíveis na instituição.';
-  }
-
-  checkUserRoles(): void {
-    this.isAdmin = this.authService.hasRole('ROLE_ADMIN');
-    this.isCoordenador = this.authService.hasRole('ROLE_COORDENADOR');
+    return 'Explore, visualize, crie e edite os cursos oferecidos pela instituição.';
   }
 
   carregarCursos(): void {
@@ -96,7 +79,7 @@ export class CursosComponent implements OnInit {
   }
 
   editarCurso(curso: Curso): void {
-    if (this.isAdmin || this.isCoordenador) {
+    if (this.authService.isRoleActiveOrHigher('ROLE_COORDENADOR')) {
       this.cursoEmEdicao = { ...curso };
       this.novoCurso = { ...curso };
       this.mostrandoFormulario = true;
@@ -149,7 +132,7 @@ export class CursosComponent implements OnInit {
   }
 
   confirmarDelecao(curso: Curso): void {
-    if (this.isAdmin || this.isCoordenador) {
+    if (this.authService.isRoleActiveOrHigher('ROLE_COORDENADOR')) {
       this.cursoParaDeletar = curso;
       this.abrirModal('confirmDeleteModal');
     } else {

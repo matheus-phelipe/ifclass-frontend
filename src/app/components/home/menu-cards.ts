@@ -11,36 +11,36 @@ export const ALL_MENU_CARDS: MenuCard[] = [
     icon: 'bi bi-calendar-week-fill',
     title: 'Aulas do dia',
     text: 'Confira quais aulas você tem hoje.',
-    link: '/aulas',
+    link: '/app/aulas',
     roles: ['ROLE_ALUNO', 'ROLE_PROFESSOR', 'ROLE_COORDENADOR', 'ROLE_ADMIN']
   },
   {
     icon: 'bi bi-door-open-fill',
     title: 'Salas',
     text: 'Veja em qual sala sua aula acontecerá.',
-    link: '/salas',
-    roles: ['ROLE_ALUNO', 'ROLE_PROFESSOR', 'ROLE_COORDENADOR', 'ROLE_ADMIN']
+    link: '/app/salas',
+    roles: ['ROLE_PROFESSOR', 'ROLE_COORDENADOR', 'ROLE_ADMIN']
   },
   {
     icon: 'bi bi-mortarboard-fill',
     title: 'Curso',
     text: 'Informações sobre os cursos.',
-    link: '/cursos',
-    roles: ['ROLE_ALUNO', 'ROLE_PROFESSOR', 'ROLE_COORDENADOR', 'ROLE_ADMIN']
+    link: '/app/cursos',
+    roles: ['ROLE_PROFESSOR', 'ROLE_COORDENADOR', 'ROLE_ADMIN']
   },
   {
     icon: 'bi bi-people-fill',
     title: 'Turma',
     text: 'Informações sobre sua turma atual.',
-    link: '/turmas',
-    roles: ['ROLE_ALUNO', 'ROLE_PROFESSOR', 'ROLE_COORDENADOR', 'ROLE_ADMIN']
+    link: '/app/turmas',
+    roles: ['ROLE_PROFESSOR', 'ROLE_COORDENADOR', 'ROLE_ADMIN']
   },
   {
     icon: 'bi bi-journal-bookmark-fill',
     title: 'Disciplinas',
     text: 'Acompanhe suas disciplinas.',
-    link: '/disciplinas',
-    roles: ['ROLE_ALUNO', 'ROLE_PROFESSOR', 'ROLE_COORDENADOR', 'ROLE_ADMIN']
+    link: '/app/disciplinas',
+    roles: ['ROLE_PROFESSOR', 'ROLE_COORDENADOR', 'ROLE_ADMIN']
   },
   {
     icon: 'bi bi-plus-square-fill',
@@ -67,14 +67,14 @@ export const ALL_MENU_CARDS: MenuCard[] = [
     icon: 'bi bi-person-gear',
     title: 'Gerenciar permissões',
     text: 'Defina permissões de acesso para usuários.',
-    link: '/permissoes',
+    link: '/app/permissoes',
     roles: ['ROLE_COORDENADOR', 'ROLE_ADMIN']
   },
   {
     icon: 'bi bi-people-fill',
     title: 'Gerenciar usuários',
     text: 'Adicione, remova e edite usuários.',
-    link: '/usuarios',
+    link: '/app/usuarios',
     roles: ['ROLE_ADMIN']
   },
   {

@@ -1,14 +1,17 @@
-import { Component, OnInit, HostListener, ElementRef, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { Bloco } from '../../model/bloco/bloco.model';
-import { Sala } from '../../model/bloco/sala.model';
-import { BlocoService } from '../../service/bloco/bloco.service';
-import { AuthService } from '../../service/auth/auth.service';
-import { NgxPanZoomModule } from 'ngx-panzoom';
-import { ProfileSwitcherComponent } from '../../shared/profile-switcher/profile-switcher';
+// ARQUIVO: src/app/components/aluno/mapa-aluno/mapa-aluno.component.ts
 
-// Re-definir a interface PanZoomConfig (COMPLETA)
+import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA, HostListener, ElementRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Bloco } from '../../../model/bloco/bloco.model';
+import { Sala } from '../../../model/bloco/sala.model';
+import { BlocoService } from '../../../service/bloco/bloco.service';
+import { NgxPanZoomModule } from 'ngx-panzoom'; 
+import { AuthService } from '../../../service/auth/auth.service';
+import { FormsModule } from '@angular/forms';
+import { ProfileSwitcherComponent } from '../../../shared/profile-switcher/profile-switcher';
+import { Router } from '@angular/router';
+import { NotificationService } from '../../../shared/sweetalert/notification.service';
+
 export interface PanZoomConfig {
   zoomFactor?: number;
   minScale?: number;
@@ -38,14 +41,14 @@ export interface PanZoomConfig {
 }
 
 @Component({
-  selector: 'app-gerenciador-salas',
-  standalone: true,  
+  selector: 'app-mapa-aluno',
+  standalone: true,
   imports: [CommonModule, FormsModule, NgxPanZoomModule, ProfileSwitcherComponent],
-  templateUrl: './gerenciador-salas.html',
-  styleUrls: ['./gerenciador-salas.css'],
+  templateUrl: './mapa-aluno.html',
+  styleUrls: ['./mapa-aluno.css'], // Crie um CSS se precisar
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class GerenciadorSalasComponent implements OnInit {
+export class MapaAlunoComponent implements OnInit {
 
   public blocos: Bloco[] = [];
   isLoading = true;
@@ -59,7 +62,10 @@ export class GerenciadorSalasComponent implements OnInit {
   private dragOffset = { x: 0, y: 0 };
   private svgElement: SVGSVGElement | null = null;
   private hasMoved = false; // Flag para diferenciar clique de arrastar
+  private dragStartPoint = { x: 0, y: 0 }; 
+  private readonly DRAG_THRESHOLD = 5; // Distância em pixels para considerar um "arrastar" em vez de um "clique"
 
+  // --- CONFIGURAÇÃO NGX-PANZOOM (ATUALIZADA) ---
   public panZoomConfig: PanZoomConfig = {
     zoomFactor: 0.15,      // Mais suave
     minScale: 0.2,         // Escala mínima: impede zoom out excessivo
@@ -83,20 +89,24 @@ export class GerenciadorSalasComponent implements OnInit {
     posY: number | undefined;
     largura: number | undefined;
     altura: number | undefined;
+    cor: string;
   } = {
     codigo: '',
     capacidade: null,
     posX: 50,
     posY: 50,
     largura: 150,
-    altura: 100
+    altura: 100,
+    cor: '#FFFFFF'
   };
   blocoSelecionadoId: number | null = null;
 
   constructor(
     private blocoService: BlocoService,
     public authService: AuthService,
-    private el: ElementRef // Usado para querySelector
+    private el: ElementRef,
+    private router: Router,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -105,40 +115,84 @@ export class GerenciadorSalasComponent implements OnInit {
 
   // --- Lógica de Drag and Drop (Apenas para Admin) ---
 
+   // 1. Métodos que são chamados pelo Template (HTML)
+  
   onMouseDown(event: MouseEvent, sala: Sala): void {
-    if (!this.authService.isRoleActiveOrHigher('ROLE_ADMIN')) return; // Garante que só admin pode iniciar drag
-    event.stopPropagation(); // Evita que o evento se propague para o pan-zoom
-    event.preventDefault(); // Evita o comportamento padrão do navegador
+    if (!this.authService.isRoleActiveOrHigher('ROLE_ADMIN')) return;
+    this.handleDragStart(event.clientX, event.clientY, sala, event);
+  }
+
+  onTouchStart(event: TouchEvent, sala: Sala): void {
+    if (!this.authService.isRoleActiveOrHigher('ROLE_ADMIN')) return;
+    // Usamos o primeiro ponto de toque
+    const touch = event.touches[0];
+    this.handleDragStart(touch.clientX, touch.clientY, sala, event);
+  }
+
+  // 2. HostListeners para movimento e finalização (escutam na janela toda)
+
+  @HostListener('window:mousemove', ['$event'])
+  onMouseMove(event: MouseEvent): void {
+    if (!this.isDragging) return;
+    this.handleDragMove(event.clientX, event.clientY);
+  }
+
+  @HostListener('window:touchmove', ['$event'])
+  onTouchMove(event: TouchEvent): void {
+    if (!this.isDragging) return;
+    const touch = event.touches[0];
+    this.handleDragMove(touch.clientX, touch.clientY);
+  }
+
+  @HostListener('window:mouseup', ['$event'])
+  onMouseUp(event: MouseEvent): void {
+    if (!this.isDragging) return;
+    this.handleDragEnd(event.clientX, event.clientY);
+  }
+
+  @HostListener('window:touchend', ['$event'])
+  onTouchEnd(event: TouchEvent): void {
+    if (!this.isDragging) return;
+    // Para touchend, usamos changedTouches pois `touches` estará vazio
+    const touch = event.changedTouches[0];
+    this.handleDragEnd(touch.clientX, touch.clientY);
+  }
+
+  // 3. Funções de Lógica Central (o coração da solução)
+
+  private handleDragStart(clientX: number, clientY: number, sala: Sala, originalEvent: MouseEvent | TouchEvent): void {
+    // Previne o comportamento padrão (como o scroll no touch) e impede que o pan-zoom capture o evento.
+    // Isso é CRUCIAL para o zoom funcionar corretamente no mobile.
+    originalEvent.stopPropagation();
+    originalEvent.preventDefault();
 
     this.isDragging = true;
-    this.hasMoved = false; // Reseta a flag de movimento
     this.draggingSala = sala;
+    this.dragStartPoint = { x: clientX, y: clientY }; // Salva o ponto inicial
 
     this.svgElement = (this.el.nativeElement as HTMLElement).querySelector('.floorplan-svg');
-    const point = this.getSVGPoint(event.clientX, event.clientY);
+    const point = this.getSVGPoint(clientX, clientY);
 
     this.dragOffset = {
       x: point.x - (sala.posX ?? 0),
       y: point.y - (sala.posY ?? 0)
     };
   }
+  
+  private handleDragMove(clientX: number, clientY: number): void {
+    if (!this.draggingSala) return;
 
-  @HostListener('window:mousemove', ['$event'])
-  onMouseMove(event: MouseEvent): void {
-    if (!this.isDragging || !this.draggingSala) return;
-    this.hasMoved = true; // Seta a flag se houve movimento
-    const point = this.getSVGPoint(event.clientX, event.clientY);
-
+    const point = this.getSVGPoint(clientX, clientY);
     let newX = Math.round(point.x - this.dragOffset.x);
     let newY = Math.round(point.y - this.dragOffset.y);
 
-    const viewBox = { width: 1600, height: 900 }; // ViewBox do SVG (verifique se corresponde ao seu SVG)
+    const viewBox = { width: 1600, height: 900 };
     const salaWidth = this.draggingSala.largura ?? 150;
     const salaHeight = this.draggingSala.altura ?? 100;
 
     newX = Math.max(0, Math.min(newX, viewBox.width - salaWidth));
     newY = Math.max(0, Math.min(newY, viewBox.height - salaHeight));
-
+    
     this.draggingSala.posX = newX;
     this.draggingSala.posY = newY;
 
@@ -148,22 +202,22 @@ export class GerenciadorSalasComponent implements OnInit {
     }
   }
 
-  @HostListener('window:mouseup')
-  @HostListener('window:mouseleave')
-  onMouseUpOrLeave(): void {
-    if (!this.isDragging || !this.draggingSala) return;
+  private handleDragEnd(clientX: number, clientY: number): void {
+    if (!this.draggingSala) return;
 
-    if (this.hasMoved) { // Se a sala foi arrastada
-        this.updateSalaPosition(this.draggingSala);
-    } else { // Se foi apenas um clique (não houve movimento significativo)
-        if (this.authService.isRoleActiveOrHigher('ROLE_ADMIN')) { // E se for admin, então selecione a sala
-            this.selectSala(this.draggingSala);
-        }
+    // Calcula a distância total do arrasto
+    const deltaX = clientX - this.dragStartPoint.x;
+    const deltaY = clientY - this.dragStartPoint.y;
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+    if (distance < this.DRAG_THRESHOLD) {
+      // Se a distância for muito pequena, consideramos um CLIQUE
+      this.selectSala(this.draggingSala);
+    } else {
+      // Se a distância for maior, consideramos um ARRASTAR
+      this.updateSalaPosition(this.draggingSala);
     }
-    this.cancelDrag();
-  }
 
-  private cancelDrag(): void {
     this.isDragging = false;
     this.draggingSala = null;
     this.svgElement = null;
@@ -205,8 +259,14 @@ export class GerenciadorSalasComponent implements OnInit {
       posX: sala.posX ?? 50,
       posY: sala.posY ?? 50,
       largura: sala.largura ?? 150,
-      altura: sala.altura ?? 100
+      altura: sala.altura ?? 100,
+      cor: sala.cor || '#FFFFFF'
     };
+
+    const parentBloco = this.blocos.find(b => b.salas.some(s => s.id === sala.id));
+    if (parentBloco) {
+      this.blocoSelecionadoId = parentBloco.id;
+    }
   }
 
   toggleBloco(blocoId: number): void {
@@ -222,7 +282,8 @@ export class GerenciadorSalasComponent implements OnInit {
       posX: 50,
       posY: 50,
       largura: 150,
-      altura: 100
+      altura: 100,
+      cor: '#FFFFFF'
     };
   }
 
@@ -230,10 +291,13 @@ export class GerenciadorSalasComponent implements OnInit {
     this.isLoading = true;
     this.blocoService.getBlocos().subscribe({
       next: (data) => {
-        this.blocos = data.sort((a, b) => (a.id ?? 0) - (b.id ?? 0));
-        if (this.blocos.length > 0 && this.blocoSelecionadoId === null) {
-            this.blocoSelecionadoId = this.blocos[0].id;
+        this.blocos = data.sort((a, b) => (a.nome.localeCompare(b.nome))); // Ordena por nome para consistência
+        
+        // Seleciona o primeiro bloco da lista por padrão
+        if (!this.activeBlocoId && this.blocos.length > 0) {
+          this.activeBlocoId = this.blocos[0].id; 
         }
+        
         this.isLoading = false;
       },
       error: () => {
@@ -274,7 +338,8 @@ export class GerenciadorSalasComponent implements OnInit {
       posX: this.formSala.posX,
       posY: this.formSala.posY,
       largura: this.formSala.largura,
-      altura: this.formSala.altura
+      altura: this.formSala.altura,
+      cor: this.formSala.cor 
     };
 
     if (this.editingSala) {
@@ -290,28 +355,53 @@ export class GerenciadorSalasComponent implements OnInit {
     }
   }
 
-  handleDeleteBloco(id: number): void {
-    if (confirm('Tem certeza que deseja apagar este bloco e todas as suas salas?')) {
+  async handleDeleteBloco(id: number): Promise<void> {
+    const isConfirmed = await this.notificationService.confirmDelete(
+      'Apagar Bloco?',
+      'Isso apagará o bloco E TODAS as salas contidas nele. Esta ação é irreversível!'
+    );
+
+    if (isConfirmed) {
       this.blocoService.deleteBloco(id).subscribe({
         next: () => {
-            if(this.blocoSelecionadoId === id) this.blocoSelecionadoId = null;
-            if(this.activeBlocoId === id) this.activeBlocoId = null;
-            this.carregarBlocos();
+          if (this.blocoSelecionadoId === id) this.blocoSelecionadoId = null;
+          if (this.activeBlocoId === id) this.activeBlocoId = null;
+          this.carregarBlocos();
+          this.notificationService.success('Tudo Apagado!', 'O bloco e suas salas foram removidos.');
         },
-        error: () => { this.error = 'Falha ao deletar bloco.';}
+        error: () => { this.error = 'Falha ao deletar bloco.' }
       });
     }
   }
 
-  handleDeleteSala(blocoId: number, salaId: number): void {
-    if (confirm('Tem certeza que deseja apagar esta sala?')) {
+  async handleDeleteSala(blocoId: number, salaId: number): Promise<void> {
+    const isConfirmed = await this.notificationService.confirmDelete(
+      'Apagar esta sala?',
+      'Você realmente deseja apagar esta sala?'
+    );
+
+    if (isConfirmed) {
       this.blocoService.deleteSala(blocoId, salaId).subscribe({
         next: () => {
           this.cancelarEdicao();
           this.carregarBlocos();
+          this.notificationService.success('Apagada!', 'A sala foi removida com sucesso.');
         },
         error: () => { this.error = 'Falha ao deletar a sala.' }
       });
     }
+  }
+
+  public getActiveBlocoName(): string {
+    if (!this.activeBlocoId) {
+      return '';
+    }
+    const activeBloco = this.blocos.find(b => b.id === this.activeBlocoId);
+    return activeBloco ? activeBloco.nome : '';
+  }
+
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 }

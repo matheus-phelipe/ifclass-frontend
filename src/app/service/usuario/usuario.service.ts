@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Usuario } from '../../model/usuario/usuario.model';
 import { environment } from '../../../environments/environment';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -22,13 +23,13 @@ export class UsuarioService {
   }
 
   // Atualizar authorities (papéis)
-  atualizarAuthorities(id: number, authorities: string) {
-    return this.http.patch(`${this.apiUrl}/${id}/authority`, { authorities });
+  atualizarAuthorities(id: number, authorities: string[]): Observable<Usuario> {
+    return this.http.patch<Usuario>(`${this.apiUrl}/${id}/authorities`, { authorities });
   }
 
   // Atualizar os dados do usuário
-  atualizarUsuario(usuario: Usuario) {
-    return this.http.put(`${this.apiUrl}/${usuario.id}`, usuario);
+  atualizarUsuario(usuario: Usuario): Observable<Usuario> {
+    return this.http.put<Usuario>(`${this.apiUrl}/${usuario.id}`, usuario);
   }
 
   // Remover usuário por ID

@@ -1,0 +1,11 @@
+.dropdown-item {
+  cursor: pointer;
+}
+.dropdown-item.active {
+  font-weight: bold;
+  background-color: #e6f9f0;
+  color: #198754;
+}
+.dropdown-toggle small {
+  line-height: 1;
+}
