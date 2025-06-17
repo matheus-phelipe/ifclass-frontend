@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment.development';
 import { BehaviorSubject, Observable, map } from 'rxjs';
+import { Router } from '@angular/router';
 
 const ACTIVE_ROLE_KEY = 'activeRole';
 const TOKEN_KEY = 'token';
@@ -20,11 +21,14 @@ export class AuthService {
   private activeRoleSubject = new BehaviorSubject<string | null>(this.getActiveRole());
   public activeRole$ = this.activeRoleSubject.asObservable();
 
+  private http = inject(HttpClient);
+  private router = inject(Router);
+
   public isAdmin$: Observable<boolean> | undefined;
   public isCoordenador$: Observable<boolean> | undefined;
   public isProfessor$: Observable<boolean> | undefined;
   
-  constructor(private http: HttpClient) {
+  constructor() {
     this.isAdmin$ = this.activeRoleSubject.pipe(
       map(role => this.isRoleActiveOrHigher('ROLE_ADMIN'))
     );
@@ -52,11 +56,13 @@ export class AuthService {
     return !!this.getToken();
   }
 
-   logout(): void {
-    localStorage.removeItem('token');
-    sessionStorage.removeItem(ACTIVE_ROLE_KEY);
-    this.activeRoleSubject.next(null);
-  }
+    logout(): void {
+      localStorage.removeItem('token'); 
+      sessionStorage.removeItem('activeRole'); 
+      this.activeRoleSubject.next(null); 
+
+      this.router.navigate(['/login']);
+    }
 
   private getDecodedToken(): any | null {
     const token = this.getToken();
