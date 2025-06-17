@@ -115,8 +115,8 @@
                       class="sala-group"
                       [class.clickable-for-user]="!(authService.isAdmin$ | async)"
                       [class.dragging]="draggingSala?.id === sala.id"
-                      (mousedown)="onMouseDown($event, sala)">
-                      
+                      (mousedown)="onMouseDown($event, sala)"
+                      (touchstart)="onTouchStart($event, sala)">
                       <rect [attr.x]="sala.posX ?? 0" [attr.y]="sala.posY ?? 0" [attr.width]="sala.largura ?? 150" [attr.height]="sala.altura ?? 100" class="sala-rect" [class.editing]="editingSala?.id === sala.id"></rect>
                     <text [attr.x]="(sala.posX ?? 0) + (sala.largura ?? 150) / 2" [attr.y]="(sala.posY ?? 0) + (sala.altura ?? 100) / 2" class="sala-text">
                       <tspan class="sala-codigo">{{ sala.codigo }}</tspan>
