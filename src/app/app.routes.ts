@@ -29,15 +29,39 @@ export const routes: Routes = [
   },
 
   // --- Layout e Rotas Principais (Admin, Coordenador, Professor) ---
-  {
+    {
     path: 'app',
-    canActivate: [authGuard],
     children: [
-      { path: 'home', component: Home },
-      { path: 'usuarios', component: Gerenciarusuarios, data: { authorities: ['ROLE_ADMIN'] } },
-      { path: 'permissoes', component: Gerenciarpermissoes, data: { authorities: ['ROLE_ADMIN', 'ROLE_COORDENADOR'] } },
-      { path: 'salas', component: GerenciadorSalasComponent },
-      { path: 'cursos', component: CursosComponent },
+      {
+        path: 'home',
+        component: Home,
+        canActivate: [authGuard], 
+        data: { authorities: ['ROLE_PROFESSOR', 'ROLE_ADMIN', 'ROLE_COORDENADOR'] }
+      },
+      {
+        path: 'usuarios',
+        component: Gerenciarusuarios,
+        canActivate: [authGuard],
+        data: { authorities: ['ROLE_ADMIN'] }
+      },
+      {
+        path: 'permissoes',
+        component: Gerenciarpermissoes,
+        canActivate: [authGuard],
+        data: { authorities: ['ROLE_ADMIN', 'ROLE_COORDENADOR'] }
+      },
+      {
+        path: 'salas',
+        component: GerenciadorSalasComponent,
+        canActivate: [authGuard], 
+        data: { authorities: ['ROLE_PROFESSOR', 'ROLE_ADMIN', 'ROLE_COORDENADOR'] }
+      },
+      {
+        path: 'cursos',
+        component: CursosComponent,
+        canActivate: [authGuard], 
+        data: { authorities: ['ROLE_PROFESSOR', 'ROLE_ADMIN', 'ROLE_COORDENADOR'] }
+      },
       { path: '', redirectTo: 'home', pathMatch: 'full' }
     ]
   },

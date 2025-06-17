@@ -12,9 +12,7 @@
     </div>
   </div>
 
-  <!-- Layout de 2 colunas -->
   <div class="row g-4">
-    <!-- Coluna da Tabela -->
     <div class="col-lg-7">
       <div class="table-container">
         <div class="table-responsive">
@@ -22,11 +20,10 @@
             <thead>
               <tr>
                 <th>Usuário</th>
-                <th>Permissão</th>
+                <th>Permissões</th>
               </tr>
             </thead>
             <tbody>
-              <!-- Adicionado (click) e classe de seleção -->
               <tr *ngFor="let usuario of usuariosFiltrados" 
                   (click)="selecionarUsuario(usuario)"
                   [class.selected-row]="usuario.id === usuarioSelecionado?.id">
@@ -41,9 +38,10 @@
                 </td>
                 <td>
                   <div class="roles-container">
-                    <span class="role-pill" [class.active]="temPapel(usuario, 'ROLE_ALUNO')" (click)="onRoleChange(usuario, 'ROLE_ALUNO')">Aluno</span>
-                    <span class="role-pill" [class.active]="temPapel(usuario, 'ROLE_PROFESSOR')" (click)="onRoleChange(usuario, 'ROLE_PROFESSOR')">Professor</span>
-                    <span class="role-pill" [class.active]="temPapel(usuario, 'ROLE_COORDENADOR')" (click)="onRoleChange(usuario, 'ROLE_COORDENADOR')">Coordenador</span>
+                    <span class="role-pill" [class.active]="temPapel(usuario, 'ROLE_ALUNO')" (click)="$event.stopPropagation(); onRoleChange(usuario, 'ROLE_ALUNO')">Aluno</span>
+                    <span class="role-pill" [class.active]="temPapel(usuario, 'ROLE_PROFESSOR')" (click)="$event.stopPropagation(); onRoleChange(usuario, 'ROLE_PROFESSOR')">Professor</span>
+                    <span class="role-pill" [class.active]="temPapel(usuario, 'ROLE_COORDENADOR')" (click)="$event.stopPropagation(); onRoleChange(usuario, 'ROLE_COORDENADOR')">Coordenador</span>
+                    <span class="role-pill" [class.active]="temPapel(usuario, 'ROLE_ADMIN')" (click)="$event.stopPropagation(); onRoleChange(usuario, 'ROLE_ADMIN')">Admin</span>
                   </div>
                 </td>
               </tr>
@@ -56,7 +54,6 @@
       </div>
     </div>
 
-    <!-- Coluna do Painel de Detalhes -->
     <div class="col-lg-5">
       <div class="details-panel" *ngIf="usuarioSelecionado">
         <div class="details-header">
@@ -70,21 +67,16 @@
             <span class="detail-value">{{ usuarioSelecionado.prontuario || 'Não informado' }}</span>
           </div>
           <div class="detail-item">
-            <span class="detail-label">Permissão Atual</span>
-            <span class="detail-value detail-role">{{ (usuarioSelecionado.authorities || 'N/A').replace('ROLE_', '') }}</span>
+            <span class="detail-label">Permissões</span>
+            <span class="detail-value detail-role">{{ formatarPermissoes(usuarioSelecionado.authorities) }}</span>
           </div>
-          <!-- Placeholder para futuras informações -->
           <div class="detail-item">
-            <span class="detail-label">Último Acesso</span>
-            <span class="detail-value">Hoje</span>
+            <span class="detail-label">ID do Usuário</span>
+            <span class="detail-value">#{{ usuarioSelecionado.id }}</span>
           </div>
-        </div>
-        <div class="details-footer">
-          <button class="btn btn-outline-success btn-sm">Ver Perfil Completo</button>
         </div>
       </div>
-       <!-- Mensagem se nenhum usuário estiver selecionado -->
-      <div class="details-panel placeholder-panel" *ngIf="!usuarioSelecionado">
+       <div class="details-panel placeholder-panel" *ngIf="!usuarioSelecionado">
          <i class="bi bi-person-badge placeholder-icon"></i>
          <p class="text-muted">Selecione um usuário para ver os detalhes</p>
       </div>
@@ -93,4 +85,3 @@
 </div>
 
 <app-alert #alerta></app-alert>
-<app-modal-confirmacao #modalConfirmPermissao [message]="mensagemModalConfirmacao" (confirmed)="confirmarAlteracaoStatus()" (canceled)="cancelarAlteracaoStatus()"></app-modal-confirmacao>

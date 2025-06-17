@@ -60,7 +60,6 @@ export class GerenciadorSalasComponent implements OnInit {
   private svgElement: SVGSVGElement | null = null;
   private hasMoved = false; // Flag para diferenciar clique de arrastar
 
-  // --- CONFIGURAÇÃO NGX-PANZOOM (ATUALIZADA) ---
   public panZoomConfig: PanZoomConfig = {
     zoomFactor: 0.15,      // Mais suave
     minScale: 0.2,         // Escala mínima: impede zoom out excessivo

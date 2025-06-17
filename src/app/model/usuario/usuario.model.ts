@@ -3,5 +3,5 @@ export interface Usuario {
   nome: string;
   email: string;
   prontuario: string;
-  authorities: string;
+  authorities: string[]; 
 }

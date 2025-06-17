@@ -29,22 +29,20 @@ export class AuthService {
     localStorage.removeItem('token');
   }
 
-  // Pega o nome do usuário de dentro do token JWT.
-  // A lógica é a mesma de getRoles(), mas pegamos um campo diferente.
-  getNomeUsuario(): string | null {
+  private getDecodedToken(): any | null {
     const token = this.getToken();
     if (!token) return null;
-
     try {
-      const base64Payload = token.split('.')[1];
-      const payload = JSON.parse(atob(base64Payload));
-      // O nome do usuário geralmente está no campo 'name' ou 'sub' (subject).
-      // Verifique qual o seu backend usa. Vamos usar 'name' como padrão.
-      return payload.name || null;
+      return JSON.parse(atob(token.split('.')[1]));
     } catch (e) {
-      console.error('Erro ao decodificar token para obter nome:', e);
+      console.error('Erro ao decodificar o token JWT:', e);
       return null;
     }
+  }
+  
+   getNomeUsuario(): string | null {
+    const payload = this.getDecodedToken();
+    return payload ? (payload.name || payload.sub) : null;
   }
 
   getRoles(): string[] {
