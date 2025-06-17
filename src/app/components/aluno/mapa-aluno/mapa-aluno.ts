@@ -10,6 +10,7 @@ import { AuthService } from '../../../service/auth/auth.service';
 import { FormsModule } from '@angular/forms';
 import { ProfileSwitcherComponent } from '../../../shared/profile-switcher/profile-switcher';
 import { Router } from '@angular/router';
+import { NotificationService } from '../../../shared/sweetalert/notification.service';
 
 export interface PanZoomConfig {
   zoomFactor?: number;
@@ -104,7 +105,8 @@ export class MapaAlunoComponent implements OnInit {
     private blocoService: BlocoService,
     public authService: AuthService,
     private el: ElementRef,
-    private router: Router 
+    private router: Router,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -353,25 +355,37 @@ export class MapaAlunoComponent implements OnInit {
     }
   }
 
-  handleDeleteBloco(id: number): void {
-    if (confirm('Tem certeza que deseja apagar este bloco e todas as suas salas?')) {
+  async handleDeleteBloco(id: number): Promise<void> {
+    const isConfirmed = await this.notificationService.confirmDelete(
+      'Apagar Bloco?',
+      'Isso apagará o bloco E TODAS as salas contidas nele. Esta ação é irreversível!'
+    );
+
+    if (isConfirmed) {
       this.blocoService.deleteBloco(id).subscribe({
         next: () => {
-            if(this.blocoSelecionadoId === id) this.blocoSelecionadoId = null;
-            if(this.activeBlocoId === id) this.activeBlocoId = null;
-            this.carregarBlocos();
+          if (this.blocoSelecionadoId === id) this.blocoSelecionadoId = null;
+          if (this.activeBlocoId === id) this.activeBlocoId = null;
+          this.carregarBlocos();
+          this.notificationService.success('Tudo Apagado!', 'O bloco e suas salas foram removidos.');
         },
-        error: () => { this.error = 'Falha ao deletar bloco.';}
+        error: () => { this.error = 'Falha ao deletar bloco.' }
       });
     }
   }
 
-  handleDeleteSala(blocoId: number, salaId: number): void {
-    if (confirm('Tem certeza que deseja apagar esta sala?')) {
+  async handleDeleteSala(blocoId: number, salaId: number): Promise<void> {
+    const isConfirmed = await this.notificationService.confirmDelete(
+      'Apagar esta sala?',
+      'Você realmente deseja apagar esta sala?'
+    );
+
+    if (isConfirmed) {
       this.blocoService.deleteSala(blocoId, salaId).subscribe({
         next: () => {
           this.cancelarEdicao();
           this.carregarBlocos();
+          this.notificationService.success('Apagada!', 'A sala foi removida com sucesso.');
         },
         error: () => { this.error = 'Falha ao deletar a sala.' }
       });

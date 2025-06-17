@@ -1,10 +1,12 @@
 import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot } from '@angular/router';
 import { inject } from '@angular/core';
 import { AuthService } from './auth.service';
+import { NotificationService } from '../../shared/sweetalert/notification.service';
 
-export const authGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
+export const authGuard: CanActivateFn = async (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
   const authService = inject(AuthService);
   const router = inject(Router);
+  const notificationService = inject(NotificationService);
 
   // 1. Verifica se o usuário está autenticado
   if (!authService.isAuthenticated()) {
@@ -15,7 +17,7 @@ export const authGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: R
   // 2. Garante que um perfil ativo esteja definido. Se não estiver, força um novo login.
   const activeRole = authService.getActiveRole();
   if (!activeRole) {
-    alert('Sua sessão está inconsistente. Por favor, faça login novamente.');
+    await notificationService.warn('Sessão Inválida', 'Sua sessão está inconsistente. Por favor, faça login novamente.');
     authService.logout();
     router.navigate(['/login']);
     return false;
@@ -38,9 +40,15 @@ export const authGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: R
   const userHasPermissionInToken = requiredAuthorities.some(role => authService.hasRole(role));
 
   if (userHasPermissionInToken) {
-    alert('Você tem permissão para acessar esta página, mas precisa trocar seu perfil de visão. Por favor, use o seletor de perfis.');
+    await notificationService.warn(
+      'Troca de Perfil Necessária',
+      'Você tem permissão para acessar esta página, mas precisa trocar seu perfil de visão. Por favor, use o seletor de perfis.'
+    );
   } else {
-    alert('Acesso negado. Você não tem permissão para acessar esta página.');
+    await notificationService.warn(
+      'Acesso Negado',
+      'Você não tem permissão para acessar esta página.'
+    );
   }
 
   // 5. REDIRECIONAMENTO CORRIGIDO PARA EVITAR O LOOP
