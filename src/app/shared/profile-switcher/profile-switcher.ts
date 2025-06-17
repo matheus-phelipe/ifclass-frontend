@@ -25,20 +25,23 @@ export class ProfileSwitcherComponent implements OnInit {
   }
 
   switchProfile(role: string): void {
-    if (role === this.activeRole) return; // Não faz nada se clicar no perfil já ativo
+    // 1. Se clicar no perfil que já está ativo, não faz nada
+    if (role === this.activeRole) {
+      return;
+    }
 
+    // 2. Atualiza o perfil ativo no sistema
     this.authService.setActiveRole(role);
 
-    // Redireciona com base no perfil escolhido
-    if (role === 'ROLE_ALUNO') {
-      this.router.navigate(['/aluno/mapa']);
-    } else {
-      // Para qualquer outro perfil, vai para a home principal
-      // Usamos .then() para forçar o recarregamento do componente se já estivermos na home
-      this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
-        this.router.navigate(['/app/home']);
-      });
-    }
+    // 3. Pega a URL atual ANTES de fazer qualquer coisa
+    const currentUrl = this.router.url;
+
+    // 4. Força a re-execução dos guards na rota ATUAL, sem mudar de página.
+    // Isso garante que as permissões (como o painel de admin) sejam atualizadas
+    // na tela em que o usuário já está.
+    this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+      this.router.navigate([currentUrl]);
+    });
   }
 
   formatRoleName(role: string): string {

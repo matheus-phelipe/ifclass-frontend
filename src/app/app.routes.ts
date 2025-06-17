@@ -21,7 +21,7 @@ export const routes: Routes = [
   {
     path: 'aluno',
     canActivate: [authGuard],
-    data: { authorities: ['ROLE_ALUNO'] },
+    data: { authorities: ['ROLE_ALUNO', 'ROLE_ADMIN'] },
     children: [
       { path: 'mapa', component: MapaAlunoComponent },
       { path: '', redirectTo: 'mapa', pathMatch: 'full' }
