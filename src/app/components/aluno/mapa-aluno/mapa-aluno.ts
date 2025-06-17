@@ -9,6 +9,7 @@ import { NgxPanZoomModule } from 'ngx-panzoom';
 import { AuthService } from '../../../service/auth/auth.service';
 import { FormsModule } from '@angular/forms';
 import { ProfileSwitcherComponent } from '../../../shared/profile-switcher/profile-switcher';
+import { Router } from '@angular/router';
 
 export interface PanZoomConfig {
   zoomFactor?: number;
@@ -98,7 +99,8 @@ export class MapaAlunoComponent implements OnInit {
   constructor(
     private blocoService: BlocoService,
     public authService: AuthService,
-    private el: ElementRef 
+    private el: ElementRef,
+    private router: Router 
   ) {}
 
   ngOnInit(): void {
@@ -232,10 +234,14 @@ export class MapaAlunoComponent implements OnInit {
     this.isLoading = true;
     this.blocoService.getBlocos().subscribe({
       next: (data) => {
-        this.blocos = data.sort((a, b) => (a.id ?? 0) - (b.id ?? 0));
-        if (this.blocos.length > 0 && this.blocoSelecionadoId === null) {
-            this.blocoSelecionadoId = this.blocos[0].id;
+        this.blocos = data.sort((a, b) => (a.nome.localeCompare(b.nome))); // Ordena por nome para consistência
+        
+        // *** NOVA LINHA ***
+        // Seleciona o primeiro bloco da lista por padrão
+        if (!this.activeBlocoId && this.blocos.length > 0) {
+          this.activeBlocoId = this.blocos[0].id; 
         }
+        
         this.isLoading = false;
       },
       error: () => {
@@ -315,5 +321,18 @@ export class MapaAlunoComponent implements OnInit {
         error: () => { this.error = 'Falha ao deletar a sala.' }
       });
     }
+  }
+
+  public getActiveBlocoName(): string {
+    if (!this.activeBlocoId) {
+      return '';
+    }
+    const activeBloco = this.blocos.find(b => b.id === this.activeBlocoId);
+    return activeBloco ? activeBloco.nome : '';
+  }
+
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 }
