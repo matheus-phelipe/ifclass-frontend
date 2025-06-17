@@ -18,3 +18,5 @@
 <ng-container *ngIf="!showMainLayout">
   <router-outlet></router-outlet>
 </ng-container>
+
+<app-loader [show]="(loaderVisible | async) ?? false"></app-loader>

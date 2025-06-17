@@ -6,12 +6,13 @@ import { provideClientHydration } from '@angular/platform-browser';
 import { routes } from './app.routes';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { jwtInterceptor } from './service/auth/jwt.interceptor';
+import { loaderInterceptor } from './core/interceptors/loader.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     provideHttpClient(
-      withInterceptors([jwtInterceptor, errorInterceptor])
+      withInterceptors([jwtInterceptor, loaderInterceptor, errorInterceptor])
     ),
     provideClientHydration()
   ]

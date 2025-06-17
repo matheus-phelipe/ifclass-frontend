@@ -4,6 +4,8 @@ import { CommonModule } from '@angular/common';
 import { filter, Subscription } from 'rxjs'; // CORRIGIDO: Importação para RxJS v7+
 import { SidebarComponent } from './shared/sidebar/sidebar';
 import { AuthService } from './service/auth/auth.service';
+import { LoaderComponent } from './shared/loader/loader.component';
+import { LoaderService } from './shared/loader/loader.service';
 
 @Component({
   selector: 'app-root',
@@ -11,7 +13,8 @@ import { AuthService } from './service/auth/auth.service';
   imports: [
     RouterOutlet, 
     CommonModule, 
-    SidebarComponent
+    SidebarComponent,
+    LoaderComponent
   ],
   templateUrl: './app.html',
   styleUrl: './app.css'
@@ -28,11 +31,14 @@ export class App implements OnInit {
   private standaloneRoutes = ['/login', '/cadastro', '/resetar-senha', '/aluno/mapa'];
   private roleSubscription!: Subscription;
 
+  loaderVisible;
+
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private loaderService: LoaderService
   ) {
-    // Verifica a URL inicial de forma síncrona
+    this.loaderVisible = this.loaderService.loading$;
     this.updateLayout(this.router.url);
   }
 
