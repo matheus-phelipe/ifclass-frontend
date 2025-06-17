@@ -40,13 +40,17 @@
             </select>
           </div>
           <div class="row g-2 mb-2">
-            <div class="col-8">
+            <div class="col-sm-5">
               <label for="roomCode" class="form-label small">Código</label>
-              <input type="text" id="roomCode" class="form-control" [(ngModel)]="formSala.codigo" name="salaCodigo" required />
+              <input type="text" id="roomCode" class="form-control form-control-sm" [(ngModel)]="formSala.codigo" name="salaCodigo" required />
             </div>
-            <div class="col-4">
+            <div class="col-sm-4">
               <label for="roomCapacity" class="form-label small">Capac.</label>
-              <input type="number" id="roomCapacity" class="form-control" [(ngModel)]="formSala.capacidade" name="salaCapacidade" required />
+              <input type="number" id="roomCapacity" class="form-control form-control-sm" [(ngModel)]="formSala.capacidade" name="salaCapacidade" required />
+            </div>
+            <div class="col-sm-3">
+              <label for="roomColor" class="form-label small">Cor</label>
+              <input type="color" id="roomColor" class="form-control form-control-color form-control-sm" [(ngModel)]="formSala.cor" name="salaCor" title="Escolha a cor da sala" />
             </div>
           </div>
           <div class="d-flex flex-wrap gap-2 mt-3">
@@ -117,7 +121,15 @@
                       [class.dragging]="draggingSala?.id === sala.id"
                       (mousedown)="onMouseDown($event, sala)"
                       (touchstart)="onTouchStart($event, sala)">
-                      <rect [attr.x]="sala.posX ?? 0" [attr.y]="sala.posY ?? 0" [attr.width]="sala.largura ?? 150" [attr.height]="sala.altura ?? 100" class="sala-rect" [class.editing]="editingSala?.id === sala.id"></rect>
+                    <rect 
+                        [attr.x]="sala.posX ?? 0" 
+                        [attr.y]="sala.posY ?? 0" 
+                        [attr.width]="sala.largura ?? 150" 
+                        [attr.height]="sala.altura ?? 100" 
+                        class="sala-rect" 
+                        [class.editing]="editingSala?.id === sala.id"
+                        [attr.fill]="sala.cor || '#FFFFFF'">
+                    </rect>
                     <text [attr.x]="(sala.posX ?? 0) + (sala.largura ?? 150) / 2" [attr.y]="(sala.posY ?? 0) + (sala.altura ?? 100) / 2" class="sala-text">
                       <tspan class="sala-codigo">{{ sala.codigo }}</tspan>
                       <tspan [attr.x]="(sala.posX ?? 0) + (sala.largura ?? 150) / 2" dy="1.4em" class="sala-capacidade">Cap: {{ sala.capacidade }}</tspan>

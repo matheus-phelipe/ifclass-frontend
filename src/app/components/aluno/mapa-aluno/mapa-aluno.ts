@@ -88,13 +88,15 @@ export class MapaAlunoComponent implements OnInit {
     posY: number | undefined;
     largura: number | undefined;
     altura: number | undefined;
+    cor: string;
   } = {
     codigo: '',
     capacidade: null,
     posX: 50,
     posY: 50,
     largura: 150,
-    altura: 100
+    altura: 100,
+    cor: '#FFFFFF'
   };
   blocoSelecionadoId: number | null = null;
 
@@ -255,7 +257,8 @@ export class MapaAlunoComponent implements OnInit {
       posX: sala.posX ?? 50,
       posY: sala.posY ?? 50,
       largura: sala.largura ?? 150,
-      altura: sala.altura ?? 100
+      altura: sala.altura ?? 100,
+      cor: sala.cor || '#FFFFFF'
     };
 
     const parentBloco = this.blocos.find(b => b.salas.some(s => s.id === sala.id));
@@ -277,7 +280,8 @@ export class MapaAlunoComponent implements OnInit {
       posX: 50,
       posY: 50,
       largura: 150,
-      altura: 100
+      altura: 100,
+      cor: '#FFFFFF'
     };
   }
 
@@ -332,7 +336,8 @@ export class MapaAlunoComponent implements OnInit {
       posX: this.formSala.posX,
       posY: this.formSala.posY,
       largura: this.formSala.largura,
-      altura: this.formSala.altura
+      altura: this.formSala.altura,
+      cor: this.formSala.cor 
     };
 
     if (this.editingSala) {
