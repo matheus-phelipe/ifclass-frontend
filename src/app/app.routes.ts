@@ -1,4 +1,3 @@
-
 import { Routes } from '@angular/router';
 import { authGuard } from './service/auth/auth.guard';
 import { LoginComponent } from './components/usuario/login/login';
@@ -61,6 +60,10 @@ export const routes: Routes = [
         component: CursosComponent,
         canActivate: [authGuard], 
         data: { authorities: ['ROLE_PROFESSOR', 'ROLE_ADMIN', 'ROLE_COORDENADOR'] }
+      },
+      {
+        path: 'turmas',
+        loadComponent: () => import('./features/turmas/turmas').then(m => m.TurmasComponent)
       },
       { path: '', redirectTo: 'home', pathMatch: 'full' }
     ]
