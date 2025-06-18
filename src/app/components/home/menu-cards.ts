@@ -57,13 +57,6 @@ export const ALL_MENU_CARDS: MenuCard[] = [
     roles: ['ROLE_COORDENADOR', 'ROLE_ADMIN']
   },
   {
-    icon: 'bi bi-link',
-    title: 'Relacionar turma/curso',
-    text: 'Associe turmas aos cursos disponíveis.',
-    link: '/relacionar-turma',
-    roles: ['ROLE_COORDENADOR', 'ROLE_ADMIN']
-  },
-  {
     icon: 'bi bi-person-gear',
     title: 'Gerenciar permissões',
     text: 'Defina permissões de acesso para usuários.',

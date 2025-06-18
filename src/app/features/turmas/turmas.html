@@ -1,0 +1,68 @@
+<div class="turmas-container">
+  <div class="turmas-header">
+    <h2>Turmas</h2>
+    <button class="btn-nova-turma" (click)="abrirModal()" *ngIf="canEditTurmas">
+      <i class="bi bi-plus-lg"></i> Nova Turma
+    </button>
+  </div>
+
+  <div *ngIf="turmas.length === 0" class="placeholder-turmas">
+    <img src="assets/ifclass.png" alt="Sem turmas" class="placeholder-img">
+    <p>Nenhuma turma cadastrada ainda.<br>Clique em <b>Nova Turma</b> para adicionar a primeira!</p>
+  </div>
+
+  <div class="turmas-lista">
+    <div class="turma-card" *ngFor="let turma of turmas">
+      <div class="turma-card-header">
+        <span class="turma-curso">{{ turma.curso?.nome || 'Curso não definido' }}</span>
+        <span class="turma-badge">{{ turma.ano }}/{{ turma.semestre }}º</span>
+      </div>
+      <div class="turma-card-actions" *ngIf="canEditTurmas">
+        <button class="btn-acao editar" (click)="abrirModal(turma)" title="Editar">
+          <i class="bi bi-pencil"></i>
+        </button>
+        <button class="btn-acao deletar" (click)="excluirTurma(turma.id!)" title="Excluir">
+          <i class="bi bi-trash"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-turma" [class.open]="isModalOpen">
+    <div class="modal-turma-content" (click)="$event.stopPropagation()">
+      <div class="modal-turma-header">
+        <h3>{{ isEditing ? 'Editar' : 'Nova' }} Turma</h3>
+        <button class="btn-fechar" (click)="fecharModal()"><i class="bi bi-x-lg"></i></button>
+      </div>
+      <form [formGroup]="turmaForm" (ngSubmit)="salvarTurma()">
+        <div class="form-group">
+          <label for="cursoId">Curso</label>
+          <select id="cursoId" formControlName="cursoId">
+            <option value="">Selecione um curso</option>
+            <option *ngFor="let curso of cursos" [value]="curso.id">{{ curso.nome }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="ano">Ano</label>
+          <input type="number" id="ano" formControlName="ano" min="2000">
+        </div>
+        <div class="form-group">
+          <label for="semestre">Semestre</label>
+          <select id="semestre" formControlName="semestre">
+            <option value="">Selecione o semestre</option>
+            <option [value]="1">1º Semestre</option>
+            <option [value]="2">2º Semestre</option>
+          </select>
+        </div>
+        <div class="modal-turma-footer">
+          <button type="button" class="btn-cancelar" (click)="fecharModal()">Cancelar</button>
+          <button type="submit" class="btn-salvar" [disabled]="turmaForm.invalid">
+            {{ isEditing ? 'Atualizar' : 'Criar' }}
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="modal-turma-backdrop" (click)="onBackdropClick($event)"></div>
+  </div>
+</div> 

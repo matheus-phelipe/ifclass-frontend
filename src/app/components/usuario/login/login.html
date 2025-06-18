@@ -24,7 +24,8 @@
               class="form-control"
               placeholder="seu.email@exemplo.com"
               required
-              pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" #emailModel="ngModel"
+              pattern="^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
+              #emailModel="ngModel"
             >
           </div>
           <div class="text-danger small mt-1" *ngIf="emailModel.invalid && emailModel.touched">

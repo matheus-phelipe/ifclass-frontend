@@ -1,17 +1,16 @@
+<app-loader [show]="(loaderVisible$ | async) ?? false"></app-loader>
+
 <ng-container *ngIf="showMainLayout">
   <div class="d-flex min-vh-100">
-
     <app-sidebar
       [isProfessor]="isProfessor"
       [isCoordenador]="isCoordenador"
       [isAdmin]="isAdmin"
       (logoutClicked)="logout()">
     </app-sidebar>
-
     <div class="flex-grow-1 p-4 bg-light d-flex flex-column" style="overflow-y: auto;">
       <router-outlet></router-outlet>
     </div>
-
   </div>
 </ng-container>
 
