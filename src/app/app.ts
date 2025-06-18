@@ -1,9 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router, RouterOutlet, NavigationEnd, Event as RouterEvent } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { filter } from 'rxjs'; // CORRIGIDO: Importação para RxJS v7+
-import { SidebarComponent } from './shared/sidebar/sidebar';
+import { filter, Subscription } from 'rxjs';
 import { AuthService } from './service/auth/auth.service';
+import { UsuarioService } from './service/usuario/usuario.service';
+import { LoaderService } from './shared/loader/loader.service';
+import { SidebarComponent } from './shared/sidebar/sidebar';
+import { LoaderComponent } from './shared/loader/loader.component';
 
 @Component({
   selector: 'app-root',
@@ -11,7 +14,8 @@ import { AuthService } from './service/auth/auth.service';
   imports: [
     RouterOutlet, 
     CommonModule, 
-    SidebarComponent
+    SidebarComponent,
+    LoaderComponent
   ],
   templateUrl: './app.html',
   styleUrl: './app.css'
@@ -25,23 +29,52 @@ export class App implements OnInit {
   showMainLayout = false;
 
   // Lista de rotas onde a sidebar NÃO deve aparecer.
-  private standaloneRoutes = ['/login', '/cadastro'];
+  private standaloneRoutes = ['/login', '/cadastro', '/resetar-senha', '/aluno/mapa'];
+  private roleSubscription!: Subscription;
+
+  get loaderVisible$() {
+    return this.loaderService.loading$;
+  }
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private loaderService: LoaderService,
+    private usuarioService: UsuarioService,
+    private cdr: ChangeDetectorRef
   ) {
-    // Verifica a URL inicial de forma síncrona
     this.updateLayout(this.router.url);
   }
 
   ngOnInit(): void {
-    // Escuta as mudanças de rota para atualizar o layout
+    // Escuta as mudanças de rota para ATUALIZAR O LAYOUT (mostrar/esconder sidebar)
     this.router.events.pipe(
       filter((event: RouterEvent): event is NavigationEnd => event instanceof NavigationEnd)
     ).subscribe((event: NavigationEnd) => {
-      this.updateLayout(event.urlAfterRedirects);
+      this.updateLayoutVisibility(event.urlAfterRedirects);
+      this.cdr.detectChanges();
     });
+
+    // Escuta as mudanças de PERFIL ATIVO para ATUALIZAR AS PERMISSÕES DA SIDEBAR
+    this.roleSubscription = this.authService.activeRole$.subscribe(() => {
+      this.checkUserRoles();
+      this.cdr.detectChanges();
+    });
+
+    // Verificações iniciais
+    this.updateLayoutVisibility(this.router.url);
+    this.checkUserRoles();
+  }
+
+  ngOnDestroy(): void {
+    // Boa prática: remove a inscrição ao destruir o componente
+    if (this.roleSubscription) {
+      this.roleSubscription.unsubscribe();
+    }
+  }
+
+  private updateLayoutVisibility(currentUrl: string): void {
+    this.showMainLayout = !this.standaloneRoutes.some(route => currentUrl.includes(route));
   }
 
   private updateLayout(currentUrl: string): void {
@@ -56,9 +89,9 @@ export class App implements OnInit {
   }
 
   private checkUserRoles(): void {
-    this.isAdmin = this.authService.hasRole('ROLE_ADMIN');
-    this.isProfessor = this.authService.hasRole('ROLE_PROFESSOR');
-    this.isCoordenador = this.authService.hasRole('ROLE_COORDENADOR');
+    this.isAdmin = this.authService.isRoleActiveOrHigher('ROLE_ADMIN');
+    this.isProfessor = this.authService.isRoleActiveOrHigher('ROLE_PROFESSOR');
+    this.isCoordenador = this.authService.isRoleActiveOrHigher('ROLE_COORDENADOR');
   }
 
   logout(): void {

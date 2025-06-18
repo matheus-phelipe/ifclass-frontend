@@ -2,36 +2,30 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Usuario } from '../../model/usuario/usuario.model';
 import { UsuarioService } from '../../service/usuario/usuario.service';
 import { CommonModule } from '@angular/common';
-import { ModalConfirmacaoComponent } from '../../shared/modal-confirmacao/modal-confirmacao';
 import { AlertComponent } from '../../shared/alert/alert';
 import { FormsModule } from '@angular/forms';
+import { ProfileSwitcherComponent } from '../../shared/profile-switcher/profile-switcher';
+import { AuthService } from '../../service/auth/auth.service';
 
 @Component({
   selector: 'app-gerenciarpermissoes',
   standalone: true,
-  // Adicionado o FormsModule aos imports do componente.
-  imports: [CommonModule, FormsModule, AlertComponent, ModalConfirmacaoComponent],
+  imports: [CommonModule, FormsModule, AlertComponent, ProfileSwitcherComponent],
   templateUrl: './gerenciarpermissoes.html',
   styleUrls: ['./gerenciarpermissoes.css']
 })
 export class Gerenciarpermissoes implements OnInit {
-  
   usuarios: Usuario[] = []; 
   usuariosFiltrados: Usuario[] = []; 
   termoBusca = '';
 
-  // NOVO: Propriedade para o painel de detalhes
   usuarioSelecionado: Usuario | null = null;
-
-  usuarioParaAlterarStatus!: Usuario | null;
-  novaPermissao = '';
-  mensagemModalConfirmacao = '';
-
-  @ViewChild('modalConfirmPermissao') modalConfirmPermissao!: ModalConfirmacaoComponent;
+  
   @ViewChild('alerta') alerta!: AlertComponent;
 
   constructor(
-    private usuarioService: UsuarioService
+    private usuarioService: UsuarioService,
+    public authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -43,87 +37,81 @@ export class Gerenciarpermissoes implements OnInit {
       next: (data) => {
         this.usuarios = data;
         this.usuariosFiltrados = data;
-        // Seleciona o primeiro usuário da lista para exibir no painel de detalhes
         if (this.usuariosFiltrados.length > 0) {
           this.selecionarUsuario(this.usuariosFiltrados[0]);
         }
       },
-      error: () => alert("Erro ao carregar usuários.")
+      error: () => this.mostrarAlerta("Erro ao carregar usuários.", 'danger')
     });
   }
   
-  // Método para selecionar um usuário e exibi-lo no painel lateral
   selecionarUsuario(usuario: Usuario): void {
     this.usuarioSelecionado = usuario;
   }
 
   filtrarUsuarios(): void {
-    if (!this.termoBusca) {
+    const busca = this.termoBusca.toLowerCase();
+    if (!busca) {
       this.usuariosFiltrados = this.usuarios;
     } else {
       this.usuariosFiltrados = this.usuarios.filter(usuario =>
-        usuario.nome.toLowerCase().includes(this.termoBusca.toLowerCase()) ||
-        usuario.email.toLowerCase().includes(this.termoBusca.toLowerCase())
+        usuario.nome.toLowerCase().includes(busca) ||
+        usuario.email.toLowerCase().includes(busca)
       );
     }
-    // Se um usuário estava selecionado, mantém a seleção se ele ainda estiver na lista filtrada
-    if (this.usuarioSelecionado && !this.usuariosFiltrados.find(u => u.id === this.usuarioSelecionado?.id)) {
+    
+    if (this.usuarioSelecionado && !this.usuariosFiltrados.some(u => u.id === this.usuarioSelecionado?.id)) {
         this.usuarioSelecionado = this.usuariosFiltrados.length > 0 ? this.usuariosFiltrados[0] : null;
     } else if (!this.usuarioSelecionado && this.usuariosFiltrados.length > 0) {
         this.usuarioSelecionado = this.usuariosFiltrados[0];
     }
   }
 
-  onRoleChange(usuario: Usuario, novoPapel: string) {
-    if (this.temPapel(usuario, novoPapel)) return;
-    this.usuarioParaAlterarStatus = usuario;
-    this.novaPermissao = novoPapel;
+  onRoleChange(usuario: Usuario, papel: string) {
+    if (!this.authService.isRoleActiveOrHigher('ROLE_COORDENADOR')) {
+      this.mostrarAlerta('Você não tem permissão para alterar papéis.', 'danger');
+      return;
+    }
     
-    this.modalConfirmPermissao.open(
-      'primary', // Usa o tipo 'primary' (azul) para uma ação padrão
-      'Confirmar Alteração',
-      `Deseja mesmo alterar o papel de ${usuario.nome} para "${novoPapel.replace('ROLE_', '')}"?`
-    );
-  }
+    const permissoesAtuais = [...(usuario.authorities || [])];
+    const index = permissoesAtuais.indexOf(papel);
 
-  confirmarAlteracaoStatus() {
-    if (!this.usuarioParaAlterarStatus) return;
-
-    this.usuarioService.atualizarAuthorities(this.usuarioParaAlterarStatus.id, this.novaPermissao).subscribe({
-      next: () => {
-        const index = this.usuarios.findIndex(u => u.id === this.usuarioParaAlterarStatus?.id);
-        if (index !== -1) {
-          // Atualiza o estado local para refletir a mudança imediatamente
-          this.usuarios[index].authorities = this.novaPermissao;
-          this.filtrarUsuarios();
+    if (index > -1) {
+      permissoesAtuais.splice(index, 1);
+    } else {
+      permissoesAtuais.push(papel);
+    }
+    
+    this.usuarioService.atualizarAuthorities(usuario.id, permissoesAtuais).subscribe({
+      next: (usuarioAtualizado) => {
+        const idx = this.usuarios.findIndex(u => u.id === usuario.id);
+        if (idx !== -1) {
+          this.usuarios[idx].authorities = usuarioAtualizado.authorities;
         }
-        this.mostrarAlerta('Permissão atualizada com sucesso!');
-        // Limpa o estado somente após a operação ser bem-sucedida
-        this.modalConfirmPermissao.close();
-        this.usuarioParaAlterarStatus = null;
-        this.novaPermissao = '';
+        if (this.usuarioSelecionado?.id === usuario.id) {
+          this.usuarioSelecionado.authorities = usuarioAtualizado.authorities;
+        }
+        this.mostrarAlerta(`Permissões de ${usuario.nome} atualizadas.`);
       },
-      error: () => {
-        this.mostrarAlerta('Erro ao atualizar a permissão');
-        // Limpa o estado também em caso de erro
-        this.modalConfirmPermissao.close();
-        this.usuarioParaAlterarStatus = null;
-        this.novaPermissao = '';
-      }
+      error: () => this.mostrarAlerta('Erro ao atualizar a permissão.', 'danger')
     });
   }
 
-  cancelarAlteracaoStatus() {
-    this.modalConfirmPermissao.close();
-    this.usuarioParaAlterarStatus = null;
-    this.novaPermissao = '';
-  }
-
+  /**
+   * Verifica se o usuário possui um papel específico em seu array de authorities.
+   */
   temPapel(usuario: Usuario, papel: string): boolean {
-    return usuario.authorities === papel;
+    return usuario.authorities && usuario.authorities.includes(papel);
   }
 
-  mostrarAlerta(mensagem: string) {
-    this.alerta.show(mensagem, 3000); 
+  formatarPermissoes(authorities: string[]): string {
+    if (!authorities || authorities.length === 0) {
+      return 'Nenhuma';
+    }
+    return authorities.map(auth => auth.replace('ROLE_', '')).join(', ');
+  }
+
+  mostrarAlerta(mensagem: string, tipo: 'success' | 'danger' = 'success') {
+    this.alerta.show(mensagem, 3000, tipo); 
   }
 }

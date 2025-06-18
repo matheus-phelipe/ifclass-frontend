@@ -1,132 +1,157 @@
-<div class="container my-5">
-    <header class="text-center mb-5">
-        <h1 class="display-5 fw-bold text-success">Planta do Campus</h1>
-        <p class="text-muted fs-5">Visualize e gerencie os blocos e salas da instituição.</p>
-    </header>
+<ng-container *ngIf="{ canManage: (authService.isAdmin$ | async) } as perms">
 
-    <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
-        {{ error }}
-        <button type="button" class="btn-close" (click)="error = null" aria-label="Close"></button>
-    </div>
-
-    <!-- PAINEL DO ADMINISTRADOR -->
-    <section *ngIf="isAdmin" class="card card-body mb-5 shadow-sm border-0 rounded-4">
-      <h2 class="h4 border-bottom pb-3 mb-4 text-success">Painel de Controle</h2>
-      <div class="row g-4">
-        <!-- Formulário de Bloco -->
-        <div class="col-lg-5">
-            <form #blocoForm="ngForm" (ngSubmit)="handleCreateBloco()">
-              <h3 class="h5">Criar Novo Bloco</h3>
-              <div class="mb-3">
-                  <label for="blockName" class="form-label">Nome do Bloco</label>
-                  <input type="text" id="blockName" class="form-control" [(ngModel)]="novoBlocoNome" name="novoBlocoNome" placeholder="Ex: Bloco Didático I" required>
-              </div>
-              <button type="submit" class="btn btn-success w-100" [disabled]="blocoForm.invalid">Adicionar Bloco</button>
-            </form>
-        </div>
-        
-        <!-- Formulário de Sala (dinâmico) -->
-        <div class="col-lg-7">
-            <form #salaForm="ngForm" (ngSubmit)="handleSubmitSala()">
-              <h3 class="h5">{{ editingSala ? 'Editar Sala' : 'Adicionar Nova Sala' }}</h3>
-              
-              <div class="mb-3">
-                  <label for="blockSelect" class="form-label">Bloco</label>
-                  <select id="blockSelect" class="form-select" [(ngModel)]="blocoSelecionadoId" name="blocoSelecionadoId" [disabled]="blocos.length === 0 || !!editingSala" required>
-                    <option *ngIf="blocos.length === 0" [ngValue]="null">Crie um bloco primeiro</option>
-                    <option *ngFor="let bloco of blocos" [value]="bloco.id">{{ bloco.nome }}</option>
-                  </select>
-              </div>
-              
-              <div class="row g-2 mb-3">
-                <div class="col-sm-8">
-                    <label for="roomCode" class="form-label">Código da Sala</label>
-                    <input type="text" id="roomCode" class="form-control" [(ngModel)]="formSala.codigo" name="salaCodigo" required>
-                </div>
-                <div class="col-sm-4">
-                    <label for="roomCapacity" class="form-label">Capacidade</label>
-                    <input type="number" id="roomCapacity" class="form-control" [(ngModel)]="formSala.capacidade" name="salaCapacidade" required>
-                </div>
-              </div>
-
-              <h4 class="h6 mt-3 text-muted">Posicionamento e Dimensões</h4>
-              <div class="row g-2">
-                <div class="col-6 col-sm-3"><label for="roomPosX" class="form-label">Pos. X</label><input type="number" id="roomPosX" class="form-control" [(ngModel)]="formSala.posX" name="salaPosX" required></div>
-                <div class="col-6 col-sm-3"><label for="roomPosY" class="form-label">Pos. Y</label><input type="number" id="roomPosY" class="form-control" [(ngModel)]="formSala.posY" name="salaPosY" required></div>
-                <div class="col-6 col-sm-3"><label for="roomWidth" class="form-label">Largura</label><input type="number" id="roomWidth" class="form-control" [(ngModel)]="formSala.largura" name="salaLargura" required></div>
-                <div class="col-6 col-sm-3"><label for="roomHeight" class="form-label">Altura</label><input type="number" id="roomHeight" class="form-control" [(ngModel)]="formSala.altura" name="salaAltura" required></div>
-              </div>
-
-              <div class="d-flex flex-wrap gap-2 mt-3">
-                <button type="submit" class="btn btn-primary flex-grow-1" [disabled]="salaForm.invalid">
-                  {{ editingSala ? 'Atualizar Sala' : 'Adicionar Sala' }}
-                </button>
-                <button *ngIf="editingSala" type="button" class="btn btn-warning" (click)="resetPosition()" title="Resetar Posição">
-                  <i class="bi bi-arrow-counterclockwise"></i>
-                </button>
-                <button *ngIf="editingSala" type="button" class="btn btn-secondary" (click)="cancelarEdicao()">
-                  Cancelar
-                </button>
-              </div>
-            </form>
+  <div class="container my-5">
+      <div>
+        <header class="text-center mb-5">
+            <h1 class="display-5 fw-bold text-success">{{ perms.canManage ? 'Planta do Campus' : 'Mapa do Campus' }}</h1>
+            <p class="text-muted fs-5">{{ perms.canManage ? 'Visualize e gerencie os blocos e salas da instituição.' : 'Explore o mapa dos blocos e salas da instituição.' }}</p>
+        </header>
+        <div>
+          <app-profile-switcher></app-profile-switcher>
         </div>
       </div>
-    </section>
+      <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+          {{ error }}
+          <button type="button" class="btn-close" (click)="error = null" aria-label="Close"></button>
+      </div>
 
-    <!-- EXIBIÇÃO DA PLANTA -->
-    <main>
-      <div class="accordion" id="blocosAccordion">
-        <div *ngFor="let bloco of blocos" class="accordion-item shadow-sm">
-          <h2 class="accordion-header" [id]="'heading' + bloco.id">
-              <button class="accordion-button" type="button" [class.collapsed]="activeBlocoId !== bloco.id" (click)="toggleBloco(bloco.id!)">
-                  {{ bloco.nome }}
-              </button>
-          </h2>
-          <div [id]="'collapse' + bloco.id" class="accordion-collapse collapse" [class.show]="activeBlocoId === bloco.id">
-            <div class="accordion-body">
-              <div *ngIf="bloco.salas && bloco.salas.length > 0; else noRooms" class="floorplan-wrapper">
-                
-                <div class="alert alert-light text-center p-2 d-none d-md-block">
-                  <small><b>Dica:</b> Clique e arraste as salas para posicioná-las. Use o scroll do mouse para dar zoom.</small>
+      <section *ngIf="perms.canManage" class="card card-body mb-5 shadow-sm border-0 rounded-4">
+        <h2 class="h4 border-bottom pb-3 mb-4 text-success">Painel de Controle</h2>
+        <div class="row g-4">
+          <div class="col-lg-5">
+              <form #blocoForm="ngForm" (ngSubmit)="handleCreateBloco()">
+                <h3 class="h5">Criar Novo Bloco</h3>
+                <div class="mb-3">
+                    <label for="blockName" class="form-label">Nome do Bloco</label>
+                    <input type="text" id="blockName" class="form-control" [(ngModel)]="novoBlocoNome" name="novoBlocoNome" placeholder="Ex: Bloco Didático I" required>
+                </div>
+                <button type="submit" class="btn btn-success w-100" [disabled]="blocoForm.invalid">Adicionar Bloco</button>
+              </form>
+          </div>
+
+          <div class="col-lg-7">
+              <form #salaForm="ngForm" (ngSubmit)="handleSubmitSala()">
+                <h3 class="h5">{{ editingSala ? 'Editar Sala' : 'Adicionar Nova Sala' }}</h3>
+
+                <div class="mb-3">
+                    <label for="blockSelect" class="form-label">Bloco</label>
+                    <select id="blockSelect" class="form-select" [(ngModel)]="blocoSelecionadoId" name="blocoSelecionadoId" [disabled]="blocos.length === 0 || !!editingSala" required>
+                      <option *ngIf="blocos.length === 0" [ngValue]="null">Crie um bloco primeiro</option>
+                      <option *ngFor="let bloco of blocos" [value]="bloco.id">{{ bloco.nome }}</option>
+                    </select>
                 </div>
 
-                <div *ngIf="editingSala" class="selected-sala-info alert alert-success">
-                  <strong>Editando Sala:</strong> {{ editingSala.codigo }}
-                  <button class="btn btn-sm btn-outline-danger float-end" (click)="handleDeleteSala(bloco.id!, editingSala.id!)">
-                      Excluir
+                <div class="row g-2 mb-3">
+                  <div class="col-sm-8">
+                      <label for="roomCode" class="form-label">Código da Sala</label>
+                      <input type="text" id="roomCode" class="form-control" [(ngModel)]="formSala.codigo" name="salaCodigo" required>
+                  </div>
+                  <div class="col-sm-4">
+                      <label for="roomCapacity" class="form-label">Capacidade</label>
+                      <input type="number" id="roomCapacity" class="form-control" [(ngModel)]="formSala.capacidade" name="salaCapacidade" required>
+                  </div>
+                </div>
+
+                <h4 class="h6 mt-3 text-muted">Posicionamento e Dimensões</h4>
+                <div class="row g-2">
+                  <div class="col-6 col-sm-3"><label for="roomPosX" class="form-label">Pos. X</label><input type="number" id="roomPosX" class="form-control" [(ngModel)]="formSala.posX" name="salaPosX" required></div>
+                  <div class="col-6 col-sm-3"><label for="roomPosY" class="form-label">Pos. Y</label><input type="number" id="roomPosY" class="form-control" [(ngModel)]="formSala.posY" name="salaPosY" required></div>
+                  <div class="col-6 col-sm-3"><label for="roomWidth" class="form-label">Largura</label><input type="number" id="roomWidth" class="form-control" [(ngModel)]="formSala.largura" name="salaLargura" required></div>
+                  <div class="col-6 col-sm-3"><label for="roomHeight" class="form-label">Altura</label><input type="number" id="roomHeight" class="form-control" [(ngModel)]="formSala.altura" name="salaAltura" required></div>
+                </div>
+
+                <div class="d-flex flex-wrap gap-2 mt-3">
+                  <button type="submit" class="btn btn-primary flex-grow-1" [disabled]="salaForm.invalid">
+                    {{ editingSala ? 'Atualizar Sala' : 'Adicionar Sala' }}
+                  </button>
+                  <button *ngIf="editingSala" type="button" class="btn btn-warning" (click)="resetPosition()" title="Resetar Posição">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                  </button>
+                  <button *ngIf="editingSala" type="button" class="btn btn-secondary" (click)="cancelarEdicao()">
+                    Cancelar
                   </button>
                 </div>
-                
-                <div class="floorplan-container" [class.is-dragging]="isDragging">
-                  <ngx-pan-zoom>
-                    <svg class="floorplan-svg" viewBox="0 0 1600 900">
-                      <g 
-                        *ngFor="let sala of bloco.salas" 
-                        (mousedown)="onMouseDown($event, sala)"
-                        class="sala-group"
-                        [class.dragging]="draggingSala?.id === sala.id">
-                        
-                        <rect [attr.x]="sala.posX ?? 0" [attr.y]="sala.posY ?? 0" [attr.width]="sala.largura ?? 150" [attr.height]="sala.altura ?? 100" class="sala-rect" [class.editing]="editingSala?.id === sala.id"></rect>
-                        <text [attr.x]="(sala.posX ?? 0) + (sala.largura ?? 150) / 2" [attr.y]="(sala.posY ?? 0) + (sala.altura ?? 100) / 2" class="sala-text">
-                          <tspan class="sala-codigo">{{ sala.codigo }}</tspan>
-                          <tspan [attr.x]="(sala.posX ?? 0) + (sala.largura ?? 150) / 2" dy="1.2em" class="sala-capacidade">Cap: {{ sala.capacidade }}</tspan>
-                        </text>
-                      </g>
-                    </svg>
-                  </ngx-pan-zoom>
-                </div>
-              </div>
-              <ng-template #noRooms>
-                <p class="text-center text-muted fst-italic p-4">Nenhuma sala adicionada a este bloco.</p>
-              </ng-template>
-                <div *ngIf="isAdmin && !editingSala" class="mt-4 pt-3 border-top text-end">
-                    <button (click)="handleDeleteBloco(bloco.id!)" class="btn btn-sm btn-outline-danger">
-                        Excluir Bloco "{{ bloco.nome }}"
+              </form>
+          </div>
+        </div>
+      </section>
+
+      <section *ngIf="!perms.canManage" class="card card-body mb-5 shadow-sm border-0 rounded-4 text-center">
+          <h2 class="h4 pb-2 text-primary">
+              <i class="bi bi-map-fill me-2"></i> Explore o Campus!
+          </h2>
+          <p class="text-muted mb-3">
+              Visualize o layout dos blocos e salas da instituição.
+          </p>
+          <p class="mb-0 text-muted">
+              Clique em um bloco para expandir e ver as salas. Use o scroll na planta para dar zoom e clique e arraste para navegar.
+          </p>
+      </section>
+
+      <main>
+        <div class="accordion" id="blocosAccordion">
+          <div *ngFor="let bloco of blocos" class="accordion-item shadow-sm">
+            <h2 class="accordion-header" [id]="'heading' + bloco.id">
+                <button class="accordion-button" type="button" [class.collapsed]="activeBlocoId !== bloco.id" (click)="toggleBloco(bloco.id!)">
+                    {{ bloco.nome }}
+                </button>
+            </h2>
+            <div [id]="'collapse' + bloco.id" class="accordion-collapse collapse" [class.show]="activeBlocoId === bloco.id">
+              <div class="accordion-body">
+                <div *ngIf="bloco.salas && bloco.salas.length > 0; else noRooms" class="floorplan-wrapper">
+
+                  <div class="alert alert-light text-center p-2 d-none d-md-block" *ngIf="perms.canManage">
+                    <small><b>Dica:</b> Clique e arraste as salas para posicioná-las. Use o scroll do mouse para dar zoom.</small>
+                  </div>
+                  <div class="alert alert-light text-center p-2 d-none d-md-block" *ngIf="!perms.canManage">
+                      <small><b>Dica:</b> Use o scroll na planta para dar zoom e clique e arraste para navegar.</small>
+                  </div>
+
+                  <div *ngIf="editingSala" class="selected-sala-info alert alert-success">
+                    <strong>Editando Sala:</strong> {{ editingSala.codigo }}
+                    <button class="btn btn-sm btn-outline-danger float-end" (click)="handleDeleteSala(bloco.id!, editingSala.id!)">
+                        Excluir
                     </button>
+                  </div>
+
+                  <div class="floorplan-container" [class.is-dragging]="isDragging">
+                    <ngx-pan-zoom [config]="panZoomConfig"  (wheel)="$event.preventDefault()">
+                      <svg class="floorplan-svg" viewBox="0 0 1600 900">
+                        <g
+                          *ngFor="let sala of bloco.salas"
+                          (mousedown)="perms.canManage ? onMouseDown($event, sala) : null"
+                          (click)="perms.canManage ? selectSala(sala) : null"
+                          class="sala-group"
+                          [class.dragging]="draggingSala?.id === sala.id"
+                          [class.clickable-for-user]="!perms.canManage"
+                          >
+
+                          <rect [attr.x]="sala.posX ?? 0" [attr.y]="sala.posY ?? 0" [attr.width]="sala.largura ?? 150" [attr.height]="sala.altura ?? 100" class="sala-rect" [class.editing]="editingSala?.id === sala.id"></rect>
+                          <text [attr.x]="(sala.posX ?? 0) + (sala.largura ?? 150) / 2" [attr.y]="(sala.posY ?? 0) + (sala.altura ?? 100) / 2" class="sala-text">
+                            <tspan class="sala-codigo">{{ sala.codigo }}</tspan>
+                            <tspan [attr.x]="(sala.posX ?? 0) + (sala.largura ?? 150) / 2" dy="1.2em" class="sala-capacidade">Cap: {{ sala.capacidade }}</tspan>
+                          </text>
+                        </g>
+                      </svg>
+                    </ngx-pan-zoom>
+                  </div>
                 </div>
+                <ng-template #noRooms>
+                  <p class="text-center text-muted fst-italic p-4">
+                    {{ perms.canManage ?
+                      'Nenhuma sala adicionada a este bloco. Use o painel de controle acima para adicionar.' :
+                      'Nenhuma sala encontrada neste bloco.' }}
+                  </p>
+                </ng-template>
+                  <div *ngIf="perms.canManage && !editingSala" class="mt-4 pt-3 border-top text-end">
+                      <button (click)="handleDeleteBloco(bloco.id!)" class="btn btn-sm btn-outline-danger">
+                          Excluir Bloco "{{ bloco.nome }}"
+                      </button>
+                  </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </main>
-</div>
+      </main>
+  </div>
+</ng-container>

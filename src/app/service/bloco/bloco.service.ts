@@ -3,12 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Bloco } from '../../model/bloco/bloco.model';
 import { Sala } from '../../model/bloco/sala.model';
+import { environment } from '../../../environments/environment.development';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BlocoService {
-  private apiUrl = '/api/blocos';
+  private apiUrl = environment.SERVIDOR+'/api/blocos';
 
   constructor(private http: HttpClient) { }
 

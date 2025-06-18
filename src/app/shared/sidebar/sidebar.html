@@ -1,120 +1,98 @@
-<!-- Sidebar -->
-    <div
-      class="d-flex flex-column bg-success text-white p-3"
-      [ngClass]="{'collapsed-sidebar': !sidebarOpen}"
-      [class.w-auto]="!sidebarOpen"
-      [class.w-100]="sidebarOpen"
-      style="width: auto; min-height: 100%; transition: all 0.3s ease;"
-      [ngStyle]="{'min-width': sidebarOpen ? '250px' : 'auto'}"
-  >
-      
-    <!-- Header + Toggle -->
-    <div class="d-flex align-items-center justify-content-between mb-4">
-      <a routerLink="/home" class="text-white text-decoration-none d-flex align-items-center">
-          <img src="assets/ifclass.png" alt="Logo" class="img-fluid" style="max-height: 40px; cursor: pointer;">
-          <h5 class="ms-2 mb-0" *ngIf="sidebarOpen">Class</h5>
-      </a>
-      <button class="btn btn-outline-light btn-sm ms-2" (click)="toggleSidebar()">
-          <i class="bi" [ngClass]="sidebarOpen ? 'bi-chevron-left' : 'bi-list'"></i>
-      </button>
-    </div>
+<div
+  class="sidebar d-flex flex-column"
+  [ngClass]="{'collapsed-sidebar': !sidebarOpen}"
+  [ngStyle]="{'min-width': sidebarOpen ? '250px' : 'auto'}"
+>
+  <div class="sidebar-header">
+    <a routerLink="/app/home" class="text-white text-decoration-none d-flex align-items-center">
+      <img src="assets/ifclass.png" alt="Logo" class="sidebar-logo img-fluid">
+      <h5 class="sidebar-title mb-0" *ngIf="sidebarOpen">Class</h5>
+    </a>
+    <button class="sidebar-toggle-btn" (click)="toggleSidebar()" aria-label="Alternar menu lateral">
+      <i class="bi" [ngClass]="sidebarOpen ? 'bi-chevron-left' : 'bi-list'"></i>
+    </button>
+  </div>
 
-    <!-- Menus -->
-    <div class="d-flex flex-column gap-2">
-      <div *ngIf="sidebarOpen" class="text-white-50 small">ALUNO</div>
+  <div class="d-flex flex-column gap-2 flex-grow-1">
+    <ng-container *ngIf="isProfessor || isCoordenador || isAdmin">
+      <div *ngIf="sidebarOpen" class="sidebar-menu-category">GERAL</div>
 
-      <a routerLink="/aulas"
-         class="text-white text-decoration-none d-flex align-items-center"
-         [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
-        <i class="bi bi-calendar-week fs-5"></i>
+      <a routerLink="/app/aulas" class="sidebar-nav-link" [ngClass]="{'justify-content-center': !sidebarOpen}">
+        <i class="bi bi-calendar-week"></i>
         <span *ngIf="sidebarOpen">Aulas do dia</span>
       </a>
-
-      <a routerLink="/salas"
-         class="text-white text-decoration-none d-flex align-items-center"
-         [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
-        <i class="bi bi-door-open fs-5"></i>
+      <a routerLink="/app/salas" class="sidebar-nav-link" [ngClass]="{'justify-content-center': !sidebarOpen}">
+        <i class="bi bi-door-open"></i>
         <span *ngIf="sidebarOpen">Salas</span>
       </a>
-
-      <a routerLink="/turmas"
-         class="text-white text-decoration-none d-flex align-items-center"
-         [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
-        <i class="bi bi-people fs-5"></i>
+      <a routerLink="/app/cursos" class="sidebar-nav-link" [ngClass]="{'justify-content-center': !sidebarOpen}">
+        <i class="bi bi-mortarboard-fill"></i>
+        <span *ngIf="sidebarOpen">Cursos</span>
+      </a>
+      <a routerLink="/app/turmas" class="sidebar-nav-link" [ngClass]="{'justify-content-center': !sidebarOpen}">
+        <i class="bi bi-people"></i>
         <span *ngIf="sidebarOpen">Turmas</span>
       </a>
-
-      <a routerLink="/disciplinas"
-         class="text-white text-decoration-none d-flex align-items-center mb-2"
-         [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
-        <i class="bi bi-journal-bookmark fs-5"></i>
+      <a routerLink="/app/disciplinas" class="sidebar-nav-link" [ngClass]="{'justify-content-center': !sidebarOpen}">
+        <i class="bi bi-journal-bookmark"></i>
         <span *ngIf="sidebarOpen">Disciplinas</span>
       </a>
+    </ng-container>
 
-      <!-- PROFESSOR -->
-      <ng-container *ngIf="isProfessor || isCoordenador || isAdmin">
-        <div *ngIf="sidebarOpen" class="text-white-50 small">PROFESSOR</div>
+    <ng-container *ngIf="isProfessor || isCoordenador || isAdmin">
+      <div *ngIf="sidebarOpen" class="sidebar-menu-category">PROFESSOR</div>
 
-        <a routerLink="/aulas/criar"
-           class="text-white text-decoration-none d-flex align-items-center mb-2"
-           [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
-          <i class="bi bi-plus-square fs-5"></i>
-          <span *ngIf="sidebarOpen">Criar aula</span>
-        </a>
-      </ng-container>
+      <a routerLink="/aulas/criar"
+         class="sidebar-nav-link"
+         [ngClass]="{'justify-content-center': !sidebarOpen}">
+        <i class="bi bi-plus-square"></i>
+        <span *ngIf="sidebarOpen">Criar aula</span>
+      </a>
+    </ng-container>
 
-      <!-- COORDENADOR -->
-      <ng-container *ngIf="isCoordenador || isAdmin">
-        <div *ngIf="sidebarOpen" class="text-white-50 small">COORDENADOR</div>
+    <ng-container *ngIf="isCoordenador || isAdmin">
+      <div *ngIf="sidebarOpen" class="sidebar-menu-category">COORDENADOR</div>
 
-        <a routerLink="/relacionar-sala"
-           class="text-white text-decoration-none d-flex align-items-center"
-           [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
-          <i class="bi bi-link fs-5"></i>
-          <span *ngIf="sidebarOpen">Relacionar sala/disciplina</span>
-        </a>
+      <a routerLink="/relacionar-sala"
+         class="sidebar-nav-link"
+         [ngClass]="{'justify-content-center': !sidebarOpen}">
+        <i class="bi bi-link"></i>
+        <span *ngIf="sidebarOpen">Relacionar sala/disciplina</span>
+      </a>
+     
+      <a routerLink="/app/permissoes"
+         class="sidebar-nav-link"
+         [ngClass]="{'justify-content-center': !sidebarOpen}">
+        <i class="bi bi-person-gear"></i>
+        <span *ngIf="sidebarOpen">Gerenciar permissões</span>
+      </a>
+    </ng-container>
 
-        <a routerLink="/relacionar-turma"
-           class="text-white text-decoration-none d-flex align-items-center"
-           [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
-          <i class="bi bi-link fs-5"></i>
-          <span *ngIf="sidebarOpen">Relacionar turma/curso</span>
-        </a>
+    <ng-container *ngIf="isAdmin">
+      <div *ngIf="sidebarOpen" class="sidebar-menu-category">ADMINISTRADOR</div>
 
-        <a routerLink="/permissoes"
-           class="text-white text-decoration-none d-flex align-items-center mb-2"
-           [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
-          <i class="bi bi-person-gear fs-5"></i>
-          <span *ngIf="sidebarOpen">Gerenciar permissões</span>
-        </a>
-      </ng-container>
+      <a routerLink="/app/usuarios"
+         class="sidebar-nav-link"
+         [ngClass]="{'justify-content-center': !sidebarOpen}">
+        <i class="bi bi-people-fill"></i>
+        <span *ngIf="sidebarOpen">Gerenciar usuários</span>
+      </a>
 
-      <!-- ADMIN -->
-      <ng-container *ngIf="isAdmin">
-        <div *ngIf="sidebarOpen" class="text-white-50 small">ADMINISTRADOR</div>
-
-        <a routerLink="/usuarios"
-           class="text-white text-decoration-none d-flex align-items-center"
-           [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
-          <i class="bi bi-people-fill fs-5"></i>
-          <span *ngIf="sidebarOpen">Gerenciar usuários</span>
-        </a>
-
-        <a routerLink="/configuracoes"
-           class="text-white text-decoration-none d-flex align-items-center"
-           [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
-          <i class="bi bi-gear fs-5"></i>
-          <span *ngIf="sidebarOpen">Configurações</span>
-        </a>
-      </ng-container>
-    </div>
-
-    <!-- Botão sair -->
-    <div class="mt-auto pt-3">
-      <button (click)="logout()" class="btn btn-outline-light btn-sm w-100 d-flex align-items-center"
-              [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}">
-        <i class="bi bi-box-arrow-right fs-5"></i>
-        <span *ngIf="sidebarOpen">Sair</span>
-      </button>
-    </div>
+      <a routerLink="/configuracoes"
+         class="sidebar-nav-link"
+         [ngClass]="{'justify-content-center': !sidebarOpen}">
+        <i class="bi bi-gear"></i>
+        <span *ngIf="sidebarOpen">Configurações</span>
+      </a>
+    </ng-container>
   </div>
+
+  <div class="mt-auto pt-3">
+    <button (click)="logout()" class="sidebar-logout-btn w-100 d-flex align-items-center"
+            [ngClass]="{'justify-content-center': !sidebarOpen, 'gap-2': sidebarOpen}"
+            aria-label="Sair do sistema">
+      <i class="bi bi-box-arrow-right"></i>
+      <span *ngIf="sidebarOpen">Sair</span>
+    </button>
+  </div>
+</div>
