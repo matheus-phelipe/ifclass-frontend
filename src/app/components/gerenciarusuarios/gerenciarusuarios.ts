@@ -125,6 +125,7 @@ export class Gerenciarusuarios implements OnInit {
           this.usuarios[idx].authorities = usuarioAtualizado.authorities;
         }
         this.mostrarAlerta(`Permissões de ${usuario.nome} atualizadas.`);
+        this.carregarUsuarios();
       },
       error: () => this.mostrarAlerta('Erro ao atualizar a permissão.', 'danger')
     });
