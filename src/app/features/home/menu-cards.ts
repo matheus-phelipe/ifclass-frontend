@@ -76,5 +76,12 @@ export const ALL_MENU_CARDS: MenuCard[] = [
     text: 'Ajuste configurações do sistema.',
     link: '/configuracoes',
     roles: ['ROLE_ADMIN']
+  },
+  {
+    icon: 'bi bi-person-lines-fill',
+    title: 'Vínculo Prof./Disciplina',
+    text: 'Vincule professores às disciplinas de forma fácil.',
+    link: '/app/vinculo-professor-disciplina',
+    roles: ['ROLE_PROFESSOR', 'ROLE_COORDENADOR', 'ROLE_ADMIN']
   }
 ];

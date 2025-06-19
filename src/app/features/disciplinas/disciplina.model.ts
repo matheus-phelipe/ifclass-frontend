@@ -1,3 +1,5 @@
+import { Usuario } from '../usuario/usuario.model';
+
 export interface Disciplina {
   id?: number;
   nome: string;
@@ -10,4 +12,5 @@ export interface Disciplina {
     nome: string;
   };
   cursoId?: number;
+  professores?: Usuario[];
 } 

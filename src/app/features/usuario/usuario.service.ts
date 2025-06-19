@@ -36,4 +36,16 @@ export class UsuarioService {
   remover(id: number) {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
+
+  vincularDisciplina(professorId: number, disciplinaId: number) {
+    return this.http.post(`${this.apiUrl}/${professorId}/disciplinas/${disciplinaId}`, {});
+  }
+
+  desvincularDisciplina(professorId: number, disciplinaId: number) {
+    return this.http.delete(`${this.apiUrl}/${professorId}/disciplinas/${disciplinaId}`);
+  }
+
+  listarDisciplinas(professorId: number) {
+    return this.http.get<import('../disciplinas/disciplina.model').Disciplina[]>(`${this.apiUrl}/${professorId}/disciplinas`);
+  }
 }

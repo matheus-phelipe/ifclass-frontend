@@ -69,6 +69,12 @@ export const routes: Routes = [
         path: 'disciplinas',
         loadComponent: () => import('./features/disciplinas/disciplinas').then(m => m.DisciplinasComponent)
       },
+      {
+        path: 'vinculo-professor-disciplina',
+        loadComponent: () => import('./features/vinculo-professor-disciplina/vinculo-professor-disciplina').then(m => m.VinculoProfessorDisciplinaComponent),
+        canActivate: [authGuard],
+        data: { authorities: ['ROLE_ADMIN', 'ROLE_COORDENADOR', 'ROLE_PROFESSOR'] }
+      },
       { path: '', redirectTo: 'home', pathMatch: 'full' }
     ]
   },
