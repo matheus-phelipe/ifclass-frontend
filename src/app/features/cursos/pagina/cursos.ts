@@ -1,10 +1,10 @@
-import { NovoCursoDTO, Curso } from './../../model/cursos/curso.model';
+import { NovoCursoDTO, Curso } from './curso.model';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '../../service/auth/auth.service';
-import { CursoService } from '../../service/curso/curso.service';
-import { ProfileSwitcherComponent } from '../../shared/profile-switcher/profile-switcher';
+import { AuthService } from '../../../service/auth/auth.service';
+import { CursoService } from './curso.service';
+import { ProfileSwitcherComponent } from '../../../shared/profile-switcher/profile-switcher';
 
 @Component({
   selector: 'app-cursos',

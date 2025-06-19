@@ -1,14 +1,14 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './service/auth/auth.guard';
-import { LoginComponent } from './components/usuario/login/login';
-import { CadastroComponent } from './components/usuario/cadastro/cadastro';
-import { ResetarSenhaComponent } from './components/usuario/resetar-senha/resetar-senha';
-import { Home } from './components/home/home';
-import { Gerenciarusuarios } from './components/gerenciarusuarios/gerenciarusuarios';
-import { Gerenciarpermissoes } from './components/gerenciarpermissoes/gerenciarpermissoes';
-import { GerenciadorSalasComponent } from './components/gerenciador-salas/gerenciador-salas';
-import { CursosComponent } from './components/cursos/cursos';
-import { MapaAlunoComponent } from './components/aluno/mapa-aluno/mapa-aluno';
+import { LoginComponent } from './features/usuario/login/login';
+import { CadastroComponent } from './features/usuario/cadastro/cadastro';
+import { ResetarSenhaComponent } from './features/usuario/resetar-senha/resetar-senha';
+import { Home } from './features/home/home';
+import { Gerenciarusuarios } from './features/gerenciarusuarios/gerenciarusuarios';
+import { Gerenciarpermissoes } from './features/gerenciarpermissoes/gerenciarpermissoes';
+import { GerenciadorSalasComponent } from './features/gerenciador-salas/gerenciador-salas';
+import { CursosComponent } from './features/cursos/pagina/cursos';
+import { MapaAlunoComponent } from './features/aluno/mapa-aluno/mapa-aluno';
 
 export const routes: Routes = [
   // Rotas públicas

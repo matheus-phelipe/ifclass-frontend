@@ -1,6 +1,6 @@
 import { ModalComponent } from './../../../shared/modal/modal';
-import { Cadastro } from './../../../model/usuario/cadastro.model';
-import { UsuarioService } from './../../../service/usuario/usuario.service';
+import { Cadastro } from './cadastro.model';
+import { UsuarioService } from '../usuario.service';
 import { Component, ViewChild } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';

@@ -3,7 +3,7 @@ import { Router, RouterOutlet, NavigationEnd, Event as RouterEvent } from '@angu
 import { CommonModule } from '@angular/common';
 import { filter, Subscription } from 'rxjs';
 import { AuthService } from './service/auth/auth.service';
-import { UsuarioService } from './service/usuario/usuario.service';
+import { UsuarioService } from './features/usuario/usuario.service';
 import { LoaderService } from './shared/loader/loader.service';
 import { SidebarComponent } from './shared/sidebar/sidebar';
 import { LoaderComponent } from './shared/loader/loader.component';

@@ -2,8 +2,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environment.development';
-import { Curso, NovoCursoDTO } from '../../model/cursos/curso.model';
+import { Curso, NovoCursoDTO } from './curso.model';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +13,10 @@ export class CursoService {
   private apiUrl = `${environment.SERVIDOR}/api/cursos`;
 
   constructor(private http: HttpClient) { }
+
+  listar(): Observable<Curso[]> {
+    return this.http.get<Curso[]>(this.apiUrl);
+  }
 
   /**
    * Obtém todos os cursos do backend.

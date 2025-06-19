@@ -5,8 +5,8 @@ import { DisciplinaService } from './disciplina.service';
 import { Disciplina } from './disciplina.model';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../service/auth/auth.service';
-import { CursoService } from '../../service/curso/curso.service';
-import { Curso } from '../../model/cursos/curso.model';
+import { Curso } from '../cursos/pagina/curso.model';
+import { CursoService } from '../cursos/pagina/curso.service';
 import { ProfileSwitcherComponent } from '../../shared/profile-switcher/profile-switcher';
 
 @Component({

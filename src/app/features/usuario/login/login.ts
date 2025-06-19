@@ -2,8 +2,8 @@
 import { AlertComponent } from './../../../shared/alert/alert'; // Importe AlertComponent
 // Remova: import { ModalComponent } from './../../../shared/modal/modal';
 import { AuthService } from './../../../service/auth/auth.service';
-import { UsuarioService } from './../../../service/usuario/usuario.service';
-import { Login } from './../../../model/usuario/login.model';
+import { UsuarioService } from '../usuario.service';
+import { Login } from './login.model';
 import { CommonModule } from '@angular/common';
 import { Component, ViewChild, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';

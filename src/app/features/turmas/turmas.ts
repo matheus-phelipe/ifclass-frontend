@@ -1,12 +1,13 @@
+import { Curso } from './../cursos/pagina/curso.model';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { TurmaService } from './turma.service';
-import { CursoService, Curso } from '../cursos/curso.service';
 import { ToastrService } from 'ngx-toastr';
 import { Turma } from './turma.model';
 import { AuthService } from '../../service/auth/auth.service';
 import { ProfileSwitcherComponent } from '../../shared/profile-switcher/profile-switcher';
+import { CursoService } from '../cursos/pagina/curso.service';
 
 @Component({
   selector: 'app-turmas',

@@ -1,6 +1,6 @@
 import { Component, ViewChild, OnInit } from '@angular/core';
-import { Usuario } from '../../model/usuario/usuario.model';
-import { UsuarioService } from '../../service/usuario/usuario.service';
+import { Usuario } from '../usuario/usuario.model';
+import { UsuarioService } from '../usuario/usuario.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../service/auth/auth.service';
