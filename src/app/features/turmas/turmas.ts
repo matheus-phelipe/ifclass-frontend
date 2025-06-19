@@ -6,11 +6,12 @@ import { CursoService, Curso } from '../cursos/curso.service';
 import { ToastrService } from 'ngx-toastr';
 import { Turma } from './turma.model';
 import { AuthService } from '../../service/auth/auth.service';
+import { ProfileSwitcherComponent } from '../../shared/profile-switcher/profile-switcher';
 
 @Component({
   selector: 'app-turmas',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ProfileSwitcherComponent],
   templateUrl: './turmas.html',
   styleUrls: ['./turmas.css']
 })

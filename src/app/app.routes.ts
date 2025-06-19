@@ -65,6 +65,10 @@ export const routes: Routes = [
         path: 'turmas',
         loadComponent: () => import('./features/turmas/turmas').then(m => m.TurmasComponent)
       },
+      {
+        path: 'disciplinas',
+        loadComponent: () => import('./features/disciplinas/disciplinas').then(m => m.DisciplinasComponent)
+      },
       { path: '', redirectTo: 'home', pathMatch: 'full' }
     ]
   },
