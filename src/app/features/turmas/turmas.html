@@ -25,6 +25,12 @@
         <button class="btn-acao deletar" (click)="excluirTurma(turma.id!)" title="Excluir">
           <i class="bi bi-trash"></i>
         </button>
+        <button class="btn-acao vincular" (click)="abrirVincularModal(turma.id!)" title="Vincular Alunos" *ngIf="canVincularAlunos">
+          <i class="bi bi-person-plus"></i>
+        </button>
+        <button class="btn-acao ver-alunos" (click)="abrirAlunosVinculadosModal(turma.id!)" title="Ver Alunos Vinculados">
+          <i class="bi bi-people"></i>
+        </button>
       </div>
     </div>
   </div>
@@ -65,5 +71,51 @@
       </form>
     </div>
     <div class="modal-turma-backdrop" (click)="onBackdropClick($event)"></div>
+  </div>
+
+  <!-- Modal de Vinculação de Alunos -->
+  <div class="modal-turma" [class.open]="isVincularModalOpen">
+    <div class="modal-turma-content" (click)="$event.stopPropagation()">
+      <div class="modal-turma-header">
+        <h3>Vincular Alunos à Turma</h3>
+        <button class="btn-fechar" (click)="fecharVincularModal()"><i class="bi bi-x-lg"></i></button>
+      </div>
+      <div class="form-group">
+        <label for="alunosSelect">Selecione os alunos</label>
+        <select id="alunosSelect" multiple [(ngModel)]="selectedAlunosIds" class="form-control" style="min-height: 180px;">
+          <option *ngFor="let aluno of alunos" [value]="aluno.id">{{ aluno.nome }} ({{ aluno.prontuario }})</option>
+        </select>
+      </div>
+      <div class="modal-turma-footer">
+        <button type="button" class="btn-cancelar" (click)="fecharVincularModal()">Cancelar</button>
+        <button type="button" class="btn-salvar" [disabled]="selectedAlunosIds.length === 0" (click)="vincularAlunosNaTurma()">
+          Vincular Selecionados
+        </button>
+      </div>
+    </div>
+    <div class="modal-turma-backdrop" (click)="fecharVincularModal()"></div>
+  </div>
+
+  <!-- Modal de Alunos Vinculados -->
+  <div class="modal-turma" [class.open]="isAlunosVinculadosModalOpen">
+    <div class="modal-turma-content" (click)="$event.stopPropagation()">
+      <div class="modal-turma-header">
+        <h3>Alunos Vinculados</h3>
+        <button class="btn-fechar" (click)="fecharAlunosVinculadosModal()"><i class="bi bi-x-lg"></i></button>
+      </div>
+      <div *ngIf="alunosVinculados.length === 0" class="text-center text-muted">Nenhum aluno vinculado.</div>
+      <ul *ngIf="alunosVinculados.length > 0" class="lista-alunos-vinculados">
+        <li *ngFor="let aluno of alunosVinculados">
+          <i class="bi bi-person-circle me-2"></i> {{ aluno.nome }} ({{ aluno.prontuario }})
+          <button class="btn-acao desvincular" (click)="desvincularAluno(aluno.id, selectedTurmaId!)" title="Desvincular Aluno">
+            <i class="bi bi-x-circle"></i>
+          </button>
+        </li>
+      </ul>
+      <div class="modal-turma-footer">
+        <button type="button" class="btn-cancelar" (click)="fecharAlunosVinculadosModal()">Fechar</button>
+      </div>
+    </div>
+    <div class="modal-turma-backdrop" (click)="fecharAlunosVinculadosModal()"></div>
   </div>
 </div> 

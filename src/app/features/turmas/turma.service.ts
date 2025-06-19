@@ -27,4 +27,20 @@ export class TurmaService {
   excluir(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+
+  vincularAlunosEmLote(turmaId: number, alunosIds: number[]) {
+    return this.http.post(`${this.apiUrl.replace('/api/turmas', '/api/aluno-turma/lote')}/${turmaId}`, alunosIds);
+  }
+
+  listarAlunosPorTurma(turmaId: number) {
+    return this.http.get<any[]>(`${this.apiUrl.replace('/api/turmas', '/api/aluno-turma/turma')}/${turmaId}`);
+  }
+
+  listarIdsAlunosVinculados() {
+    return this.http.get<number[]>(`${this.apiUrl.replace('/api/turmas', '/api/aluno-turma/alunos-vinculados')}`);
+  }
+
+  desvincularAlunoDaTurma(alunoId: number) {
+    return this.http.delete(`${this.apiUrl.replace('/api/turmas', '/api/aluno-turma')}/${alunoId}`);
+  }
 } 
