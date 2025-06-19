@@ -1,0 +1,84 @@
+<app-profile-switcher></app-profile-switcher>
+<div class="disciplinas-container">
+  <div class="disciplinas-header">
+    <h2>Disciplinas</h2>
+    <button class="btn-nova-disciplina" (click)="abrirModal()" *ngIf="canEditDisciplinas">
+      <i class="bi bi-plus-lg"></i> Nova Disciplina
+    </button>
+  </div>
+
+  <div *ngIf="disciplinas.length === 0" class="placeholder-disciplinas">
+    <img src="assets/ifclass.png" alt="Sem disciplinas" class="placeholder-img">
+    <p>Nenhuma disciplina cadastrada ainda.<br>Clique em <b>Nova Disciplina</b> para adicionar a primeira!</p>
+  </div>
+
+  <div class="disciplinas-lista">
+    <div class="disciplina-card" *ngFor="let disciplina of disciplinas">
+      <div class="disciplina-card-header">
+        <span class="disciplina-nome">{{ disciplina.nome }}</span>
+        <span class="disciplina-badge">{{ disciplina.codigo }}</span>
+      </div>
+      <div class="disciplina-card-info">
+        <span><b>Carga Horária:</b> {{ disciplina.cargaHoraria }}h</span>
+        <span><b>Departamento:</b> {{ disciplina.departamento }}</span>
+      </div>
+      <div class="disciplina-card-desc">
+        <span>{{ disciplina.descricao }}</span>
+      </div>
+      <div class="disciplina-card-actions" *ngIf="canEditDisciplinas">
+        <button class="btn-acao editar" (click)="abrirModal(disciplina)" title="Editar">
+          <i class="bi bi-pencil"></i>
+        </button>
+        <button class="btn-acao deletar" (click)="excluirDisciplina(disciplina.id!)" title="Excluir">
+          <i class="bi bi-trash"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-disciplina" [class.open]="isModalOpen">
+    <div class="modal-disciplina-content" (click)="$event.stopPropagation()">
+      <div class="modal-disciplina-header">
+        <h3>{{ isEditing ? 'Editar' : 'Nova' }} Disciplina</h3>
+        <button class="btn-fechar" (click)="fecharModal()"><i class="bi bi-x-lg"></i></button>
+      </div>
+      <form [formGroup]="disciplinaForm" (ngSubmit)="salvarDisciplina()">
+        <div class="form-group">
+          <label for="nome">Nome</label>
+          <input type="text" id="nome" formControlName="nome" required>
+        </div>
+        <div class="form-group">
+          <label for="codigo">Código</label>
+          <input type="text" id="codigo" formControlName="codigo" required>
+        </div>
+        <div class="form-group">
+          <label for="cargaHoraria">Carga Horária</label>
+          <input type="number" id="cargaHoraria" formControlName="cargaHoraria" min="1" required>
+        </div>
+        <div class="form-group">
+          <label for="departamento">Departamento</label>
+          <input type="text" id="departamento" formControlName="departamento" required>
+        </div>
+        <div class="form-group">
+          <label for="cursoId">Curso</label>
+          <select id="cursoId" formControlName="cursoId">
+            <option value="">Selecione um curso</option>
+            <option *ngFor="let curso of cursos" [value]="curso.id">{{ curso.nome }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="descricao">Descrição</label>
+          <textarea id="descricao" formControlName="descricao"></textarea>
+        </div>
+        <div class="modal-disciplina-footer">
+          <button type="button" class="btn-cancelar" (click)="fecharModal()">Cancelar</button>
+          <button type="submit" class="btn-salvar" [disabled]="disciplinaForm.invalid">
+            {{ isEditing ? 'Atualizar' : 'Criar' }}
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="modal-disciplina-backdrop" (click)="onBackdropClick($event)"></div>
+  </div>
+</div> 
