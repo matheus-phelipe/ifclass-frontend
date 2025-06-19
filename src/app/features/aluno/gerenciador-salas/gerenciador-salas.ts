@@ -1,12 +1,12 @@
 import { Component, OnInit, HostListener, ElementRef, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Bloco } from '../../model/bloco/bloco.model';
-import { Sala } from '../../model/bloco/sala.model';
-import { BlocoService } from '../../service/bloco/bloco.service';
-import { AuthService } from '../../service/auth/auth.service';
+import { Bloco } from '../bloco.model';
+import { Sala } from '../sala.model';
+import { BlocoService } from '../bloco.service';
+import { AuthService } from '../../../service/auth/auth.service';
 import { NgxPanZoomModule } from 'ngx-panzoom';
-import { ProfileSwitcherComponent } from '../../shared/profile-switcher/profile-switcher';
+import { ProfileSwitcherComponent } from '../../../shared/profile-switcher/profile-switcher';
 
 // Re-definir a interface PanZoomConfig (COMPLETA)
 export interface PanZoomConfig {

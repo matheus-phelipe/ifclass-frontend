@@ -6,7 +6,7 @@ import { ResetarSenhaComponent } from './features/usuario/resetar-senha/resetar-
 import { Home } from './features/home/home';
 import { Gerenciarusuarios } from './features/gerenciarusuarios/gerenciarusuarios';
 import { Gerenciarpermissoes } from './features/gerenciarpermissoes/gerenciarpermissoes';
-import { GerenciadorSalasComponent } from './features/gerenciador-salas/gerenciador-salas';
+import { GerenciadorSalasComponent } from './features/aluno/gerenciador-salas/gerenciador-salas';
 import { CursosComponent } from './features/cursos/pagina/cursos';
 import { MapaAlunoComponent } from './features/aluno/mapa-aluno/mapa-aluno';
 

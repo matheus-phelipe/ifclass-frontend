@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Bloco } from '../../model/bloco/bloco.model';
-import { Sala } from '../../model/bloco/sala.model';
+import { Bloco } from './bloco.model';
+import { Sala } from './sala.model';
 import { environment } from '../../../environments/environment.development';
 
 @Injectable({

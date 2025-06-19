@@ -2,9 +2,9 @@
 
 import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA, HostListener, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Bloco } from '../../../model/bloco/bloco.model';
-import { Sala } from '../../../model/bloco/sala.model';
-import { BlocoService } from '../../../service/bloco/bloco.service';
+import { Bloco } from '../bloco.model';
+import { Sala } from '../sala.model';
+import { BlocoService } from '../bloco.service';
 import { NgxPanZoomModule } from 'ngx-panzoom'; 
 import { AuthService } from '../../../service/auth/auth.service';
 import { FormsModule } from '@angular/forms';
