@@ -7,6 +7,9 @@ import { ProximaAula } from '../../model/aula/proximaaula.model';
 import { Aviso } from '../../model/aviso/aviso.model';
 import { ProfileSwitcherComponent } from '../../shared/profile-switcher/profile-switcher';
 import { Subscription } from 'rxjs';
+import { AulaService } from '../aulas/aula.service';
+import { UsuarioService } from '../usuario/usuario.service';
+import { Aula } from '../aulas/aula.model';
 
 @Component({
   selector: 'app-home',
@@ -24,7 +27,7 @@ export class Home implements OnInit, OnDestroy {
   
   private roleSubscription!: Subscription;
 
-  constructor(public authService: AuthService) {}
+  constructor(public authService: AuthService, private aulaService: AulaService, private usuarioService: UsuarioService) {}
 
   ngOnInit(): void {
     this.nomeUsuario = this.authService.getNomeUsuario() || 'Usuário';
@@ -51,20 +54,29 @@ export class Home implements OnInit, OnDestroy {
     this.menuCards = ALL_MENU_CARDS.filter(card => card.roles.includes(activeRole));
   }
 
-   carregarDadosDashboard(): void {
+  async carregarDadosDashboard(): Promise<void> {
     this.proximaAula = null;
-
     const activeRole = this.authService.getActiveRole();
-    const podeVerAula = activeRole === 'ROLE_ALUNO' || activeRole === 'ROLE_PROFESSOR';
-
-    if (podeVerAula) {
-      this.proximaAula = {
-        disciplina: 'Cálculo I',
-        professor: 'Dr. Newton',
-        sala: 'S-205',
-        bloco: 'Bloco B',
-        horario: '14:00 - 15:40'
-      };
+    if (activeRole === 'ROLE_PROFESSOR') {
+      const usuarioId = this.authService.getIdUsuario();
+      if (usuarioId) {
+        const hoje = new Date();
+        const dataStr = hoje.toISOString().slice(0, 10);
+        this.aulaService.buscarPorProfessorEData(usuarioId, dataStr).subscribe(aulas => {
+          if (aulas && aulas.length > 0) {
+            aulas.sort((a, b) => a.hora.localeCompare(b.hora));
+            const agora = hoje.toTimeString().slice(0, 5);
+            const proxima = aulas.find(a => a.hora >= agora) || aulas[0];
+            this.proximaAula = {
+              disciplina: proxima.disciplina.nome,
+              professor: proxima.professor.nome,
+              sala: proxima.sala.codigo,
+              bloco: this.getBlocoNome(proxima.sala.id),
+              horario: proxima.hora
+            };
+          }
+        });
+      }
     }
 
     this.avisos = [
@@ -72,5 +84,10 @@ export class Home implements OnInit, OnDestroy {
       { id: 2, titulo: 'Inscrições para atividades complementares abertas.', data: '10/06/2025' },
       { id: 3, titulo: 'Palestra sobre IA na educação no auditório.', data: '08/06/2025' }
     ];
+  }
+
+  getBlocoNome(salaId: number): string {
+    // Implemente conforme sua lógica de blocos
+    return '-';
   }
 }

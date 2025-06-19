@@ -128,6 +128,7 @@
                         [attr.height]="sala.altura ?? 100" 
                         class="sala-rect" 
                         [class.editing]="editingSala?.id === sala.id"
+                        [class.sala-aula-hoje]="isSalaAulaHoje(sala.id)"
                         [attr.fill]="sala.cor || '#FFFFFF'">
                     </rect>
                     <text [attr.x]="(sala.posX ?? 0) + (sala.largura ?? 150) / 2" [attr.y]="(sala.posY ?? 0) + (sala.altura ?? 100) / 2" class="sala-text">
@@ -139,6 +140,27 @@
               </ng-container>
             </svg>
           </ngx-pan-zoom>
+        </div>
+      </div>
+
+      <!-- LEGENDA PARA SALAS DO DIA E DA SEMANA -->
+      <div class="mapa-legenda">
+        <div>
+          <span class="sala-legenda sala-aula-hoje"></span> Você tem aula aqui <strong>hoje</strong>
+        </div>
+        <div class="mt-2">
+          <strong>Aulas da semana:</strong>
+          <ul class="list-unstyled small ms-2">
+            <li *ngFor="let aula of aulasSemana">
+              <span class="sala-legenda sala-aula-semana"></span>
+              <span class="fw-bold">{{ aula.disciplina.nome }}</span> -
+              {{ aula.data | diaSemana }}
+              {{ aula.horaInicio || aula.hora }} -
+              {{ aula.horaFim ? aula.horaFim : '' }}<br>
+              <span class="text-muted">Sala: {{ aula.sala.codigo }}</span>
+            </li>
+            <li *ngIf="aulasSemana.length === 0" class="text-muted">Nenhuma aula cadastrada para esta semana.</li>
+          </ul>
         </div>
       </div>
     </ng-container>

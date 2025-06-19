@@ -9,6 +9,10 @@ import { Gerenciarpermissoes } from './features/gerenciarpermissoes/gerenciarper
 import { GerenciadorSalasComponent } from './features/aluno/gerenciador-salas/gerenciador-salas';
 import { CursosComponent } from './features/cursos/pagina/cursos';
 import { MapaAlunoComponent } from './features/aluno/mapa-aluno/mapa-aluno';
+import { TurmasComponent } from './features/turmas/turmas';
+import { DisciplinasComponent } from './features/disciplinas/disciplinas';
+import { VinculoProfessorDisciplinaComponent } from './features/vinculo-professor-disciplina/vinculo-professor-disciplina';
+import { CriarAulaComponent } from './features/aulas/criar-aula/criar-aula';
 
 export const routes: Routes = [
   // Rotas públicas
@@ -63,17 +67,26 @@ export const routes: Routes = [
       },
       {
         path: 'turmas',
-        loadComponent: () => import('./features/turmas/turmas').then(m => m.TurmasComponent)
+        component: TurmasComponent,
+        canActivate: [authGuard], 
+        data: { authorities: ['ROLE_PROFESSOR', 'ROLE_ADMIN', 'ROLE_COORDENADOR'] }
       },
       {
         path: 'disciplinas',
-        loadComponent: () => import('./features/disciplinas/disciplinas').then(m => m.DisciplinasComponent)
-      },
+        component: DisciplinasComponent,
+        canActivate: [authGuard], 
+        data: { authorities: ['ROLE_PROFESSOR', 'ROLE_ADMIN', 'ROLE_COORDENADOR'] }      },
       {
         path: 'vinculo-professor-disciplina',
-        loadComponent: () => import('./features/vinculo-professor-disciplina/vinculo-professor-disciplina').then(m => m.VinculoProfessorDisciplinaComponent),
-        canActivate: [authGuard],
-        data: { authorities: ['ROLE_ADMIN', 'ROLE_COORDENADOR', 'ROLE_PROFESSOR'] }
+        component: VinculoProfessorDisciplinaComponent,
+        canActivate: [authGuard], 
+        data: { authorities: ['ROLE_PROFESSOR', 'ROLE_ADMIN', 'ROLE_COORDENADOR'] }
+      },
+      {
+        path: 'criar-aula',
+        component: CriarAulaComponent,
+        canActivate: [authGuard], 
+        data: { authorities: ['ROLE_PROFESSOR', 'ROLE_ADMIN', 'ROLE_COORDENADOR'] }
       },
       { path: '', redirectTo: 'home', pathMatch: 'full' }
     ]

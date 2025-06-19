@@ -280,3 +280,43 @@
   align-items: center;
   gap: 0.5rem;
 }
+
+.sala-aula-hoje {
+  stroke: #2ecc40;
+  stroke-width: 5px;
+  fill: #d4f8e8 !important;
+}
+.mapa-legenda {
+  margin: 18px 0 0 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1rem;
+  color: #2ecc40;
+  font-weight: 500;
+}
+.sala-legenda {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  margin-right: 6px;
+  vertical-align: middle;
+  border: 1.5px solid #888;
+}
+.sala-aula-hoje {
+  background: #4caf50;
+  border-color: #388e3c;
+}
+.sala-aula-semana {
+  background: #2196f3;
+  border-color: #1565c0;
+}
+.mapa-legenda {
+  margin-top: 18px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 12px 18px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  font-size: 1rem;
+}

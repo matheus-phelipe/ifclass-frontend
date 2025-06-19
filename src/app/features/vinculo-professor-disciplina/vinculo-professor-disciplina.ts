@@ -5,6 +5,7 @@ import { DisciplinaService } from '../disciplinas/disciplina.service';
 import { Usuario } from '../usuario/usuario.model';
 import { Disciplina } from '../disciplinas/disciplina.model';
 import { ProfileSwitcherComponent } from '../../shared/profile-switcher/profile-switcher';
+import { AuthService } from '../../service/auth/auth.service';
 
 @Component({
   selector: 'app-vinculo-professor-disciplina',
@@ -18,15 +19,19 @@ export class VinculoProfessorDisciplinaComponent implements OnInit {
   disciplinas: Disciplina[] = [];
   disciplinasVinculadas: Disciplina[] = [];
   professorSelecionado?: Usuario;
+  professorSelecionadoId?: number;
   carregando = false;
   erro = '';
+  podeEditar = false;
 
   constructor(
     private usuarioService: UsuarioService,
-    private disciplinaService: DisciplinaService
+    private disciplinaService: DisciplinaService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
+    this.podeEditar = this.authService.isRoleActiveOrHigher('ROLE_COORDENADOR') || this.authService.isRoleActiveOrHigher('ROLE_ADMIN');
     this.carregarProfessores();
     this.carregarDisciplinas();
   }
@@ -49,8 +54,15 @@ export class VinculoProfessorDisciplinaComponent implements OnInit {
 
   selecionarProfessorPorId(profId: string) {
     const id = Number(profId);
+    if (this.professorSelecionadoId === id) {
+      this.professorSelecionadoId = undefined;
+      this.professorSelecionado = undefined;
+      this.disciplinasVinculadas = [];
+      return;
+    }
     const prof = this.professores.find(p => p.id === id);
     if (prof) {
+      this.professorSelecionadoId = id;
       this.professorSelecionado = prof;
       this.carregando = true;
       this.usuarioService.listarDisciplinas(prof.id).subscribe({
@@ -64,6 +76,7 @@ export class VinculoProfessorDisciplinaComponent implements OnInit {
         }
       });
     } else {
+      this.professorSelecionadoId = undefined;
       this.professorSelecionado = undefined;
       this.disciplinasVinculadas = [];
     }
@@ -74,19 +87,32 @@ export class VinculoProfessorDisciplinaComponent implements OnInit {
   }
 
   alternarVinculo(disc: Disciplina) {
-    if (!this.professorSelecionado) return;
+    if (!this.podeEditar || !this.professorSelecionado) return;
     this.carregando = true;
+    const id = this.professorSelecionado.id;
+    const reload = () => {
+      this.usuarioService.listarDisciplinas(id).subscribe({
+        next: (disciplinas) => {
+          this.disciplinasVinculadas = disciplinas;
+          this.carregando = false;
+        },
+        error: () => {
+          this.erro = 'Erro ao atualizar disciplinas do professor.';
+          this.carregando = false;
+        }
+      });
+    };
     if (this.estaVinculada(disc)) {
-      this.usuarioService.desvincularDisciplina(this.professorSelecionado.id, disc.id!).subscribe({
-        next: () => this.selecionarProfessorPorId(this.professorSelecionado!.id.toString()),
+      this.usuarioService.desvincularDisciplina(id, disc.id!).subscribe({
+        next: reload,
         error: () => {
           this.erro = 'Erro ao desvincular disciplina.';
           this.carregando = false;
         }
       });
     } else {
-      this.usuarioService.vincularDisciplina(this.professorSelecionado.id, disc.id!).subscribe({
-        next: () => this.selecionarProfessorPorId(this.professorSelecionado!.id.toString()),
+      this.usuarioService.vincularDisciplina(id, disc.id!).subscribe({
+        next: reload,
         error: () => {
           this.erro = 'Erro ao vincular disciplina.';
           this.carregando = false;

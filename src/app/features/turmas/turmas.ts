@@ -10,6 +10,7 @@ import { ProfileSwitcherComponent } from '../../shared/profile-switcher/profile-
 import { CursoService } from '../cursos/pagina/curso.service';
 import { UsuarioService } from '../usuario/usuario.service';
 import { Usuario } from '../usuario/usuario.model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-turmas',
@@ -44,7 +45,8 @@ export class TurmasComponent implements OnInit {
     private fb: FormBuilder,
     private toastr: ToastrService,
     private authService: AuthService,
-    private usuarioService: UsuarioService
+    private usuarioService: UsuarioService,
+    private router: Router
   ) {
     this.turmaForm = this.fb.group({
       id: [null],
@@ -55,6 +57,10 @@ export class TurmasComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    if (this.authService.getActiveRole() === 'ROLE_ALUNO') {
+      this.router.navigate(['/aluno/mapa']);
+      return;
+    }
     this.carregarTurmas();
     this.carregarCursos();
     this.canEditTurmas = this.authService.isRoleActiveOrHigher('ROLE_COORDENADOR') || this.authService.isRoleActiveOrHigher('ROLE_ADMIN');

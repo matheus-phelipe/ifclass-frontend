@@ -8,6 +8,7 @@ import { AuthService } from '../../service/auth/auth.service';
 import { Curso } from '../cursos/pagina/curso.model';
 import { CursoService } from '../cursos/pagina/curso.service';
 import { ProfileSwitcherComponent } from '../../shared/profile-switcher/profile-switcher';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-disciplinas',
@@ -29,7 +30,8 @@ export class DisciplinasComponent implements OnInit {
     private fb: FormBuilder,
     private toastr: ToastrService,
     private authService: AuthService,
-    private cursoService: CursoService
+    private cursoService: CursoService,
+    private router: Router
   ) {
     this.disciplinaForm = this.fb.group({
       id: [null],
@@ -43,6 +45,10 @@ export class DisciplinasComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    if (this.authService.getActiveRole() === 'ROLE_ALUNO') {
+      this.router.navigate(['/aluno/mapa']);
+      return;
+    }
     this.carregarDisciplinas();
     this.carregarCursos();
     this.canEditDisciplinas = this.authService.isRoleActiveOrHigher('ROLE_COORDENADOR') || this.authService.isRoleActiveOrHigher('ROLE_ADMIN');

@@ -46,7 +46,7 @@
     <ng-container *ngIf="isProfessor || isCoordenador || isAdmin">
       <div *ngIf="sidebarOpen" class="sidebar-menu-category">PROFESSOR</div>
 
-      <a routerLink="/aulas/criar"
+      <a routerLink="/app/criar-aula"
          class="sidebar-nav-link"
          [ngClass]="{'justify-content-center': !sidebarOpen}">
         <i class="bi bi-plus-square"></i>
@@ -56,14 +56,6 @@
 
     <ng-container *ngIf="isCoordenador || isAdmin">
       <div *ngIf="sidebarOpen" class="sidebar-menu-category">COORDENADOR</div>
-
-      <a routerLink="/relacionar-sala"
-         class="sidebar-nav-link"
-         [ngClass]="{'justify-content-center': !sidebarOpen}">
-        <i class="bi bi-link"></i>
-        <span *ngIf="sidebarOpen">Relacionar sala/disciplina</span>
-      </a>
-     
       <a routerLink="/app/permissoes"
          class="sidebar-nav-link"
          [ngClass]="{'justify-content-center': !sidebarOpen}">

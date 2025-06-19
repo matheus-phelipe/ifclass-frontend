@@ -44,17 +44,17 @@ export const ALL_MENU_CARDS: MenuCard[] = [
   },
   {
     icon: 'bi bi-plus-square-fill',
-    title: 'Criar aula',
+    title: 'Criar Aula',
     text: 'Crie uma nova aula e defina sala, horário e disciplina.',
-    link: '/aulas/criar',
+    link: '/app/criar-aula',
     roles: ['ROLE_PROFESSOR', 'ROLE_COORDENADOR', 'ROLE_ADMIN']
   },
   {
-    icon: 'bi bi-link',
-    title: 'Relacionar sala/disciplina',
-    text: 'Associe salas às disciplinas disponíveis.',
-    link: '/relacionar-sala',
-    roles: ['ROLE_COORDENADOR', 'ROLE_ADMIN']
+    icon: 'bi bi-person-lines-fill',
+    title: 'Vínculo Prof./Disciplina',
+    text: 'Vincule professores às disciplinas de forma fácil.',
+    link: '/app/vinculo-professor-disciplina',
+    roles: ['ROLE_PROFESSOR', 'ROLE_COORDENADOR', 'ROLE_ADMIN']
   },
   {
     icon: 'bi bi-person-gear',
@@ -76,12 +76,5 @@ export const ALL_MENU_CARDS: MenuCard[] = [
     text: 'Ajuste configurações do sistema.',
     link: '/configuracoes',
     roles: ['ROLE_ADMIN']
-  },
-  {
-    icon: 'bi bi-person-lines-fill',
-    title: 'Vínculo Prof./Disciplina',
-    text: 'Vincule professores às disciplinas de forma fácil.',
-    link: '/app/vinculo-professor-disciplina',
-    roles: ['ROLE_PROFESSOR', 'ROLE_COORDENADOR', 'ROLE_ADMIN']
   }
 ];

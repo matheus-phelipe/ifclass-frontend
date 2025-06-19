@@ -1,59 +1,37 @@
 <app-profile-switcher></app-profile-switcher>
 <div class="vinculo-main-container">
-  <div class="vinculo-card">
-    <div class="vinculo-header">
-      <i class="bi bi-person-lines-fill"></i>
-      <h2>Vínculo Professor x Disciplinas</h2>
-    </div>
-    <div *ngIf="erro" class="erro"><i class="bi bi-exclamation-circle"></i> {{ erro }}</div>
-    <div class="selecao-professor">
-      <label for="professorSelect"><i class="bi bi-person-circle"></i> Selecione um professor:</label>
-      <select id="professorSelect" (change)="selecionarProfessorPorId($any($event.target).value)" [disabled]="carregando">
-        <option value="">-- Escolha --</option>
-        <option *ngFor="let prof of professores" [value]="prof.id">{{ prof.nome }}</option>
-      </select>
-      <button *ngIf="professorSelecionado" class="btn-limpar" (click)="selecionarProfessorPorId('')" [disabled]="carregando">
-        <i class="bi bi-x-circle"></i> Limpar
-      </button>
-    </div>
-  </div>
-
-  <div class="vinculo-card" *ngIf="professorSelecionado">
-    <div class="vinculo-header">
-      <i class="bi bi-journal-bookmark"></i>
-      <h3>Disciplinas de <span class="prof-nome">{{ professorSelecionado.nome }}</span></h3>
-    </div>
-    <div *ngIf="carregando" class="carregando">
-      <span class="loader"></span> Carregando...
-    </div>
-    <table class="tabela-disciplinas" *ngIf="disciplinas.length">
-      <thead>
-        <tr>
-          <th>Nome</th>
-          <th>Código</th>
-          <th>Departamento</th>
-          <th>Vinculado?</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let disc of disciplinas; let i = index" [class.alt-row]="i % 2 === 1">
-          <td>{{ disc.nome }}</td>
-          <td>{{ disc.codigo }}</td>
-          <td>{{ disc.departamento }}</td>
-          <td>
-            <label class="checkbox-custom">
-              <input type="checkbox"
-                     [checked]="estaVinculada(disc)"
-                     (change)="alternarVinculo(disc)"
-                     [disabled]="carregando">
-              <span></span>
-            </label>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <div *ngIf="!disciplinas.length && !carregando" class="nenhuma-disciplina">
-      <i class="bi bi-info-circle"></i> Nenhuma disciplina cadastrada.
+  <h2><i class="bi bi-people"></i> Vínculo Professor x Disciplinas</h2>
+  <div *ngIf="erro" class="erro"><i class="bi bi-exclamation-circle"></i> {{ erro }}</div>
+  <div class="professores-cards">
+    <div class="prof-card" *ngFor="let prof of professores">
+      <div class="prof-header">
+        <div class="prof-avatar"><i class="bi bi-person-circle"></i></div>
+        <div class="prof-info">
+          <div class="prof-nome">{{ prof.nome }}</div>
+          <div class="prof-email">{{ prof.email }}</div>
+        </div>
+        <button class="btn-toggle" (click)="selecionarProfessorPorId(prof.id.toString())" [disabled]="carregando || !podeEditar">
+          <i class="bi" [ngClass]="professorSelecionado?.id === prof.id ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+        </button>
+      </div>
+      <div class="prof-disciplinas" *ngIf="professorSelecionadoId === prof.id">
+        <div *ngIf="carregando" class="carregando"><span class="loader"></span> Carregando...</div>
+        <div *ngIf="!carregando">
+          <div class="disciplinas-chips">
+            <span class="disciplina-chip" *ngFor="let disc of disciplinasVinculadas">{{ disc.nome }}</span>
+            <span *ngIf="disciplinasVinculadas.length === 0" class="nenhuma-disciplina">Nenhuma disciplina vinculada.</span>
+          </div>
+          <div class="disciplinas-vinculo-list" *ngIf="podeEditar">
+            <div class="vinculo-item" *ngFor="let disc of disciplinas">
+              <span>{{ disc.nome }}</span>
+              <label class="switch">
+                <input type="checkbox" [checked]="estaVinculada(disc)" (change)="alternarVinculo(disc)" [disabled]="carregando || !podeEditar">
+                <span class="slider round"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

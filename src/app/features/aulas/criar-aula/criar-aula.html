@@ -1,0 +1,69 @@
+<app-profile-switcher></app-profile-switcher>
+<div class="criar-aula-main">
+  <div class="criar-aula-container">
+    <h2><i class="bi bi-plus-square"></i> Criar Nova Aula</h2>
+    <form [formGroup]="form" (ngSubmit)="criarAula()" class="criar-aula-form">
+      <div class="form-group">
+        <label for="sala">Sala</label>
+        <select id="sala" formControlName="sala" required>
+          <option value="">Selecione a sala</option>
+          <option *ngFor="let sala of salas" [value]="sala.id">{{ sala.codigo }} (Bloco {{ getBlocoNome(sala.id) }})</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="turma">Turma</label>
+        <select id="turma" formControlName="turma" required>
+          <option value="">Selecione a turma</option>
+          <option *ngFor="let turma of turmas" [value]="turma.id">{{ turma.curso?.nome || '-' }} - {{ turma.ano }}/{{ turma.semestre }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="disciplina">Disciplina</label>
+        <select id="disciplina" formControlName="disciplina" required>
+          <option value="">Selecione a disciplina</option>
+          <option *ngFor="let disc of disciplinas" [value]="disc.id">{{ disc.nome }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="professor">Professor</label>
+        <select id="professor" formControlName="professor" required>
+          <option value="">Selecione o professor</option>
+          <option *ngFor="let prof of professores" [value]="prof.id">{{ prof.nome }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="data">Data</label>
+        <input id="data" type="date" formControlName="data" required />
+      </div>
+      <div class="form-group">
+        <label for="hora">Hora</label>
+        <input id="hora" type="time" formControlName="hora" required />
+      </div>
+      <div class="form-actions">
+        <button type="submit" [disabled]="form.invalid || carregando">
+          <span *ngIf="!carregando"><i class="bi bi-check-circle"></i> Criar Aula</span>
+          <span *ngIf="carregando" class="loader"></span>
+        </button>
+      </div>
+      <div *ngIf="sucesso" class="sucesso"><i class="bi bi-check-circle"></i> {{ sucesso }}</div>
+      <div *ngIf="erro" class="erro"><i class="bi bi-exclamation-circle"></i> {{ erro }}</div>
+    </form>
+  </div>
+  <div class="aulas-lista-container">
+    <h2><i class="bi bi-list-ul"></i> Aulas Cadastradas</h2>
+    <div *ngIf="aulas.length === 0" class="nenhuma-aula">
+      <i class="bi bi-info-circle"></i> Nenhuma aula cadastrada.
+    </div>
+    <div class="aulas-cards" *ngIf="aulas.length > 0">
+      <div class="aula-card" *ngFor="let aula of aulas">
+        <div class="aula-info">
+          <div><b>Data:</b> {{ aula.data | date: 'dd/MM/yyyy' }} <b>Hora:</b> {{ aula.hora }}</div>
+          <div><b>Disciplina:</b> {{ aula.disciplina.nome }}</div>
+          <div><b>Turma:</b> {{ aula.turma.curso?.nome }} - {{ aula.turma.ano }}/{{ aula.turma.semestre }}</div>
+          <div><b>Sala:</b> {{ aula.sala.codigo }} (Bloco {{ getBlocoNome(aula.sala.id || 0) }})</div>
+          <div><b>Professor:</b> {{ aula.professor.nome }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

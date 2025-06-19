@@ -11,6 +11,10 @@ import { FormsModule } from '@angular/forms';
 import { ProfileSwitcherComponent } from '../../../shared/profile-switcher/profile-switcher';
 import { Router } from '@angular/router';
 import { NotificationService } from '../../../shared/sweetalert/notification.service';
+import { AulaService } from '../../aulas/aula.service';
+import { Aula } from '../../aulas/aula.model';
+import { AlunoTurmaService } from '../aluno-turma.service';
+import { DiaSemanaPipe } from './dia-semana.pipe';
 
 export interface PanZoomConfig {
   zoomFactor?: number;
@@ -43,7 +47,7 @@ export interface PanZoomConfig {
 @Component({
   selector: 'app-mapa-aluno',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgxPanZoomModule, ProfileSwitcherComponent],
+  imports: [CommonModule, FormsModule, NgxPanZoomModule, ProfileSwitcherComponent, DiaSemanaPipe],
   templateUrl: './mapa-aluno.html',
   styleUrls: ['./mapa-aluno.css'], // Crie um CSS se precisar
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
@@ -101,16 +105,52 @@ export class MapaAlunoComponent implements OnInit {
   };
   blocoSelecionadoId: number | null = null;
 
+  aulasHoje: Aula[] = [];
+  salasAulaHoje: number[] = [];
+  aulasSemana: Aula[] = [];
+
   constructor(
     private blocoService: BlocoService,
     public authService: AuthService,
     private el: ElementRef,
     private router: Router,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private aulaService: AulaService,
+    private alunoTurmaService: AlunoTurmaService
   ) {}
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.carregarBlocos();
+    if (this.authService.getActiveRole() === 'ROLE_ALUNO') {
+      const usuarioId = this.authService.getIdUsuario();
+      if (usuarioId) {
+        this.alunoTurmaService.buscarTurmaDoAluno(usuarioId).subscribe(turma => {
+          if (turma && turma.id) {
+            // Buscar aulas do dia
+            const hoje = new Date();
+            const dataStr = hoje.toISOString().slice(0, 10);
+            this.aulaService.buscarPorTurmaEData(turma.id, dataStr).subscribe(aulas => {
+              this.aulasHoje = aulas;
+              this.salasAulaHoje = aulas.map(a => a.sala.id);
+            });
+            // Buscar aulas da semana
+            const aulasSemana: Aula[] = [];
+            const promises = [];
+            for (let i = 0; i < 7; i++) {
+              const data = new Date();
+              data.setDate(hoje.getDate() - hoje.getDay() + i); // Domingo a Sábado
+              const dataSemanaStr = data.toISOString().slice(0, 10);
+              promises.push(this.aulaService.buscarPorTurmaEData(turma.id, dataSemanaStr).toPromise().then(aulas => {
+                if (aulas && aulas.length > 0) aulasSemana.push(...aulas);
+              }));
+            }
+            Promise.all(promises).then(() => {
+              this.aulasSemana = aulasSemana;
+            });
+          }
+        });
+      }
+    }
   }
 
   // --- Lógica de Drag and Drop (Apenas para Admin) ---
@@ -402,5 +442,10 @@ export class MapaAlunoComponent implements OnInit {
 
   logout() {
     this.authService.logout();
+  }
+
+  // Método utilitário para saber se a sala é de aula hoje
+  isSalaAulaHoje(salaId: number): boolean {
+    return this.salasAulaHoje.includes(salaId);
   }
 }
