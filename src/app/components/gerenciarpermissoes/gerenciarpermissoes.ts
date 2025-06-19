@@ -33,7 +33,7 @@ export class Gerenciarpermissoes implements OnInit {
   }
 
   carregarUsuarios() {
-    this.usuarioService.listarTodos().subscribe({
+    this.usuarioService.listarCoordenador().subscribe({
       next: (data) => {
         this.usuarios = data;
         this.usuariosFiltrados = data;

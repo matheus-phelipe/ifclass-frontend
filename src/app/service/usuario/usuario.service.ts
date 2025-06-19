@@ -19,7 +19,11 @@ export class UsuarioService {
 
   // Listar todos os usuários
   listarTodos() {
-    return this.http.get<Usuario[]>(this.apiUrl);
+    return this.http.get<Usuario[]>(`${this.apiUrl}/lista/admin`);
+  }
+
+  listarCoordenador() {
+    return this.http.get<Usuario[]>(`${this.apiUrl}/lista/coordenador`);
   }
 
   // Atualizar authorities (papéis)
