@@ -108,6 +108,7 @@ export class MapaAlunoComponent implements OnInit {
   aulasHoje: Aula[] = [];
   salasAulaHoje: number[] = [];
   aulasSemana: Aula[] = [];
+  alunoTemTurmaMasSemAulas = false;
 
   constructor(
     private blocoService: BlocoService,
@@ -121,32 +122,47 @@ export class MapaAlunoComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     this.carregarBlocos();
+    this.alunoTemTurmaMasSemAulas = false; // Resetar a flag
     if (this.authService.getActiveRole() === 'ROLE_ALUNO') {
       const usuarioId = this.authService.getIdUsuario();
       if (usuarioId) {
-        this.alunoTurmaService.buscarTurmaDoAluno(usuarioId).subscribe(turma => {
-          if (turma && turma.id) {
-            // Buscar aulas do dia
-            const hoje = new Date();
-            const dataStr = hoje.toISOString().slice(0, 10);
-            this.aulaService.buscarPorTurmaEData(turma.id, dataStr).subscribe(aulas => {
-              this.aulasHoje = aulas;
-              this.salasAulaHoje = aulas.map(a => a.sala.id);
-            });
-            // Buscar aulas da semana
-            const aulasSemana: Aula[] = [];
-            const promises = [];
-            for (let i = 0; i < 7; i++) {
-              const data = new Date();
-              data.setDate(hoje.getDate() - hoje.getDay() + i); // Domingo a Sábado
-              const dataSemanaStr = data.toISOString().slice(0, 10);
-              promises.push(this.aulaService.buscarPorTurmaEData(turma.id, dataSemanaStr).toPromise().then(aulas => {
-                if (aulas && aulas.length > 0) aulasSemana.push(...aulas);
-              }));
+        this.alunoTurmaService.buscarTurmaDoAluno(usuarioId).subscribe({
+          next: turma => {
+            if (turma && turma.id) {
+              // Buscar aulas do dia
+              const hoje = new Date();
+              const dataStr = hoje.toISOString().slice(0, 10);
+              this.aulaService.buscarPorTurmaEData(turma.id, dataStr).subscribe(aulas => {
+                this.aulasHoje = aulas;
+                this.salasAulaHoje = aulas.map(a => a.sala.id);
+              });
+              // Buscar aulas da semana
+              const aulasSemana: Aula[] = [];
+              const promises = [];
+              for (let i = 0; i < 7; i++) {
+                const data = new Date();
+                data.setDate(hoje.getDate() - hoje.getDay() + i); // Domingo a Sábado
+                const dataSemanaStr = data.toISOString().slice(0, 10);
+                promises.push(this.aulaService.buscarPorTurmaEData(turma.id, dataSemanaStr).toPromise().then(aulas => {
+                  if (aulas && aulas.length > 0) aulasSemana.push(...aulas);
+                }));
+              }
+              Promise.all(promises).then(() => {
+                this.aulasSemana = aulasSemana;
+                if (this.aulasSemana.length === 0) {
+                  this.alunoTemTurmaMasSemAulas = true;
+                }
+              });
             }
-            Promise.all(promises).then(() => {
-              this.aulasSemana = aulasSemana;
-            });
+          },
+          error: (err) => {
+            // Se o erro for 404, significa que o aluno não está em nenhuma turma.
+            // Isso é um estado esperado para um admin ou usuário novo, não um erro de sistema.
+            if (err.status !== 404) {
+              // Para outros erros, mostramos a notificação.
+              this.notificationService.warn('Erro', 'Ocorreu um erro ao buscar os dados do aluno.');
+            }
+            // Em caso de 404, não fazemos nada, a tela já mostra "Nenhuma aula".
           }
         });
       }
@@ -447,5 +463,12 @@ export class MapaAlunoComponent implements OnInit {
   // Método utilitário para saber se a sala é de aula hoje
   isSalaAulaHoje(salaId: number): boolean {
     return this.salasAulaHoje.includes(salaId);
+  }
+
+  voltarAoPainelAdmin(): void {
+    if (this.authService.hasRole('ROLE_ADMIN')) {
+      this.authService.setActiveRole('ROLE_ADMIN');
+      this.router.navigate(['/app/home']);
+    }
   }
 }

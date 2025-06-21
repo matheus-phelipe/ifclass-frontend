@@ -99,10 +99,16 @@
             <p *ngIf="!(authService.isAdmin$ | async)" class="text-muted">Use dois dedos para ampliar. Arraste para mover o mapa.</p>
             <p *ngIf="authService.isAdmin$ | async" class="text-muted">Clique e arraste uma sala para movê-la. Clique para editar.</p>
           </div>
-          <button *ngIf="(authService.isAdmin$ | async) && activeBlocoId" (click)="handleDeleteBloco(activeBlocoId)" class="btn btn-outline-danger">
-            <i class="bi bi-trash-fill me-2"></i>
-            Excluir Bloco
-          </button>
+          <div class="d-flex gap-2">
+               <button *ngIf="authService.hasRole('ROLE_ADMIN')" class="btn btn-outline-success" (click)="voltarAoPainelAdmin()">
+                  <i class="bi bi-house-door-fill me-2"></i>
+                  Voltar ao Painel
+               </button>
+                <button *ngIf="(authService.isAdmin$ | async) && activeBlocoId" (click)="handleDeleteBloco(activeBlocoId)" class="btn btn-outline-danger">
+                  <i class="bi bi-trash-fill me-2"></i>
+                  Excluir Bloco
+                </button>
+          </div>
         </header>
 
         <div class="alert alert-danger" *ngIf="error">
@@ -154,12 +160,15 @@
             <li *ngFor="let aula of aulasSemana">
               <span class="sala-legenda sala-aula-semana"></span>
               <span class="fw-bold">{{ aula.disciplina.nome }}</span> -
-              {{ aula.data | diaSemana }}
+              {{ aula.diaSemana | diaSemana }}
               {{ aula.horaInicio || aula.hora }} -
               {{ aula.horaFim ? aula.horaFim : '' }}<br>
               <span class="text-muted">Sala: {{ aula.sala.codigo }}</span>
             </li>
-            <li *ngIf="aulasSemana.length === 0" class="text-muted">Nenhuma aula cadastrada para esta semana.</li>
+            <ng-container *ngIf="aulasSemana.length === 0">
+              <li *ngIf="alunoTemTurmaMasSemAulas" class="text-muted">Sua turma ainda não tem nenhuma aula cadastrada!</li>
+              <li *ngIf="!alunoTemTurmaMasSemAulas" class="text-muted">Nenhuma aula cadastrada para esta semana.</li>
+            </ng-container>
           </ul>
         </div>
       </div>

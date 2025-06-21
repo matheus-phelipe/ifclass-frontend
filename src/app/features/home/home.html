@@ -65,11 +65,20 @@
         </div>
         
         <!-- Mensagem para Professor sem aula -->
-        <div *ngIf="authService.getActiveRole() === 'ROLE_PROFESSOR'" class="card-destaque h-100">
+        <div *ngIf="authService.getActiveRole() === 'ROLE_PROFESSOR' && !professorSemAulas" class="card-destaque h-100">
           <div class="card-destaque-body text-center">
             <i class="bi bi-calendar2-check display-1 text-white mb-3"></i>
             <h2 class="disciplina-titulo">Nenhuma aula para hoje!</h2>
             <p class="text-white-50">Aproveite para planejar suas próximas atividades ou criar novas aulas.</p>
+          </div>
+        </div>
+        
+        <!-- Mensagem para Professor sem nenhuma aula cadastrada -->
+        <div *ngIf="professorSemAulas" class="card-destaque h-100">
+          <div class="card-destaque-body text-center">
+            <i class="bi bi-calendar-x display-1 text-white mb-3"></i>
+            <h2 class="disciplina-titulo">Você ainda não tem nenhuma aula cadastrada.</h2>
+            <p class="text-white-50">Vá em "Criar Aula" para começar.</p>
           </div>
         </div>
 

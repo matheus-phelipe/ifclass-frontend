@@ -28,6 +28,7 @@ export class Home implements OnInit, OnDestroy {
   avisos: Aviso[] = [];
   menuCards: MenuCard[] = [];
   blocos: Bloco[] = [];
+  professorSemAulas = false;
   
   private roleSubscription!: Subscription;
 
@@ -67,6 +68,7 @@ export class Home implements OnInit, OnDestroy {
   async carregarDadosDashboard(): Promise<void> {
     this.proximaAula = null;
     this.proximaAulaFutura = null;
+    this.professorSemAulas = false;
     const activeRole = this.authService.getActiveRole();
     if (activeRole === 'ROLE_PROFESSOR') {
       const usuarioId = this.authService.getIdUsuario();
@@ -97,7 +99,12 @@ export class Home implements OnInit, OnDestroy {
                   diaSemana: proxima.diaSemana
                 };
               },
-              error: () => { this.proximaAulaFutura = null; }
+              error: (err) => { 
+                if (err.status === 404) {
+                  this.professorSemAulas = true;
+                }
+                this.proximaAulaFutura = null; 
+              }
             });
           }
         });
