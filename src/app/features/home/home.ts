@@ -10,6 +10,8 @@ import { Subscription } from 'rxjs';
 import { AulaService } from '../aulas/aula.service';
 import { UsuarioService } from '../usuario/usuario.service';
 import { Aula } from '../aulas/aula.model';
+import { BlocoService } from '../aluno/bloco.service';
+import { Bloco } from '../aluno/bloco.model';
 
 @Component({
   selector: 'app-home',
@@ -22,15 +24,23 @@ export class Home implements OnInit, OnDestroy {
   
   nomeUsuario = '';
   proximaAula: ProximaAula | null = null;
+  proximaAulaFutura: ProximaAula | null = null;
   avisos: Aviso[] = [];
   menuCards: MenuCard[] = [];
+  blocos: Bloco[] = [];
   
   private roleSubscription!: Subscription;
 
-  constructor(public authService: AuthService, private aulaService: AulaService, private usuarioService: UsuarioService) {}
+  constructor(
+    public authService: AuthService, 
+    private aulaService: AulaService, 
+    private usuarioService: UsuarioService,
+    private blocoService: BlocoService
+  ) {}
 
   ngOnInit(): void {
     this.nomeUsuario = this.authService.getNomeUsuario() || 'Usuário';
+    this.carregarBlocos();
 
     this.roleSubscription = this.authService.activeRole$.subscribe(() => {
       this.filterMenuCards();
@@ -56,6 +66,7 @@ export class Home implements OnInit, OnDestroy {
 
   async carregarDadosDashboard(): Promise<void> {
     this.proximaAula = null;
+    this.proximaAulaFutura = null;
     const activeRole = this.authService.getActiveRole();
     if (activeRole === 'ROLE_PROFESSOR') {
       const usuarioId = this.authService.getIdUsuario();
@@ -74,6 +85,20 @@ export class Home implements OnInit, OnDestroy {
               bloco: this.getBlocoNome(proxima.sala.id),
               horario: proxima.hora
             };
+          } else {
+            this.aulaService.buscarProximaAula(usuarioId).subscribe({
+              next: proxima => {
+                this.proximaAulaFutura = {
+                  disciplina: proxima.disciplina.nome,
+                  professor: proxima.professor.nome,
+                  sala: proxima.sala.codigo,
+                  bloco: this.getBlocoNome(proxima.sala.id),
+                  horario: proxima.hora,
+                  diaSemana: proxima.diaSemana
+                };
+              },
+              error: () => { this.proximaAulaFutura = null; }
+            });
           }
         });
       }
@@ -87,7 +112,33 @@ export class Home implements OnInit, OnDestroy {
   }
 
   getBlocoNome(salaId: number): string {
-    // Implemente conforme sua lógica de blocos
-    return '-';
+    for (const bloco of this.blocos) {
+      if (bloco.salas.some(sala => sala.id === salaId)) {
+        return bloco.nome;
+      }
+    }
+    return 'Não encontrado';
+  }
+
+  formatarDiaSemana(dia: string | undefined): string {
+    if (!dia) return '';
+    const dias: { [key: string]: string } = {
+      'MONDAY': 'Segunda-feira',
+      'TUESDAY': 'Terça-feira',
+      'WEDNESDAY': 'Quarta-feira',
+      'THURSDAY': 'Quinta-feira',
+      'FRIDAY': 'Sexta-feira',
+      'SATURDAY': 'Sábado',
+      'SUNDAY': 'Domingo'
+    };
+    return dias[dia] || dia;
+  }
+
+  private carregarBlocos(): void {
+    this.blocoService.getBlocos().subscribe(blocos => {
+      this.blocos = blocos;
+      // Após carregar os blocos, podemos recarregar o dashboard se necessário
+      this.carregarDadosDashboard();
+    });
   }
 }

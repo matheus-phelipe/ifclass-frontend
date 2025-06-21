@@ -112,7 +112,7 @@
 
         <div class="floorplan-container" [class.is-dragging]="isDragging">
           <ngx-pan-zoom [config]="panZoomConfig">
-            <svg class="floorplan-svg" viewBox="0 0 1600 900">
+            <svg class="floorplan-svg" viewBox="0 0 3200 1800">
               <ng-container *ngFor="let bloco of blocos">
                 <g *ngIf="bloco.id === activeBlocoId">
                   <g *ngFor="let sala of bloco.salas"

@@ -1,5 +1,5 @@
 import { CommonModule, NgClass } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild, OnChanges, SimpleChanges } from '@angular/core';
 
 declare var bootstrap: any;
 
@@ -13,15 +13,16 @@ type ModalType = 'danger' | 'primary' | 'success';
   templateUrl: './modal-confirmacao.html',
   styleUrls: ['./modal-confirmacao.css']
 })
-export class ModalConfirmacaoComponent implements AfterViewInit {
+export class ModalConfirmacaoComponent implements AfterViewInit, OnChanges {
   @Input() title: string = 'Confirmação';
   @Input() message: string = 'Deseja continuar?';
   
   // NOVO: Input para controlar o tipo do modal
   @Input() type: ModalType = 'primary';
+  @Input() isVisible: boolean = false;
 
-  @Output() confirmed = new EventEmitter<void>();
-  @Output() canceled = new EventEmitter<void>();
+  @Output() onConfirm = new EventEmitter<void>();
+  @Output() onCancel = new EventEmitter<void>();
 
   @ViewChild('modalRef') modalRef!: ElementRef;
 
@@ -33,10 +34,20 @@ export class ModalConfirmacaoComponent implements AfterViewInit {
       this.modalRef.nativeElement.addEventListener('hidden.bs.modal', () => {
         // Apenas emite o 'canceled' se o usuário realmente fechar (não ao confirmar)
         if (!this.confirmedEmitted) {
-          this.canceled.emit();
+          this.onCancel.emit();
         }
         this.confirmedEmitted = false; // Reseta para a próxima abertura
       });
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['isVisible'] && this.bsModal) {
+      if (changes['isVisible'].currentValue) {
+        this.bsModal.show();
+      } else {
+        this.bsModal.hide();
+      }
     }
   }
 
@@ -57,10 +68,14 @@ export class ModalConfirmacaoComponent implements AfterViewInit {
   }
 
   private confirmedEmitted = false;
-  onConfirm(): void {
+  confirm(): void {
     this.confirmedEmitted = true; // Marca que a confirmação foi emitida
-    this.confirmed.emit();
+    this.onConfirm.emit();
     this.close();
+  }
+
+  cancel(): void {
+    this.onCancel.emit();
   }
 
   // Getters para classes dinâmicas no template

@@ -9,7 +9,7 @@ export interface Aula {
   turma: Turma;
   disciplina: Disciplina;
   professor: Usuario;
-  data: string; // yyyy-MM-dd
+  diaSemana: string;
   hora: string; // HH:mm
   horaInicio?: string; // HH:mm, opcional
   horaFim?: string;    // HH:mm, opcional

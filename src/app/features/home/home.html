@@ -32,14 +32,48 @@
         </div>
       </div>
 
-      <!-- Mensagem para admin/coordenador -->
-       <div *ngIf="((authService.isAdmin$ | async) || (authService.isCoordenador$ | async)) && !proximaAula" class="card-destaque h-100">
-          <div class="card-destaque-body text-center">
-            <i class="bi bi-graph-up-arrow display-1 text-white mb-3"></i>
-            <h2 class="disciplina-titulo">Visão Geral do Campus</h2>
-            <p class="text-white-50">Utilize os menus de acesso rápido para gerenciar o sistema.</p>
+      <!-- Widget de Próxima Aula Futura -->
+      <div *ngIf="proximaAulaFutura" class="card-destaque h-100">
+        <div class="card-destaque-header">
+          <i class="bi bi-calendar-event me-2"></i>
+          <span>Sua Próxima Aula Será</span>
+        </div>
+        <div class="card-destaque-body">
+          <h2 class="disciplina-titulo">{{ proximaAulaFutura.disciplina }}</h2>
+          <div class="detalhes-aula">
+            <span class="d-block mb-2"><i class="bi bi-calendar-week"></i> {{ formatarDiaSemana(proximaAulaFutura.diaSemana) }}</span>
+            <span><i class="bi bi-person-video"></i> {{ proximaAulaFutura.professor }}</span>
+            <span><i class="bi bi-geo-alt-fill"></i> Sala {{ proximaAulaFutura.sala }} ({{ proximaAulaFutura.bloco }})</span>
+            <span><i class="bi bi-hourglass-split"></i> {{ proximaAulaFutura.horario }}</span>
           </div>
-       </div>
+        </div>
+        <div class="card-destaque-footer">
+          <a routerLink="/aulas" class="btn btn-light">Ver grade completa</a>
+        </div>
+      </div>
+
+      <!-- Mensagens de Boas-Vindas (quando não há próxima aula) -->
+      <ng-container *ngIf="!proximaAula && !proximaAulaFutura">
+
+        <!-- Mensagem para Admin/Coordenador -->
+        <div *ngIf="authService.getActiveRole() === 'ROLE_ADMIN' || authService.getActiveRole() === 'ROLE_COORDENADOR'" class="card-destaque h-100">
+            <div class="card-destaque-body text-center">
+              <i class="bi bi-graph-up-arrow display-1 text-white mb-3"></i>
+              <h2 class="disciplina-titulo">Visão Geral do Campus</h2>
+              <p class="text-white-50">Utilize os menus de acesso rápido para gerenciar o sistema.</p>
+            </div>
+        </div>
+        
+        <!-- Mensagem para Professor sem aula -->
+        <div *ngIf="authService.getActiveRole() === 'ROLE_PROFESSOR'" class="card-destaque h-100">
+          <div class="card-destaque-body text-center">
+            <i class="bi bi-calendar2-check display-1 text-white mb-3"></i>
+            <h2 class="disciplina-titulo">Nenhuma aula para hoje!</h2>
+            <p class="text-white-50">Aproveite para planejar suas próximas atividades ou criar novas aulas.</p>
+          </div>
+        </div>
+
+      </ng-container>
 
     </div>
 
