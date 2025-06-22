@@ -1,0 +1,97 @@
+<div class="container my-4">
+  <app-profile-switcher></app-profile-switcher>
+
+  <div class="d-flex justify-content-between align-items-center my-4">
+    <h1 class="h2 fw-bold mb-0" style="color: #333;">Disciplinas</h1>
+    <button class="btn btn-success btn-lg shadow-sm" (click)="abrirModal()" *ngIf="canEditDisciplinas">
+      <i class="bi bi-plus-lg me-2"></i>Nova Disciplina
+    </button>
+  </div>
+
+  <div *ngIf="disciplinas.length === 0" class="text-center py-5">
+    <div class="display-4 text-muted mb-3">
+      <i class="bi bi-journal-bookmark-fill"></i>
+    </div>
+    <h4 class="text-muted">Nenhuma disciplina cadastrada</h4>
+    <p *ngIf="canEditDisciplinas" class="text-muted">Clique em "Nova Disciplina" para começar.</p>
+  </div>
+
+  <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+    <div class="col" *ngFor="let disciplina of disciplinas">
+      <div class="disciplina-card">
+        <div class="disciplina-card-header">
+          <h5 class="disciplina-nome">{{ disciplina.nome }}</h5>
+          <span class="disciplina-badge">{{ disciplina.codigo }}</span>
+        </div>
+        <div class="disciplina-card-body">
+          <p class="disciplina-descricao">{{ disciplina.descricao }}</p>
+          <div class="disciplina-info">
+            <span><i class="bi bi-clock-history me-2"></i>{{ disciplina.cargaHoraria }}h</span>
+            <span><i class="bi bi-building me-2"></i>{{ disciplina.departamento }}</span>
+          </div>
+        </div>
+        <div class="disciplina-card-footer" *ngIf="canEditDisciplinas">
+          <button class="btn-acao editar" (click)="abrirModal(disciplina)" title="Editar">
+            <i class="bi bi-pencil-fill"></i>
+          </button>
+          <button class="btn-acao deletar" (click)="excluirDisciplina(disciplina.id!)" title="Excluir">
+            <i class="bi bi-trash-fill"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" [class.show]="isModalOpen" [style.display]="isModalOpen ? 'block' : 'none'" (click)="onBackdropClick($event)">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ isEditing ? 'Editar' : 'Nova' }} Disciplina</h5>
+          <button type="button" class="btn-close" (click)="fecharModal()"></button>
+        </div>
+        <div class="modal-body">
+            <form [formGroup]="disciplinaForm" (ngSubmit)="salvarDisciplina()">
+                <div class="row">
+                    <div class="col-md-8 mb-3">
+                      <label for="nome" class="form-label">Nome da Disciplina</label>
+                      <input type="text" id="nome" class="form-control" formControlName="nome" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                      <label for="codigo" class="form-label">Código</label>
+                      <input type="text" id="codigo" class="form-control" formControlName="codigo" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="cargaHoraria" class="form-label">Carga Horária (h)</label>
+                        <input type="number" id="cargaHoraria" class="form-control" formControlName="cargaHoraria" min="1" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="departamento" class="form-label">Departamento</label>
+                        <input type="text" id="departamento" class="form-control" formControlName="departamento" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="cursoId" class="form-label">Curso</label>
+                    <select id="cursoId" class="form-select" formControlName="cursoId" required>
+                      <option [ngValue]="null" disabled>Selecione um curso</option>
+                      <option *ngFor="let curso of cursos" [value]="curso.id">{{ curso.nome }}</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                  <label for="descricao" class="form-label">Descrição</label>
+                  <textarea id="descricao" class="form-control" formControlName="descricao" rows="3"></textarea>
+                </div>
+              </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="fecharModal()">Cancelar</button>
+          <button type="button" class="btn btn-success" [disabled]="disciplinaForm.invalid" (click)="salvarDisciplina()">
+            {{ isEditing ? 'Atualizar' : 'Criar' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div> 

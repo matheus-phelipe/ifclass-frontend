@@ -1,0 +1,235 @@
+<ng-container *ngIf="{ canManage: (authService.isAdmin$ | async) } as perms">
+
+  <div class="container-fluid">
+    <div class="page-header d-flex justify-content-between align-items-start">
+      <div>
+        <h2 class="page-title">Gerenciar Usuários</h2>
+      </div>
+      <app-profile-switcher></app-profile-switcher>
+    </div>
+    
+    <div class="filter-controls-container mb-4">
+      <div class="search-container">
+        <i class="bi bi-search search-icon"></i>
+        <input 
+          type="text" 
+          class="form-control search-input" 
+          placeholder="Buscar por nome ou email..."
+          [(ngModel)]="termoBusca"
+          (input)="filtrarUsuarios()">
+      </div>
+
+      <div class="permission-filter-container">
+        <label class="filter-label">Filtrar por:</label>
+        <div class="btn-group" role="group">
+          <button *ngFor="let permissao of permissoesDisponiveis"
+                  type="button"
+                  class="btn btn-sm"
+                  [class.btn-primary]="filtroPermissao === permissao"
+                  [class.btn-outline-secondary]="filtroPermissao !== permissao"
+                  (click)="filtrarPorPermissao(permissao)">
+            {{ formatarNomePermissao(permissao) }}
+          </button>
+        </div>
+      </div>
+    </div>
+      
+    <div class="row g-4">
+      <div class="col-lg-7">
+        <div class="table-container">
+          <div class="table-responsive">
+            <table class="table align-middle">
+              <thead>
+                <tr>
+                  <th>Usuário</th>
+                  <th>Permissões</th>
+                  <th class="text-center">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let usuario of usuariosPaginados" 
+                    (click)="selecionarUsuario(usuario)"
+                    [class.selected-row]="usuario.id === usuarioSelecionado?.id">
+                  <td>
+                    <div class="user-info">
+                      <div class="user-avatar">{{ usuario.nome.charAt(0) }}</div>
+                      <div>
+                        <div class="user-name">{{ usuario.nome }}</div>
+                        <div class="user-email">{{ usuario.email }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="roles-container">
+                      <span class="role-pill" [class.active]="temPapel(usuario, 'ROLE_ALUNO')" (click)="$event.stopPropagation(); onRoleChange(usuario, 'ROLE_ALUNO')">Aluno</span>
+                      <span class="role-pill" [class.active]="temPapel(usuario, 'ROLE_PROFESSOR')" (click)="$event.stopPropagation(); onRoleChange(usuario, 'ROLE_PROFESSOR')">Professor</span>
+                      <span class="role-pill" [class.active]="temPapel(usuario, 'ROLE_COORDENADOR')" (click)="$event.stopPropagation(); onRoleChange(usuario, 'ROLE_COORDENADOR')">Coordenador</span>
+                    </div>
+                  </td>
+                  <td class="text-center">
+                    <div class="actions-container" (click)="$event.stopPropagation()">
+                        <button class="btn action-btn btn-edit" title="Editar Usuário" (click)="abrirModalEditar(usuario)">
+                          <i class="bi bi-pencil-fill"></i>
+                        </button>
+                        <button class="btn action-btn btn-delete" title="Remover Usuário" (click)="removerUsuario(usuario)">
+                          <i class="bi bi-trash3-fill"></i>
+                        </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr *ngIf="usuariosPaginados.length === 0">
+                  <td colspan="3" class="text-center text-muted p-5">Nenhum usuário encontrado.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Controles de Paginação -->
+          <div class="pagination-container" *ngIf="totalPaginas > 0">
+            <div class="pagination-controls-top">
+              <!-- Informações da página -->
+              <div class="pagination-info">
+                <span class="text-muted">
+                  Mostrando {{ (paginaAtual - 1) * itensPorPagina + 1 }} a 
+                  {{ Math.min(paginaAtual * itensPorPagina, usuariosFiltrados.length) }} 
+                  de {{ usuariosFiltrados.length }} usuários
+                </span>
+              </div>
+
+              <!-- Seletor de itens por página -->
+              <div class="items-per-page">
+                <label class="form-label me-2">Itens por página:</label>
+                <select class="form-select form-select-sm" 
+                        [(ngModel)]="itensPorPagina" 
+                        (change)="alterarItensPorPagina()"
+                        style="width: auto;">
+                  <option [ngValue]="5">5</option>
+                  <option [ngValue]="10">10</option>
+                  <option [ngValue]="20">20</option>
+                  <option [ngValue]="50">50</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Navegação de páginas -->
+            <nav aria-label="Navegação de páginas" class="mt-3" *ngIf="totalPaginas > 1">
+              <ul class="pagination justify-content-center mb-0">
+                <!-- Botão Anterior -->
+                <li class="page-item" [class.disabled]="paginaAtual === 1">
+                  <button class="page-link" 
+                          (click)="paginaAnterior()" 
+                          [disabled]="paginaAtual === 1"
+                          aria-label="Página anterior">
+                    <i class="bi bi-chevron-left"></i>
+                  </button>
+                </li>
+
+                <!-- Primeira página (se não estiver visível) -->
+                <li class="page-item" *ngIf="getPaginasVisiveis()[0] > 1">
+                  <button class="page-link" (click)="irParaPagina(1)">1</button>
+                </li>
+
+                <!-- Separador (se necessário) -->
+                <li class="page-item disabled" *ngIf="getPaginasVisiveis()[0] > 2">
+                  <span class="page-link">...</span>
+                </li>
+
+                <!-- Páginas visíveis -->
+                <li class="page-item" 
+                    *ngFor="let pagina of getPaginasVisiveis()" 
+                    [class.active]="pagina === paginaAtual">
+                  <button class="page-link" (click)="irParaPagina(pagina)">{{ pagina }}</button>
+                </li>
+
+                <!-- Separador (se necessário) -->
+                <li class="page-item disabled" *ngIf="getPaginasVisiveis()[getPaginasVisiveis().length - 1] < totalPaginas - 1">
+                  <span class="page-link">...</span>
+                </li>
+
+                <!-- Última página (se não estiver visível) -->
+                <li class="page-item" *ngIf="getPaginasVisiveis()[getPaginasVisiveis().length - 1] < totalPaginas">
+                  <button class="page-link" (click)="irParaPagina(totalPaginas)">{{ totalPaginas }}</button>
+                </li>
+
+                <!-- Botão Próximo -->
+                <li class="page-item" [class.disabled]="paginaAtual === totalPaginas">
+                  <button class="page-link" 
+                          (click)="proximaPagina()" 
+                          [disabled]="paginaAtual === totalPaginas"
+                          aria-label="Próxima página">
+                    <i class="bi bi-chevron-right"></i>
+                  </button>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-5">
+        <div class="details-panel" *ngIf="usuarioSelecionado">
+          <div class="details-header">
+            <div class="details-avatar">{{ usuarioSelecionado.nome.charAt(0) }}</div>
+            <h4 class="details-name">{{ usuarioSelecionado.nome }}</h4>
+            <p class="details-email">{{ usuarioSelecionado.email }}</p>
+          </div>
+          <div class="details-body">
+            <div class="detail-item">
+              <span class="detail-label">Prontuário</span>
+              <span class="detail-value">{{ usuarioSelecionado.prontuario || 'Não informado' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Permissões</span>
+              <span class="detail-value detail-role">{{ formatarPermissoes(usuarioSelecionado.authorities) }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">ID do Usuário</span>
+              <span class="detail-value">#{{ usuarioSelecionado.id }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="details-panel placeholder-panel" *ngIf="!usuarioSelecionado">
+          <i class="bi bi-people-fill placeholder-icon"></i>
+          <p class="text-muted">Selecione um usuário para ver os detalhes</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="editarUsuarioModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="bi bi-pencil-square me-2"></i>
+            Editar Usuário
+          </h5>
+          <button type="button" class="btn-close" (click)="editarUsuarioModal.hide()" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body" *ngIf="usuarioParaEditar">
+          <form #editarUsuarioForm="ngForm" class="d-flex flex-column gap-3">
+            <div>
+              <label for="nome" class="form-label">Nome</label>
+              <input type="text" id="nome" class="form-control" [(ngModel)]="usuarioParaEditar.nome" name="nome">
+            </div>
+            <div>
+              <label for="email" class="form-label">Email</label>
+              <input type="email" id="email" class="form-control" [(ngModel)]="usuarioParaEditar.email" name="email">
+            </div>
+            <div>
+              <label class="form-label">Prontuário</label>
+              <input type="text" class="form-control" [(ngModel)]="usuarioParaEditar.prontuario" name="prontuario">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="editarUsuarioModal.hide()">Cancelar</button>
+          <button type="button" class="btn btn-success" (click)="salvarEdicao()">Salvar Alterações</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+<app-alert #alerta></app-alert>
+<app-modal-confirmacao #modalConfirm (canceled)="cancelarRemocao()"></app-modal-confirmacao>

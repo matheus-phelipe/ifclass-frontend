@@ -1,68 +1,137 @@
-<div class="turmas-container">
-  <div class="turmas-header">
-    <h2>Turmas</h2>
-    <button class="btn-nova-turma" (click)="abrirModal()" *ngIf="canEditTurmas">
-      <i class="bi bi-plus-lg"></i> Nova Turma
+<div class="container my-4">
+  <app-profile-switcher></app-profile-switcher>
+
+  <div class="d-flex justify-content-between align-items-center my-4">
+    <h1 class="h2 fw-bold mb-0" style="color: #333;">Turmas</h1>
+    <button class="btn btn-success btn-lg shadow-sm" (click)="abrirModal()" *ngIf="canEditTurmas">
+      <i class="bi bi-plus-lg me-2"></i>Nova Turma
     </button>
   </div>
 
-  <div *ngIf="turmas.length === 0" class="placeholder-turmas">
-    <img src="assets/ifclass.png" alt="Sem turmas" class="placeholder-img">
-    <p>Nenhuma turma cadastrada ainda.<br>Clique em <b>Nova Turma</b> para adicionar a primeira!</p>
-  </div>
-
-  <div class="turmas-lista">
-    <div class="turma-card" *ngFor="let turma of turmas">
-      <div class="turma-card-header">
-        <span class="turma-curso">{{ turma.curso?.nome || 'Curso não definido' }}</span>
-        <span class="turma-badge">{{ turma.ano }}/{{ turma.semestre }}º</span>
-      </div>
-      <div class="turma-card-actions" *ngIf="canEditTurmas">
-        <button class="btn-acao editar" (click)="abrirModal(turma)" title="Editar">
-          <i class="bi bi-pencil"></i>
-        </button>
-        <button class="btn-acao deletar" (click)="excluirTurma(turma.id!)" title="Excluir">
-          <i class="bi bi-trash"></i>
-        </button>
-      </div>
+  <div *ngIf="turmas.length === 0" class="text-center py-5">
+    <div class="display-4 text-muted mb-3">
+      <i class="bi bi-people"></i>
     </div>
+    <h4 class="text-muted">Nenhuma turma cadastrada</h4>
+    <p *ngIf="canEditTurmas" class="text-muted">Clique em "Nova Turma" para começar.</p>
   </div>
 
-  <!-- Modal -->
-  <div class="modal-turma" [class.open]="isModalOpen">
-    <div class="modal-turma-content" (click)="$event.stopPropagation()">
-      <div class="modal-turma-header">
-        <h3>{{ isEditing ? 'Editar' : 'Nova' }} Turma</h3>
-        <button class="btn-fechar" (click)="fecharModal()"><i class="bi bi-x-lg"></i></button>
-      </div>
-      <form [formGroup]="turmaForm" (ngSubmit)="salvarTurma()">
-        <div class="form-group">
-          <label for="cursoId">Curso</label>
-          <select id="cursoId" formControlName="cursoId">
-            <option value="">Selecione um curso</option>
-            <option *ngFor="let curso of cursos" [value]="curso.id">{{ curso.nome }}</option>
-          </select>
+  <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+    <div class="col" *ngFor="let turma of turmas">
+      <div class="turma-card">
+        <div class="turma-card-header">
+          <h5 class="turma-curso-nome">{{ turma.curso?.nome || 'Curso não definido' }}</h5>
+          <span class="turma-badge">{{ turma.ano }}/{{ turma.semestre }}º</span>
         </div>
-        <div class="form-group">
-          <label for="ano">Ano</label>
-          <input type="number" id="ano" formControlName="ano" min="2000">
-        </div>
-        <div class="form-group">
-          <label for="semestre">Semestre</label>
-          <select id="semestre" formControlName="semestre">
-            <option value="">Selecione o semestre</option>
-            <option [value]="1">1º Semestre</option>
-            <option [value]="2">2º Semestre</option>
-          </select>
-        </div>
-        <div class="modal-turma-footer">
-          <button type="button" class="btn-cancelar" (click)="fecharModal()">Cancelar</button>
-          <button type="submit" class="btn-salvar" [disabled]="turmaForm.invalid">
-            {{ isEditing ? 'Atualizar' : 'Criar' }}
+        <div class="turma-card-actions" *ngIf="canEditTurmas">
+          <button class="btn-acao editar" (click)="abrirModal(turma)" title="Editar">
+            <i class="bi bi-pencil-fill"></i>
+          </button>
+          <button class="btn-acao deletar" (click)="excluirTurma(turma.id!)" title="Excluir">
+            <i class="bi bi-trash-fill"></i>
+          </button>
+          <button class="btn-acao vincular" (click)="abrirVincularModal(turma.id!)" title="Vincular Alunos" *ngIf="canVincularAlunos">
+            <i class="bi bi-person-plus-fill"></i>
+          </button>
+          <button class="btn-acao ver" (click)="abrirAlunosVinculadosModal(turma.id!)" title="Ver Alunos Vinculados">
+            <i class="bi bi-people-fill"></i>
           </button>
         </div>
-      </form>
+      </div>
     </div>
-    <div class="modal-turma-backdrop" (click)="onBackdropClick($event)"></div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" [class.show]="isModalOpen" [style.display]="isModalOpen ? 'block' : 'none'" (click)="onBackdropClick($event, 'main')">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ isEditing ? 'Editar' : 'Nova' }} Turma</h5>
+        <button type="button" class="btn-close" (click)="fecharModal()"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="turmaForm" (ngSubmit)="salvarTurma()">
+          <div class="mb-3">
+            <label for="cursoId" class="form-label">Curso</label>
+            <select id="cursoId" class="form-select" formControlName="cursoId">
+              <option value="">Selecione um curso</option>
+              <option *ngFor="let curso of cursos" [value]="curso.id">{{ curso.nome }}</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="ano" class="form-label">Ano</label>
+            <input type="number" id="ano" class="form-control" formControlName="ano" min="2000">
+          </div>
+          <div class="mb-3">
+            <label for="semestre" class="form-label">Semestre</label>
+            <select id="semestre" class="form-select" formControlName="semestre">
+              <option value="">Selecione o semestre</option>
+              <option [value]="1">1º Semestre</option>
+              <option [value]="2">2º Semestre</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="fecharModal()">Cancelar</button>
+        <button type="button" class="btn btn-success" [disabled]="turmaForm.invalid" (click)="salvarTurma()">
+          {{ isEditing ? 'Atualizar' : 'Criar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Outros Modais (Vincular e Ver Alunos) - Estrutura similar -->
+<div class="modal fade" [class.show]="isVincularModalOpen" [style.display]="isVincularModalOpen ? 'block' : 'none'" (click)="onBackdropClick($event,'vincular')">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Vincular Alunos à Turma</h5>
+        <button type="button" class="btn-close" (click)="fecharVincularModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="alunosSelect" class="form-label">Selecione os alunos</label>
+          <select id="alunosSelect" multiple [(ngModel)]="selectedAlunosIds" class="form-control" style="min-height: 180px;">
+            <option *ngFor="let aluno of alunos" [value]="aluno.id">{{ aluno.nome }} ({{ aluno.prontuario }})</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="fecharVincularModal()">Cancelar</button>
+        <button type="button" class="btn btn-primary" [disabled]="selectedAlunosIds.length === 0" (click)="vincularAlunosNaTurma()">
+          Vincular Selecionados
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" [class.show]="isAlunosVinculadosModalOpen" [style.display]="isAlunosVinculadosModalOpen ? 'block' : 'none'" (click)="onBackdropClick($event,'alunos')">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Alunos Vinculados</h5>
+        <button type="button" class="btn-close" (click)="fecharAlunosVinculadosModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div *ngIf="alunosVinculados.length === 0" class="text-center text-muted p-4">Nenhum aluno vinculado.</div>
+        <ul *ngIf="alunosVinculados.length > 0" class="list-group">
+          <li *ngFor="let aluno of alunosVinculados" class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <i class="bi bi-person-circle me-2"></i> {{ aluno.nome }} ({{ aluno.prontuario }})
+            </div>
+            <button class="btn btn-sm btn-outline-danger" (click)="desvincularAluno(aluno.id, selectedTurmaId!)" title="Desvincular Aluno">
+              <i class="bi bi-x-circle"></i>
+            </button>
+          </li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="fecharAlunosVinculadosModal()">Fechar</button>
+      </div>
+    </div>
   </div>
 </div> 

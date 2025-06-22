@@ -1,0 +1,145 @@
+<div class="main-content">
+  <header class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="h2 fw-bold">Criar Nova Aula</h2>
+      <p class="text-muted">Preencha os detalhes para agendar uma nova aula recorrente.</p>
+    </div>
+    <app-profile-switcher></app-profile-switcher>
+  </header>
+
+  <div class="row">
+    <!-- Formulário de Criação -->
+    <div class="col-lg-5">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <form [formGroup]="form" (ngSubmit)="criarAula()" class="needs-validation" novalidate>
+            <div class="row g-3">
+
+              <!-- Seletor de Dia da Semana -->
+              <div class="col-12">
+                <label for="diaSemana" class="form-label">Dia da Semana <span class="text-danger">*</span></label>
+                <select id="diaSemana" class="form-select" formControlName="diaSemana">
+                  <option [ngValue]="null" disabled>Selecione o dia</option>
+                  <option value="MONDAY">Segunda-feira</option>
+                  <option value="TUESDAY">Terça-feira</option>
+                  <option value="WEDNESDAY">Quarta-feira</option>
+                  <option value="THURSDAY">Quinta-feira</option>
+                  <option value="FRIDAY">Sexta-feira</option>
+                  <option value="SATURDAY">Sábado</option>
+                </select>
+              </div>
+
+              <!-- Seletor de Horário -->
+              <div class="col-12">
+                <label for="hora" class="form-label">Horário <span class="text-danger">*</span></label>
+                <input type="time" id="hora" class="form-control" formControlName="hora">
+              </div>
+              
+              <!-- Seletor de Turma -->
+              <div class="col-12">
+                <label for="turma" class="form-label">Turma <span class="text-danger">*</span></label>
+                <select id="turma" class="form-select" formControlName="turma">
+                  <option [ngValue]="null" disabled>Selecione a turma</option>
+                  <option *ngFor="let turma of turmas" [value]="turma.id">{{ turma.id }} - {{ turma.curso?.nome }} ({{turma.ano}}.{{turma.semestre}})</option>
+                </select>
+              </div>
+
+              <!-- Seletor de Disciplina -->
+              <div class="col-12">
+                <label for="disciplina" class="form-label">Disciplina <span class="text-danger">*</span></label>
+                <select id="disciplina" class="form-select" formControlName="disciplina">
+                  <option [ngValue]="null" disabled>Selecione a disciplina</option>
+                  <option *ngFor="let disciplina of disciplinas" [value]="disciplina.id">{{ disciplina.nome }}</option>
+                </select>
+              </div>
+              
+              <!-- Seletor de Professor -->
+              <div class="col-12">
+                <label for="professor" class="form-label">Professor <span class="text-danger">*</span></label>
+                <select id="professor" class="form-select" formControlName="professor">
+                  <option [ngValue]="null" disabled>Selecione o professor</option>
+                  <option *ngFor="let p of professores" [value]="p.id">{{ p.nome }}</option>
+                </select>
+              </div>
+              
+              <!-- Seletor de Sala -->
+              <div class="col-12">
+                <label for="sala" class="form-label">Sala <span class="text-danger">*</span></label>
+                <select id="sala" class="form-select" formControlName="sala">
+                  <option [ngValue]="null" disabled>Selecione a sala</option>
+                  <optgroup *ngFor="let bloco of blocos" [label]="bloco.nome">
+                    <option *ngFor="let sala of bloco.salas" [value]="sala.id">
+                      {{ sala.codigo }}
+                    </option>
+                  </optgroup>
+                </select>
+              </div>
+
+            </div>
+
+            <!-- Botão de Submissão -->
+            <div class="d-grid mt-4">
+              <button type="submit" class="btn btn-success btn-lg" [disabled]="form.invalid || carregando">
+                <span *ngIf="!carregando"><i class="bi bi-plus-circle-fill me-2"></i>Criar Aula Recorrente</span>
+                <span *ngIf="carregando" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              </button>
+            </div>
+          </form>
+
+          <!-- Alertas -->
+          <div *ngIf="sucesso" class="alert alert-success mt-3" role="alert">{{ sucesso }}</div>
+          <div *ngIf="erro" class="alert alert-danger mt-3" role="alert">{{ erro }}</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Listagem de Aulas -->
+    <div class="col-lg-7">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">Aulas Agendadas</h5>
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead>
+                <tr>
+                  <th>Dia</th>
+                  <th>Horário</th>
+                  <th>Turma</th>
+                  <th>Disciplina</th>
+                  <th>Professor</th>
+                  <th>Sala</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let aula of aulas">
+                  <td>{{ formatarDiaSemana(aula.diaSemana) }}</td>
+                  <td>{{ aula.hora }}</td>
+                  <td>{{ aula.turma.id }}</td>
+                  <td>{{ aula.disciplina.nome }}</td>
+                  <td>{{ aula.professor.nome }}</td>
+                  <td>{{ getBlocoNome(aula.sala.id) }} - {{ aula.sala.codigo }}</td>
+                  <td>
+                    <button class="btn btn-sm btn-outline-danger" (click)="abrirModalRemocao(aula)"><i class="bi bi-trash"></i></button>
+                  </td>
+                </tr>
+                <tr *ngIf="aulas.length === 0">
+                  <td colspan="7" class="text-center text-muted">Nenhuma aula agendada.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-modal-confirmacao 
+  [isVisible]="isModalVisible"
+  [title]="modalConfig.title"
+  [message]="modalConfig.message"
+  [type]="modalConfig.type"
+  (onConfirm)="confirmarRemocao()"
+  (onCancel)="cancelarRemocao()">
+</app-modal-confirmacao>

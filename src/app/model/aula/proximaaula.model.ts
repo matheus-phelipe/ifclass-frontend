@@ -4,4 +4,5 @@ export interface ProximaAula {
   sala: string;
   horario: string;
   bloco: string;
+  diaSemana?: string;
 }

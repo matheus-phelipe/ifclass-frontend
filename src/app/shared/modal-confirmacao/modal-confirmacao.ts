@@ -1,5 +1,5 @@
 import { CommonModule, NgClass } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild, OnChanges, SimpleChanges } from '@angular/core';
 
 declare var bootstrap: any;
 
@@ -13,15 +13,18 @@ type ModalType = 'danger' | 'primary' | 'success';
   templateUrl: './modal-confirmacao.html',
   styleUrls: ['./modal-confirmacao.css']
 })
-export class ModalConfirmacaoComponent implements AfterViewInit {
+export class ModalConfirmacaoComponent implements AfterViewInit, OnChanges {
   @Input() title: string = 'Confirmação';
   @Input() message: string = 'Deseja continuar?';
   
   // NOVO: Input para controlar o tipo do modal
   @Input() type: ModalType = 'primary';
+  @Input() isVisible: boolean = false;
 
-  @Output() confirmed = new EventEmitter<void>();
-  @Output() canceled = new EventEmitter<void>();
+  @Output() onConfirm = new EventEmitter<void>();
+  @Output() onCancel = new EventEmitter<void>();
+  
+  private confirmAction: (() => void) | null = null;
 
   @ViewChild('modalRef') modalRef!: ElementRef;
 
@@ -33,18 +36,29 @@ export class ModalConfirmacaoComponent implements AfterViewInit {
       this.modalRef.nativeElement.addEventListener('hidden.bs.modal', () => {
         // Apenas emite o 'canceled' se o usuário realmente fechar (não ao confirmar)
         if (!this.confirmedEmitted) {
-          this.canceled.emit();
+          this.onCancel.emit();
         }
         this.confirmedEmitted = false; // Reseta para a próxima abertura
       });
     }
   }
 
-  // Método open atualizado para receber os parâmetros
-  public open(type: ModalType = 'primary', title: string, message: string): void {
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['isVisible'] && this.bsModal) {
+      if (changes['isVisible'].currentValue) {
+        this.bsModal.show();
+      } else {
+        this.bsModal.hide();
+      }
+    }
+  }
+
+  // Método open atualizado para receber os parâmetros E a ação de callback
+  public open(type: ModalType = 'primary', title: string, message: string, action: () => void): void {
     this.type = type;
     this.title = title;
     this.message = message;
+    this.confirmAction = action; // Armazena a ação a ser executada
     if (this.bsModal) {
       this.bsModal.show();
     }
@@ -57,9 +71,18 @@ export class ModalConfirmacaoComponent implements AfterViewInit {
   }
 
   private confirmedEmitted = false;
-  onConfirm(): void {
-    this.confirmedEmitted = true; // Marca que a confirmação foi emitida
-    this.confirmed.emit();
+  confirm(): void {
+    this.confirmedEmitted = true;
+    if (this.confirmAction) {
+      this.confirmAction(); // Executa a ação armazenada
+    } else {
+      this.onConfirm.emit(); // Emite o evento se não há callback
+    }
+    this.close();
+  }
+
+  cancel(): void {
+    this.onCancel.emit();
     this.close();
   }
 

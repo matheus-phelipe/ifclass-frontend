@@ -1,0 +1,69 @@
+<div class="container my-4">
+  <app-profile-switcher></app-profile-switcher>
+
+  <div class="text-center my-4">
+    <h1 class="h2 fw-bold mb-0" style="color: #333;">Vínculo Professor x Disciplinas</h1>
+    <p class="text-muted" *ngIf="podeEditar">Selecione um professor para gerenciar suas disciplinas.</p>
+  </div>
+  
+  <div *ngIf="erro" class="alert alert-danger">{{ erro }}</div>
+
+  <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+    <div class="col" *ngFor="let prof of professores">
+      <div class="card vinculo-card" [class.active]="professorSelecionadoId === prof.id">
+        <div class="card-header d-flex align-items-center" (click)="selecionarProfessorPorId(prof.id.toString())">
+          <i class="bi bi-person-circle fs-3 me-3 text-success"></i>
+          <div class="flex-grow-1">
+            <h6 class="mb-0 fw-bold">{{ prof.nome }}</h6>
+            <small class="text-muted">{{ prof.email }}</small>
+          </div>
+          <button class="btn btn-link text-decoration-none text-success">
+            <i class="bi fs-4" [ngClass]="professorSelecionadoId === prof.id ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+          </button>
+        </div>
+
+        <div class="collapse" [class.show]="professorSelecionadoId === prof.id">
+          <div class="card-body">
+            <div *ngIf="carregando" class="text-center py-4">
+              <div class="spinner-border spinner-border-sm text-success" role="status">
+                <span class="visually-hidden">Carregando...</span>
+              </div>
+            </div>
+            
+            <div *ngIf="!carregando">
+              <div class="mb-3">
+                <h6 class="text-muted small text-uppercase">Disciplinas Vinculadas</h6>
+                <div class="d-flex flex-wrap gap-2" *ngIf="disciplinasVinculadas.length > 0; else nenhumaVinculada">
+                  <span class="badge bg-success-subtle text-success-emphasis rounded-pill" *ngFor="let disc of disciplinasVinculadas">
+                    {{ disc.nome }}
+                  </span>
+                </div>
+                <ng-template #nenhumaVinculada>
+                  <p class="fst-italic text-muted small mb-0">Nenhuma disciplina vinculada.</p>
+                </ng-template>
+              </div>
+
+              <div *ngIf="podeEditar">
+                <h6 class="text-muted small text-uppercase mt-4">Todas as Disciplinas</h6>
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let disc of disciplinas">
+                    {{ disc.nome }}
+                    <div class="form-check form-switch">
+                      <input 
+                        class="form-check-input" 
+                        type="checkbox" 
+                        role="switch"
+                        [checked]="estaVinculada(disc)" 
+                        (change)="alternarVinculo(disc)"
+                        [disabled]="carregando">
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

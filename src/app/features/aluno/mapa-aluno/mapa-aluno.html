@@ -1,0 +1,185 @@
+<div class="totem-container">
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <img src="assets/ifclass.png" alt="Logo IFClass" />
+      <h1 class="h2">Mapa do Campus</h1>
+    </div>
+
+    <ng-container *ngIf="authService.isAdmin$ | async as canManage">
+      <section *ngIf="canManage" class="admin-panel">
+        <h2 class="admin-panel-title">
+          <i class="bi bi-sliders"></i> Painel de Controle
+        </h2>
+
+        <form #blocoForm="ngForm" (ngSubmit)="handleCreateBloco()" class="mb-4">
+          <label for="blockName" class="form-label fw-bold">Criar Novo Bloco</label>
+          <div class="input-group">
+            <input type="text" id="blockName" class="form-control" [(ngModel)]="novoBlocoNome" name="novoBlocoNome" placeholder="Ex: Bloco C" required />
+            <button type="submit" class="btn btn-success" [disabled]="blocoForm.invalid" title="Adicionar Bloco">
+              <i class="bi bi-plus-lg"></i>
+            </button>
+          </div>
+        </form>
+
+        <form #salaForm="ngForm" (ngSubmit)="handleSubmitSala()">
+          <h3 class="form-label fw-bold">{{ editingSala ? 'Editar Sala' : 'Adicionar Nova Sala' }}</h3>
+          
+          <div *ngIf="editingSala" class="alert alert-success p-2 d-flex justify-content-between align-items-center mb-3">
+            <span class="small">Editando: <strong>{{ editingSala.codigo }}</strong></span>
+            <button class="btn btn-sm btn-outline-danger" type="button" (click)="handleDeleteSala(activeBlocoId!, editingSala.id!)" title="Excluir Sala">
+                <i class="bi bi-trash"></i>
+            </button>
+          </div>
+
+          <div class="mb-2">
+            <label for="blockSelect" class="form-label small">Bloco</label>
+            <select id="blockSelect" class="form-select" [(ngModel)]="blocoSelecionadoId" name="blocoSelecionadoId" [disabled]="blocos.length === 0 || !!editingSala" required>
+              <option *ngIf="blocos.length === 0" [ngValue]="null">Crie um bloco primeiro</option>
+              <option *ngFor="let bloco of blocos" [value]="bloco.id">{{ bloco.nome }}</option>
+            </select>
+          </div>
+          <div class="row g-2 mb-2">
+            <div class="col-sm-5">
+              <label for="roomCode" class="form-label small">Código</label>
+              <input type="text" id="roomCode" class="form-control form-control-sm" [(ngModel)]="formSala.codigo" name="salaCodigo" required />
+            </div>
+            <div class="col-sm-4">
+              <label for="roomCapacity" class="form-label small">Capac.</label>
+              <input type="number" id="roomCapacity" class="form-control form-control-sm" [(ngModel)]="formSala.capacidade" name="salaCapacidade" required />
+            </div>
+            <div class="col-sm-3">
+              <label for="roomColor" class="form-label small">Cor</label>
+              <input type="color" id="roomColor" class="form-control form-control-color form-control-sm" [(ngModel)]="formSala.cor" name="salaCor" title="Escolha a cor da sala" />
+            </div>
+          </div>
+          <div class="d-flex flex-wrap gap-2 mt-3">
+            <button type="submit" class="btn btn-primary flex-grow-1" [disabled]="salaForm.invalid">
+              {{ editingSala ? 'Atualizar' : 'Adicionar' }}
+            </button>
+            <button *ngIf="editingSala" type="button" class="btn btn-secondary" (click)="cancelarEdicao()">Cancelar</button>
+          </div>
+        </form>
+      </section>
+    </ng-container>
+
+    <nav class="bloco-list">
+      <h2 class="h5 text-muted">Blocos</h2>
+      <ul>
+        <li *ngFor="let bloco of blocos"
+            class="bloco-item"
+            [class.active]="bloco.id === activeBlocoId"
+            (click)="toggleBloco(bloco.id!)">
+          <i class="bi bi-building"></i>
+          <span>{{ bloco.nome }}</span>
+          <i class="bi bi-chevron-right"></i>
+        </li>
+        <li *ngIf="blocos.length === 0" class="bloco-item-empty">
+          Nenhum bloco encontrado.
+        </li>
+      </ul>
+    </nav>
+    
+    <footer class="sidebar-footer">
+      <app-profile-switcher></app-profile-switcher>
+      
+      <button class="btn btn-outline-danger logout-button" (click)="logout()" title="Sair do sistema">
+        <i class="bi bi-box-arrow-right"></i>
+        <span>Sair</span>
+      </button>
+    </footer>
+  </aside>
+
+  <main class="main-content">
+    <ng-container *ngIf="activeBlocoId; else welcomeScreen">
+      <div class="floorplan-view">
+        <header class="main-content-header">
+          <div>
+            <h3>Bloco: <strong>{{ getActiveBlocoName() }}</strong></h3>
+            <p *ngIf="!(authService.isAdmin$ | async)" class="text-muted">Use dois dedos para ampliar. Arraste para mover o mapa.</p>
+            <p *ngIf="authService.isAdmin$ | async" class="text-muted">Clique e arraste uma sala para movê-la. Clique para editar.</p>
+          </div>
+          <div class="d-flex gap-2">
+               <button *ngIf="authService.hasRole('ROLE_ADMIN')" class="btn btn-outline-success" (click)="voltarAoPainelAdmin()">
+                  <i class="bi bi-house-door-fill me-2"></i>
+                  Voltar ao Painel
+               </button>
+                <button *ngIf="(authService.isAdmin$ | async) && activeBlocoId" (click)="handleDeleteBloco(activeBlocoId)" class="btn btn-outline-danger">
+                  <i class="bi bi-trash-fill me-2"></i>
+                  Excluir Bloco
+                </button>
+          </div>
+        </header>
+
+        <div class="alert alert-danger" *ngIf="error">
+          {{ error }}
+          <button type="button" class="btn-close" (click)="error = null" aria-label="Close"></button>
+        </div>
+
+        <div class="floorplan-container" [class.is-dragging]="isDragging">
+          <ngx-pan-zoom [config]="panZoomConfig">
+            <svg class="floorplan-svg" viewBox="0 0 3200 1800">
+              <ng-container *ngFor="let bloco of blocos">
+                <g *ngIf="bloco.id === activeBlocoId">
+                  <g *ngFor="let sala of bloco.salas"
+                      class="sala-group"
+                      [class.clickable-for-user]="!(authService.isAdmin$ | async)"
+                      [class.dragging]="draggingSala?.id === sala.id"
+                      (mousedown)="onMouseDown($event, sala)"
+                      (touchstart)="onTouchStart($event, sala)">
+                    <rect 
+                        [attr.x]="sala.posX ?? 0" 
+                        [attr.y]="sala.posY ?? 0" 
+                        [attr.width]="sala.largura ?? 150" 
+                        [attr.height]="sala.altura ?? 100" 
+                        class="sala-rect" 
+                        [class.editing]="editingSala?.id === sala.id"
+                        [class.sala-aula-hoje]="isSalaAulaHoje(sala.id)"
+                        [attr.fill]="sala.cor || '#FFFFFF'">
+                    </rect>
+                    <text [attr.x]="(sala.posX ?? 0) + (sala.largura ?? 150) / 2" [attr.y]="(sala.posY ?? 0) + (sala.altura ?? 100) / 2" class="sala-text">
+                      <tspan class="sala-codigo">{{ sala.codigo }}</tspan>
+                      <tspan [attr.x]="(sala.posX ?? 0) + (sala.largura ?? 150) / 2" dy="1.4em" class="sala-capacidade">Cap: {{ sala.capacidade }}</tspan>
+                    </text>
+                  </g>
+                </g>
+              </ng-container>
+            </svg>
+          </ngx-pan-zoom>
+        </div>
+      </div>
+
+      <!-- LEGENDA PARA SALAS DO DIA E DA SEMANA -->
+      <div class="mapa-legenda">
+        <div>
+          <span class="sala-legenda sala-aula-hoje"></span> Você tem aula aqui <strong>hoje</strong>
+        </div>
+        <div class="mt-2">
+          <strong>Aulas da semana:</strong>
+          <ul class="list-unstyled small ms-2">
+            <li *ngFor="let aula of aulasSemana">
+              <span class="sala-legenda sala-aula-semana"></span>
+              <span class="fw-bold">{{ aula.disciplina.nome }}</span> -
+              {{ aula.diaSemana | diaSemana }}
+              {{ aula.horaInicio || aula.hora }} -
+              {{ aula.horaFim ? aula.horaFim : '' }}<br>
+              <span class="text-muted">Sala: {{ aula.sala.codigo }}</span>
+            </li>
+            <ng-container *ngIf="aulasSemana.length === 0">
+              <li *ngIf="alunoTemTurmaMasSemAulas" class="text-muted">Sua turma ainda não tem nenhuma aula cadastrada!</li>
+              <li *ngIf="!alunoTemTurmaMasSemAulas" class="text-muted">Nenhuma aula cadastrada para esta semana.</li>
+            </ng-container>
+          </ul>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-template #welcomeScreen>
+      <div class="welcome-screen">
+        <i class="bi bi-map-fill welcome-icon"></i>
+        <h2 class="display-6">Bem-vindo ao IFClass!</h2>
+        <p class="lead text-muted">Selecione um bloco no menu à esquerda para começar a explorar o campus.</p>
+      </div>
+    </ng-template>
+  </main>
+</div>

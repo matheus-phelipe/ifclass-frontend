@@ -169,5 +169,12 @@ export class AuthService {
     const requiredLevel = roleHierarchy[requiredRole] || 0;
     return activeLevel >= requiredLevel;
   }
+
+  getIdUsuario(): number | null {
+    const payload = this.getDecodedToken();
+    if (!payload) return null;
+    // Tenta pegar o campo 'id' ou 'sub' (caso o backend use sub para id)
+    return payload.id ? Number(payload.id) : (payload.sub ? Number(payload.sub) : null);
+  }
 }
 
