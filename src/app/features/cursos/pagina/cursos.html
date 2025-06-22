@@ -1,264 +1,156 @@
 <ng-container *ngIf="{ canManage: (authService.isCoordenador$ | async) } as perms">
 
-  <div class="container my-5">
-    <header class="text-center mb-5">
-      <div>
-        <h1 class="display-5 fw-bold text-success">{{ perms.canManage ? 'Gerenciar Cursos' : 'Catálogo de Cursos' }}</h1>
-        <p class="text-muted fs-5">{{ perms.canManage ? 'Visualize, crie e edite os cursos da instituição.' : 'Explore todos os cursos disponíveis.' }}</p>
-      </div>
-      <div>
-        <app-profile-switcher></app-profile-switcher>
-      </div>
-    </header>
-    
+  <div class="container my-4">
+    <app-profile-switcher></app-profile-switcher>
 
-    <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
-      {{ error }}
-      <button type="button" class="btn-close" (click)="error = null" aria-label="Close"></button>
+    <div class="d-flex justify-content-between align-items-center my-4">
+      <h1 class="h2 fw-bold mb-0" style="color: #333;">
+        {{ authService.isRoleActiveOrHigher('ROLE_COORDENADOR') ? 'Gerenciar Cursos' : 'Catálogo de Cursos' }}
+      </h1>
+      <button class="btn btn-success btn-lg shadow-sm" (click)="abrirModal()" *ngIf="authService.isRoleActiveOrHigher('ROLE_COORDENADOR')">
+        <i class="bi bi-plus-lg me-2"></i>Novo Curso
+      </button>
     </div>
 
-    <section *ngIf="perms.canManage" class="card card-body mb-5 shadow-sm border-0 rounded-4">
-      <h2 class="h4 border-bottom pb-3 mb-4 text-success">
-        <i class="bi bi-plus-circle me-2"></i> Adicionar/Editar Curso
-      </h2>
+    <div class="mb-4">
+      <input
+        type="text"
+        class="form-control form-control-lg"
+        placeholder="Pesquisar por nome, código ou departamento..."
+        (input)="onSearch($event)"
+      />
+    </div>
 
-      <div class="d-flex justify-content-end mb-4" *ngIf="!mostrandoFormulario">
-        <button class="btn btn-success" (click)="abrirFormularioNovoCurso()">
-          <i class="bi bi-plus-lg me-2"></i> Novo Curso
-        </button>
+    <div *ngIf="isLoading" class="text-center py-5">
+      <div class="spinner-border text-success" style="width: 3rem; height: 3rem;" role="status">
+        <span class="visually-hidden">Carregando...</span>
       </div>
+    </div>
 
-      <div *ngIf="mostrandoFormulario" class="animated-form-appear">
-        <form #cursoForm="ngForm" (ngSubmit)="salvarCurso()">
-          <div class="row g-3 mb-3">
-            <div class="col-12 col-md-6"> <label for="nomeCurso" class="form-label">Nome do Curso</label>
-              <input
-                type="text"
-                id="nomeCurso"
-                class="form-control"
-                [(ngModel)]="novoCurso.nome"
-                name="nome"
-                placeholder="Ex: Programação Orientada a Objetos"
-                required
-              />
-            </div>
-            <div class="col-6 col-md-3"> <label for="codigoCurso" class="form-label">Código</label>
-              <input
-                type="text"
-                id="codigoCurso"
-                class="form-control"
-                [(ngModel)]="novoCurso.codigo"
-                name="codigo"
-                placeholder="Ex: POO202"
-                required
-              />
-            </div>
-            <div class="col-6 col-md-3"> <label for="cargaHoraria" class="form-label">Carga Horária (horas)</label>
-              <input
-                type="number"
-                id="cargaHoraria"
-                class="form-control"
-                [(ngModel)]="novoCurso.cargaHoraria"
-                name="cargaHoraria"
-                placeholder="Ex: 80"
-                required
-                min="1"
-              />
-            </div>
-          </div>
-          <div class="mb-3">
-            <label for="departamento" class="form-label">Departamento</label>
-            <select
-              id="departamento"
-              class="form-select"
-              [(ngModel)]="novoCurso.departamento"
-              name="departamento"
-              required
-            >
-              <option [ngValue]="''" disabled>Selecione um departamento</option>
-              <option *ngFor="let dep of departamentosDisponiveis" [value]="dep">{{ dep }}</option>
-            </select>
-          </div>
-          <div class="mb-4">
-            <label for="descricaoCurso" class="form-label">Descrição do Curso</label>
-            <textarea
-              id="descricaoCurso"
-              class="form-control"
-              [(ngModel)]="novoCurso.descricao"
-              name="descricao"
-              rows="3"
-              placeholder="Descreva brevemente o conteúdo e os objetivos do curso..."
-            ></textarea>
-          </div>
+    <div *ngIf="!isLoading && cursosFiltrados.length === 0" class="text-center py-5">
+      <div class="display-4 text-muted mb-3">
+        <i class="bi bi-mortarboard-fill"></i>
+      </div>
+      <h4 class="text-muted">Nenhum curso encontrado</h4>
+      <p *ngIf="termoBusca" class="text-muted">Tente um termo de busca diferente.</p>
+    </div>
 
-          <div class="d-flex justify-content-end gap-2">
-            <button type="button" class="btn btn-outline-secondary" (click)="cancelarEdicaoOuCriacao()">
-              Cancelar
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+      <div class="col" *ngFor="let curso of cursosFiltrados">
+        <div class="curso-card">
+          <div class="curso-card-header">
+            <h5 class="curso-nome">{{ curso.nome }}</h5>
+            <span class="curso-badge">{{ curso.codigo }}</span>
+          </div>
+          <div class="curso-card-body">
+            <p class="curso-descricao">{{ curso.descricao | slice:0:100 }}{{ curso.descricao.length > 100 ? '...' : '' }}</p>
+            <div class="curso-info">
+              <span><i class="bi bi-clock-history me-2"></i>{{ curso.cargaHoraria }}h</span>
+              <span><i class="bi bi-building me-2"></i>{{ curso.departamento }}</span>
+            </div>
+          </div>
+          <div class="curso-card-footer">
+            <button class="btn-acao ver" (click)="verDetalhes(curso)" title="Ver Detalhes">
+              <i class="bi bi-eye-fill"></i>
             </button>
-            <button type="submit" class="btn btn-success" [disabled]="cursoForm.invalid">
-              <i class="bi bi-save me-2"></i> {{ cursoEmEdicao ? 'Atualizar Curso' : 'Criar Curso' }}
-            </button>
+            <ng-container *ngIf="authService.isRoleActiveOrHigher('ROLE_COORDENADOR')">
+              <button class="btn-acao editar" (click)="abrirModal(curso)" title="Editar">
+                <i class="bi bi-pencil-fill"></i>
+              </button>
+              <button class="btn-acao deletar" (click)="confirmarDelecao(curso)" title="Excluir">
+                <i class="bi bi-trash-fill"></i>
+              </button>
+            </ng-container>
           </div>
-        </form>
-      </div>
-    </section>
-
-    <section *ngIf="!perms.canManage" class="card card-body mb-5 shadow-sm border-0 rounded-4">
-      <div class="text-center">
-        <h2 class="h4 pb-2 text-primary">
-          <i class="bi bi-mortarboard me-2"></i> Bem-vindo ao Catálogo de Cursos!
-        </h2>
-        <p class="text-muted mb-3">
-          Explore a lista completa de cursos oferecidos pela nossa instituição.
-        </p>
-        <p class="mb-0 text-muted">
-          Use a barra de pesquisa abaixo para encontrar cursos específicos e clique em
-          <span class="badge bg-info text-dark mx-1">Ver</span> para acessar os detalhes completos, incluindo a descrição.
-        </p>
-      </div>
-    </section>
-
-    <main>
-      <div *ngIf="isLoading" class="text-center p-5">
-        <div class="spinner-border text-success" style="width: 3rem; height: 3rem;" role="status">
-          <span class="visually-hidden">Carregando...</span>
         </div>
       </div>
-
-      <div *ngIf="!isLoading && cursos.length === 0" class="text-center card card-body p-5 rounded-4 border-dashed">
-        <h3 class="h5">Nenhum curso encontrado.</h3>
-        <p class="text-muted">
-          {{ perms.canManage ?
-            'Use o botão "Novo Curso" acima para começar a cadastrar.' :
-            'Consulte a coordenação para mais informações sobre os cursos disponíveis.' }}
-        </p>
-      </div>
-
-      <div *ngIf="!isLoading && cursos.length > 0">
-        <div class="mb-4">
-          <input
-            type="text"
-            class="form-control"
-            placeholder="Pesquisar cursos por nome, código, departamento ou descrição..."
-            [(ngModel)]="termoBusca"
-            name="termoBusca"
-          />
-        </div>
-
-        <div class="table-responsive">
-          <table class="table table-hover table-striped shadow-sm rounded-table-corners">
-            <thead class="bg-success text-white">
-              <tr>
-                <th scope="col">Nome do Curso</th>
-                <th scope="col">Código</th>
-                <th scope="col">Carga Horária</th>
-                <th scope="col">Departamento</th>
-                <th scope="col" class="text-center">Detalhes</th>
-                <th scope="col" class="text-center" *ngIf="perms.canManage">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let curso of cursosFiltrados">
-                <td>{{ curso.nome }}</td>
-                <td>{{ curso.codigo }}</td>
-                <td>{{ curso.cargaHoraria }} horas</td>
-                <td>{{ curso.departamento }}</td>
-                <td class="text-center">
-                  <button
-                    class="btn btn-sm btn-verde-claro"
-                    (click)="verDetalhes(curso)"
-                    title="Ver Detalhes do Curso"
-                  >
-                    <i class="bi bi-eye-fill me-1"></i> Ver
-                  </button>
-                </td>
-                <td class="text-center" *ngIf="perms.canManage">
-                  <button
-                    class="btn btn-sm btn-outline-primary me-2"
-                    (click)="editarCurso(curso)"
-                    [disabled]="!perms.canManage"
-                    title="Editar Curso"
-                  >
-                    <i class="bi bi-pencil"></i>
-                  </button>
-                  <button
-                    class="btn btn-sm btn-outline-danger"
-                    (click)="confirmarDelecao(curso)"
-                    [disabled]="!perms.canManage"
-                    title="Excluir Curso"
-                  >
-                    <i class="bi bi-trash"></i>
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </main>
+    </div>
   </div>
 </ng-container>
 
-<div class="modal" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true"
-     [ngClass]="{'show': cursoParaDeletar, 'd-block': cursoParaDeletar}">
+<!-- Modal Criar/Editar Curso -->
+<div class="modal fade" [class.show]="isModalOpen" [style.display]="isModalOpen ? 'block' : 'none'" (click)="onBackdropClick($event)">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Exclusão</h5>
-        <button type="button" class="btn-close" (click)="fecharModalDelecao()" aria-label="Close"></button>
+        <h5 class="modal-title">{{ isEditing ? 'Editar' : 'Novo' }} Curso</h5>
+        <button type="button" class="btn-close" (click)="fecharModal()"></button>
       </div>
       <div class="modal-body">
-        Tem certeza que deseja excluir o curso **{{ cursoParaDeletar?.nome }} ({{ cursoParaDeletar?.codigo }})**?
-        Esta ação não pode ser desfeita.
+        <form [formGroup]="cursoForm" (ngSubmit)="salvarCurso()">
+          <div class="row">
+            <div class="col-md-8 mb-3">
+              <label for="nome" class="form-label">Nome do Curso</label>
+              <input type="text" id="nome" class="form-control" formControlName="nome" required>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="codigo" class="form-label">Código</label>
+              <input type="text" id="codigo" class="form-control" formControlName="codigo" required>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="cargaHoraria" class="form-label">Carga Horária (h)</label>
+                <input type="number" id="cargaHoraria" class="form-control" formControlName="cargaHoraria" min="1" required>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="departamento" class="form-label">Departamento</label>
+                <select id="departamento" class="form-select" formControlName="departamento" required>
+                    <option [ngValue]="null" disabled>Selecione</option>
+                    <option *ngFor="let dep of departamentosDisponiveis" [value]="dep">{{ dep }}</option>
+                </select>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="descricao" class="form-label">Descrição</label>
+            <textarea id="descricao" class="form-control" formControlName="descricao" rows="4"></textarea>
+          </div>
+        </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="fecharModalDelecao()">Cancelar</button>
-        <button type="button" class="btn btn-danger" (click)="deletarCurso()">Excluir</button>
+        <button type="button" class="btn btn-secondary" (click)="fecharModal()">Cancelar</button>
+        <button type="button" class="btn btn-success" [disabled]="cursoForm.invalid" (click)="salvarCurso()">
+          <i class="bi bi-save me-1"></i> {{ isEditing ? 'Atualizar' : 'Salvar' }}
+        </button>
       </div>
     </div>
   </div>
 </div>
 
-<div class="modal" id="detalhesCursoModal" tabindex="-1" aria-labelledby="detalhesCursoModalLabel" aria-hidden="true"
-     [ngClass]="{'show': cursoDetalhes, 'd-block': cursoDetalhes}">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content shadow-lg modal-details-custom">
-      <div class="modal-header bg-success text-white">
-        <h5 class="modal-title" id="detalhesCursoModalLabel">
-          <i class="bi bi-book me-2"></i> Detalhes do Curso: {{ cursoDetalhes?.nome }}
-        </h5>
-        <button type="button" class="btn-close btn-close-white" (click)="fecharDetalhes()" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" *ngIf="cursoDetalhes">
-        <div class="row g-3 info-grid">
-          <div class="col-12 col-md-6">
-            <p><strong><i class="bi bi-tag-fill me-2"></i>Nome:</strong></p>
-            <p>{{ cursoDetalhes.nome }}</p>
-          </div>
-          <div class="col-12 col-md-6">
-            <p><strong><i class="bi bi-journal-code me-2"></i>Código:</strong></p>
-            <p>{{ cursoDetalhes.codigo }}</p>
-          </div>
-          <div class="col-12 col-md-6">
-            <p><strong><i class="bi bi-clock-fill me-2"></i>Carga Horária:</strong></p>
-            <p>{{ cursoDetalhes.cargaHoraria }} horas</p>
-          </div>
-          <div class="col-12 col-md-6">
-            <p><strong><i class="bi bi-building-fill me-2"></i>Departamento:</strong></p>
-            <p>{{ cursoDetalhes.departamento }}</p>
-          </div>
+<!-- Modal Detalhes -->
+<div class="modal fade" [class.show]="cursoDetalhes" [style.display]="cursoDetalhes ? 'block' : 'none'" (click)="fecharDetalhes()">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ cursoDetalhes?.nome }}</h5>
+                <button type="button" class="btn-close" (click)="fecharDetalhes()"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Código:</strong> {{ cursoDetalhes?.codigo }}</p>
+                <p><strong>Carga Horária:</strong> {{ cursoDetalhes?.cargaHoraria }}h</p>
+                <p><strong>Departamento:</strong> {{ cursoDetalhes?.departamento }}</p>
+                <hr>
+                <p>{{ cursoDetalhes?.descricao }}</p>
+            </div>
         </div>
-        <hr class="my-4">
-        <h6 class="text-primary-dark"><i class="bi bi-card-text me-2"></i>Descrição Detalhada:</h6>
-        <div class="description-box p-3 rounded">
-          <p class="mb-0">{{ cursoDetalhes.descricao || 'Nenhuma descrição disponível para este curso.' }}</p>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="fecharDetalhes()">Fechar</button>
-      </div>
     </div>
-  </div>
 </div>
 
-<div class="modal-backdrop fade" [ngClass]="{'show': cursoParaDeletar || cursoDetalhes, 'd-block': cursoParaDeletar || cursoDetalhes}"></div>
+<!-- Modal Confirmação Deleção -->
+<div class="modal fade" [class.show]="cursoParaDeletar" [style.display]="cursoParaDeletar ? 'block' : 'none'" (click)="fecharModalDelecao()">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" (click)="fecharModalDelecao()"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir o curso <strong>{{ cursoParaDeletar?.nome }}</strong>?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="fecharModalDelecao()">Cancelar</button>
+                <button type="button" class="btn btn-danger" (click)="deletarCurso()">Excluir</button>
+            </div>
+        </div>
+    </div>
+</div>

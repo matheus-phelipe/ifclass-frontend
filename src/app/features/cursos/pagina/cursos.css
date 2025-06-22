@@ -264,3 +264,121 @@ header h1 {
 body.modal-open {
   overflow: hidden;
 }
+
+/* Estilos para os Cards de Curso */
+.curso-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.07);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease-in-out;
+  border: 1px solid transparent;
+  min-height: 240px; /* Altura mínima para consistência */
+}
+
+.curso-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border-color: #d1e7dd; /* Verde claro */
+}
+
+.curso-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.curso-nome {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #146c43; /* Verde escuro */
+}
+
+.curso-badge {
+  background-color: #e9ecef;
+  color: #495057;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  flex-shrink: 0;
+  margin-left: 10px;
+}
+
+.curso-card-body {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+.curso-descricao {
+  color: #6c757d;
+  font-size: 0.95rem;
+  flex-grow: 1;
+  margin-bottom: 1rem;
+}
+
+.curso-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  color: #495057;
+  padding-top: 1rem;
+  border-top: 1px solid #f1f3f5;
+}
+
+.curso-card-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 1rem;
+  border-top: 1px solid #f8f9fa;
+}
+
+/* Estilos para Botões de Ação */
+.btn-acao {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.1rem;
+  color: #6c757d;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-acao:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.btn-acao.ver:hover {
+  background-color: #cff4fc;
+  color: #087990;
+  border-color: #b6effb;
+}
+
+.btn-acao.editar:hover {
+  background-color: #e9ecef;
+  color: #000;
+}
+
+.btn-acao.deletar:hover {
+  background-color: #f8d7da;
+  color: #842029;
+  border-color: #f5c2c7;
+}
+
+/* Garante que os modais do bootstrap tenham um backdrop */
+.modal-backdrop {
+  opacity: 0.5;
+}
