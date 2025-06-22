@@ -202,6 +202,8 @@ export class TurmasComponent implements OnInit {
         this.fecharVincularModal();
       } else if (modalType === 'alunos') {
         this.fecharAlunosVinculadosModal();
+      } else if (modalType === 'main') {
+        this.fecharModal();
       } else {
         this.fecharModal();
       }

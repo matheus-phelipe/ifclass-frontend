@@ -43,7 +43,7 @@
 </div>
 
 <!-- Modal -->
-<div class="modal fade" [class.show]="isModalOpen" [style.display]="isModalOpen ? 'block' : 'none'" (click)="onBackdropClick($event)">
+<div class="modal fade" [class.show]="isModalOpen" [style.display]="isModalOpen ? 'block' : 'none'" (click)="onBackdropClick($event, 'main')">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
