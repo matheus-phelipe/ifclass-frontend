@@ -57,13 +57,6 @@ export const ALL_MENU_CARDS: MenuCard[] = [
     roles: ['ROLE_PROFESSOR', 'ROLE_COORDENADOR', 'ROLE_ADMIN']
   },
   {
-    icon: 'bi bi-person-gear',
-    title: 'Gerenciar permissões',
-    text: 'Defina permissões de acesso para usuários.',
-    link: '/app/permissoes',
-    roles: ['ROLE_COORDENADOR', 'ROLE_ADMIN']
-  },
-  {
     icon: 'bi bi-people-fill',
     title: 'Gerenciar usuários',
     text: 'Adicione, remova e edite usuários.',

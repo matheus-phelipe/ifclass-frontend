@@ -56,24 +56,16 @@
 
     <ng-container *ngIf="isCoordenador || isAdmin">
       <div *ngIf="sidebarOpen" class="sidebar-menu-category">COORDENADOR</div>
-      <a routerLink="/app/permissoes"
-         class="sidebar-nav-link"
-         [ngClass]="{'justify-content-center': !sidebarOpen}">
-        <i class="bi bi-person-gear"></i>
-        <span *ngIf="sidebarOpen">Gerenciar permissões</span>
-      </a>
-    </ng-container>
-
-    <ng-container *ngIf="isAdmin">
-      <div *ngIf="sidebarOpen" class="sidebar-menu-category">ADMINISTRADOR</div>
-
       <a routerLink="/app/usuarios"
          class="sidebar-nav-link"
          [ngClass]="{'justify-content-center': !sidebarOpen}">
         <i class="bi bi-people-fill"></i>
         <span *ngIf="sidebarOpen">Gerenciar usuários</span>
       </a>
+    </ng-container>
 
+    <ng-container *ngIf="isAdmin">
+      <div *ngIf="sidebarOpen" class="sidebar-menu-category">ADMINISTRADOR</div>
       <a routerLink="/configuracoes"
          class="sidebar-nav-link"
          [ngClass]="{'justify-content-center': !sidebarOpen}">

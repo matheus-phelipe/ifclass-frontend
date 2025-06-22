@@ -5,7 +5,6 @@ import { CadastroComponent } from './features/usuario/cadastro/cadastro';
 import { ResetarSenhaComponent } from './features/usuario/resetar-senha/resetar-senha';
 import { Home } from './features/home/home';
 import { Gerenciarusuarios } from './features/gerenciarusuarios/gerenciarusuarios';
-import { Gerenciarpermissoes } from './features/gerenciarpermissoes/gerenciarpermissoes';
 import { GerenciadorSalasComponent } from './features/aluno/gerenciador-salas/gerenciador-salas';
 import { CursosComponent } from './features/cursos/pagina/cursos';
 import { MapaAlunoComponent } from './features/aluno/mapa-aluno/mapa-aluno';
@@ -46,12 +45,6 @@ export const routes: Routes = [
         component: Gerenciarusuarios,
         canActivate: [authGuard],
         data: { authorities: ['ROLE_ADMIN'] }
-      },
-      {
-        path: 'permissoes',
-        component: Gerenciarpermissoes,
-        canActivate: [authGuard],
-        data: { authorities: ['ROLE_ADMIN', 'ROLE_COORDENADOR'] }
       },
       {
         path: 'salas',
