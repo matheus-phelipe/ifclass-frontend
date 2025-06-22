@@ -33,6 +33,17 @@
 
 .accordion-body {
   padding: 1.5rem;
+  background-color: #f8f9fa;
+}
+
+/* NOVO: Estilos para o painel de controle lateral */
+.control-panel {
+  position: sticky;
+  top: 2rem; /* Fixa o painel ao rolar a página */
+  background-color: #fff;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  border: 1px solid #dee2e6;
 }
 
 /* NOVOS ESTILOS PARA A PLANTA BAIXA */
@@ -45,7 +56,10 @@
 
 .selected-sala-info {
   padding: 0.75rem 1.25rem;
-  margin-bottom: 0;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .floorplan-container {
@@ -110,8 +124,8 @@
 .sala-rect.editing {
   fill: #d1e7dd; /* Verde claro */
   stroke: var(--cor-primaria, #198754);
-  stroke-width: 4px; /* Borda mais grossa para destaque */
-  stroke-dasharray: 8 4; /* Linha tracejada para indicar edição */
+  stroke-width: 3px; /* Borda mais grossa para destaque */
+  stroke-dasharray: 6 3; /* Linha tracejada para indicar edição */
   animation: pulse 2s infinite;
 }
 
@@ -137,8 +151,29 @@
     cursor: default; /* Garante que não apareça o grab no hover para user */
 }
 .sala-group.clickable-for-user .sala-rect:hover { /* Estilo de hover para usuário, mas sem indicar arrastar */
-    fill: #e0f2f1; /* Um verde bem claro no hover */
-    transform: scale(1.005); /* Um pequeno scale, menos que para admin */
+    fill: #e9ecef;
+    transform: none; /* Remove o scale para usuário comum */
+}
+
+/* Ajustes de texto */
+.sala-text {
+  font-size: 14px;
+  font-weight: 500;
+  fill: #212529;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  pointer-events: none; /* Impede que o texto intercepte eventos de mouse */
+  user-select: none;
+}
+
+.sala-codigo {
+  font-size: 1.2em;
+  font-weight: 700;
+}
+
+.sala-capacidade {
+  font-size: 0.9em;
+  fill: #495057;
 }
 
 /* Ajustes de cores para os novos painéis de informação */

@@ -48,92 +48,93 @@
 }
 .disciplina-card {
   background: #fff;
-  border-radius: 22px;
-  box-shadow: 0 4px 32px rgba(25, 118, 210, 0.10), 0 1.5px 8px rgba(25, 118, 210, 0.08);
-  padding: 36px 30px 22px 30px;
-  min-width: 340px;
-  max-width: 360px;
-  flex: 1 1 340px;
+  border-radius: 18px;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.07);
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  transition: box-shadow 0.25s, transform 0.22s;
-  position: relative;
-  animation: cardPop 0.7s cubic-bezier(.4,2,.6,1);
-}
-@keyframes cardPop {
-  from { opacity: 0; transform: scale(0.97) translateY(30px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
+  transition: all 0.3s ease-in-out;
+  border: 1px solid transparent;
+  min-height: 220px;
 }
 .disciplina-card:hover {
-  box-shadow: 0 8px 40px 0 rgba(33, 150, 243, 0.18), 0 2px 12px rgba(25, 118, 210, 0.13);
-  transform: translateY(-6px) scale(1.025);
+  transform: translateY(-6px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border-color: #d1e7dd;
 }
 .disciplina-card-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 12px;
 }
 .disciplina-nome {
-  font-size: 1.18rem;
-  font-weight: 700;
-  color: #1976d2;
-  letter-spacing: 0.2px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #146c43;
 }
 .disciplina-badge {
-  background: linear-gradient(90deg, #1976d2 60%, #42a5f5 100%);
-  color: #fff;
-  border-radius: 10px;
-  padding: 7px 20px;
-  font-size: 1.08rem;
-  font-weight: 700;
-  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.13);
-  letter-spacing: 0.5px;
-  border: none;
+  background-color: #e9ecef;
+  color: #495057;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  flex-shrink: 0;
+  margin-left: 10px;
 }
-.disciplina-card-info {
+.disciplina-card-body {
+  flex-grow: 1;
   display: flex;
-  gap: 18px;
-  font-size: 1.01rem;
-  color: #333;
-  margin-bottom: 8px;
+  flex-direction: column;
 }
-.disciplina-card-desc {
-  font-size: 0.98rem;
-  color: #555;
-  margin-bottom: 10px;
+.disciplina-descricao {
+  color: #6c757d;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  flex-grow: 1;
 }
-.disciplina-card-actions {
+.disciplina-info {
   display: flex;
-  gap: 16px;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  color: #495057;
+  padding-top: 1rem;
+  border-top: 1px solid #f1f3f5;
+}
+.disciplina-card-footer {
+  display: flex;
   justify-content: flex-end;
+  gap: 12px;
+  padding-top: 1rem;
 }
 .btn-acao {
-  background: #f5f7fa;
-  border: none;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
   border-radius: 50%;
-  width: 42px;
-  height: 42px;
-  font-size: 1.18rem;
+  width: 40px;
+  height: 40px;
+  font-size: 1.1rem;
+  color: #6c757d;
   cursor: pointer;
-  transition: background 0.18s, color 0.18s, box-shadow 0.18s, transform 0.15s;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 1px 4px rgba(25, 118, 210, 0.07);
+}
+.btn-acao:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 .btn-acao.editar:hover {
-  background: #e3f2fd;
-  color: #1976d2;
-  box-shadow: 0 2px 8px #42a5f5a0;
-  transform: scale(1.08);
+  background-color: #e9ecef;
+  color: #000;
 }
 .btn-acao.deletar:hover {
-  background: #ffebee;
-  color: #d32f2f;
-  box-shadow: 0 2px 8px #d32f2f40;
-  transform: scale(1.08);
+  background-color: #f8d7da;
+  color: #842029;
+  border-color: #f5c2c7;
 }
 .placeholder-disciplinas {
   display: flex;
@@ -261,6 +262,9 @@
   top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(25, 118, 210, 0.13);
   z-index: 10000;
+}
+.modal-backdrop {
+  opacity: 0.5;
 }
 @media (max-width: 700px) {
   .disciplinas-lista {

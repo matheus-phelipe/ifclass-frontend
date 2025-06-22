@@ -196,9 +196,15 @@ export class TurmasComponent implements OnInit {
     }
   }
 
-  onBackdropClick(event: MouseEvent) {
+  onBackdropClick(event: MouseEvent, modalType: string) {
     if (event.target === event.currentTarget) {
-      this.fecharModal();
+      if (modalType === 'vincular') {
+        this.fecharVincularModal();
+      } else if (modalType === 'alunos') {
+        this.fecharAlunosVinculadosModal();
+      } else {
+        this.fecharModal();
+      }
     }
   }
 

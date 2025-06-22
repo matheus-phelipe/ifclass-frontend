@@ -1,84 +1,97 @@
-<app-profile-switcher></app-profile-switcher>
-<div class="disciplinas-container">
-  <div class="disciplinas-header">
-    <h2>Disciplinas</h2>
-    <button class="btn-nova-disciplina" (click)="abrirModal()" *ngIf="canEditDisciplinas">
-      <i class="bi bi-plus-lg"></i> Nova Disciplina
+<div class="container my-4">
+  <app-profile-switcher></app-profile-switcher>
+
+  <div class="d-flex justify-content-between align-items-center my-4">
+    <h1 class="h2 fw-bold mb-0" style="color: #333;">Disciplinas</h1>
+    <button class="btn btn-success btn-lg shadow-sm" (click)="abrirModal()" *ngIf="canEditDisciplinas">
+      <i class="bi bi-plus-lg me-2"></i>Nova Disciplina
     </button>
   </div>
 
-  <div *ngIf="disciplinas.length === 0" class="placeholder-disciplinas">
-    <img src="assets/ifclass.png" alt="Sem disciplinas" class="placeholder-img">
-    <p>Nenhuma disciplina cadastrada ainda.<br>Clique em <b>Nova Disciplina</b> para adicionar a primeira!</p>
+  <div *ngIf="disciplinas.length === 0" class="text-center py-5">
+    <div class="display-4 text-muted mb-3">
+      <i class="bi bi-journal-bookmark-fill"></i>
+    </div>
+    <h4 class="text-muted">Nenhuma disciplina cadastrada</h4>
+    <p *ngIf="canEditDisciplinas" class="text-muted">Clique em "Nova Disciplina" para começar.</p>
   </div>
 
-  <div class="disciplinas-lista">
-    <div class="disciplina-card" *ngFor="let disciplina of disciplinas">
-      <div class="disciplina-card-header">
-        <span class="disciplina-nome">{{ disciplina.nome }}</span>
-        <span class="disciplina-badge">{{ disciplina.codigo }}</span>
-      </div>
-      <div class="disciplina-card-info">
-        <span><b>Carga Horária:</b> {{ disciplina.cargaHoraria }}h</span>
-        <span><b>Departamento:</b> {{ disciplina.departamento }}</span>
-      </div>
-      <div class="disciplina-card-desc">
-        <span>{{ disciplina.descricao }}</span>
-      </div>
-      <div class="disciplina-card-actions" *ngIf="canEditDisciplinas">
-        <button class="btn-acao editar" (click)="abrirModal(disciplina)" title="Editar">
-          <i class="bi bi-pencil"></i>
-        </button>
-        <button class="btn-acao deletar" (click)="excluirDisciplina(disciplina.id!)" title="Excluir">
-          <i class="bi bi-trash"></i>
-        </button>
+  <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+    <div class="col" *ngFor="let disciplina of disciplinas">
+      <div class="disciplina-card">
+        <div class="disciplina-card-header">
+          <h5 class="disciplina-nome">{{ disciplina.nome }}</h5>
+          <span class="disciplina-badge">{{ disciplina.codigo }}</span>
+        </div>
+        <div class="disciplina-card-body">
+          <p class="disciplina-descricao">{{ disciplina.descricao }}</p>
+          <div class="disciplina-info">
+            <span><i class="bi bi-clock-history me-2"></i>{{ disciplina.cargaHoraria }}h</span>
+            <span><i class="bi bi-building me-2"></i>{{ disciplina.departamento }}</span>
+          </div>
+        </div>
+        <div class="disciplina-card-footer" *ngIf="canEditDisciplinas">
+          <button class="btn-acao editar" (click)="abrirModal(disciplina)" title="Editar">
+            <i class="bi bi-pencil-fill"></i>
+          </button>
+          <button class="btn-acao deletar" (click)="excluirDisciplina(disciplina.id!)" title="Excluir">
+            <i class="bi bi-trash-fill"></i>
+          </button>
+        </div>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Modal -->
-  <div class="modal-disciplina" [class.open]="isModalOpen">
-    <div class="modal-disciplina-content" (click)="$event.stopPropagation()">
-      <div class="modal-disciplina-header">
-        <h3>{{ isEditing ? 'Editar' : 'Nova' }} Disciplina</h3>
-        <button class="btn-fechar" (click)="fecharModal()"><i class="bi bi-x-lg"></i></button>
-      </div>
-      <form [formGroup]="disciplinaForm" (ngSubmit)="salvarDisciplina()">
-        <div class="form-group">
-          <label for="nome">Nome</label>
-          <input type="text" id="nome" formControlName="nome" required>
+<!-- Modal -->
+<div class="modal fade" [class.show]="isModalOpen" [style.display]="isModalOpen ? 'block' : 'none'" (click)="onBackdropClick($event)">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ isEditing ? 'Editar' : 'Nova' }} Disciplina</h5>
+          <button type="button" class="btn-close" (click)="fecharModal()"></button>
         </div>
-        <div class="form-group">
-          <label for="codigo">Código</label>
-          <input type="text" id="codigo" formControlName="codigo" required>
+        <div class="modal-body">
+            <form [formGroup]="disciplinaForm" (ngSubmit)="salvarDisciplina()">
+                <div class="row">
+                    <div class="col-md-8 mb-3">
+                      <label for="nome" class="form-label">Nome da Disciplina</label>
+                      <input type="text" id="nome" class="form-control" formControlName="nome" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                      <label for="codigo" class="form-label">Código</label>
+                      <input type="text" id="codigo" class="form-control" formControlName="codigo" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="cargaHoraria" class="form-label">Carga Horária (h)</label>
+                        <input type="number" id="cargaHoraria" class="form-control" formControlName="cargaHoraria" min="1" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="departamento" class="form-label">Departamento</label>
+                        <input type="text" id="departamento" class="form-control" formControlName="departamento" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="cursoId" class="form-label">Curso</label>
+                    <select id="cursoId" class="form-select" formControlName="cursoId" required>
+                      <option [ngValue]="null" disabled>Selecione um curso</option>
+                      <option *ngFor="let curso of cursos" [value]="curso.id">{{ curso.nome }}</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                  <label for="descricao" class="form-label">Descrição</label>
+                  <textarea id="descricao" class="form-control" formControlName="descricao" rows="3"></textarea>
+                </div>
+              </form>
         </div>
-        <div class="form-group">
-          <label for="cargaHoraria">Carga Horária</label>
-          <input type="number" id="cargaHoraria" formControlName="cargaHoraria" min="1" required>
-        </div>
-        <div class="form-group">
-          <label for="departamento">Departamento</label>
-          <input type="text" id="departamento" formControlName="departamento" required>
-        </div>
-        <div class="form-group">
-          <label for="cursoId">Curso</label>
-          <select id="cursoId" formControlName="cursoId">
-            <option value="">Selecione um curso</option>
-            <option *ngFor="let curso of cursos" [value]="curso.id">{{ curso.nome }}</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="descricao">Descrição</label>
-          <textarea id="descricao" formControlName="descricao"></textarea>
-        </div>
-        <div class="modal-disciplina-footer">
-          <button type="button" class="btn-cancelar" (click)="fecharModal()">Cancelar</button>
-          <button type="submit" class="btn-salvar" [disabled]="disciplinaForm.invalid">
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="fecharModal()">Cancelar</button>
+          <button type="button" class="btn btn-success" [disabled]="disciplinaForm.invalid" (click)="salvarDisciplina()">
             {{ isEditing ? 'Atualizar' : 'Criar' }}
           </button>
         </div>
-      </form>
+      </div>
     </div>
-    <div class="modal-disciplina-backdrop" (click)="onBackdropClick($event)"></div>
-  </div>
-</div> 
+  </div> 
