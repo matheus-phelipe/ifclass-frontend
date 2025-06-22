@@ -51,7 +51,28 @@
     </ng-container>
 
     <ng-container *ngIf="isCoordenador || isAdmin">
-      <div *ngIf="sidebarOpen" class="sidebar-menu-category">COORDENADOR</div>
+      <div *ngIf="sidebarOpen" class="sidebar-menu-category">COORDENAÇÃO</div>
+
+      <a routerLink="/app/coordenacao/dashboard" class="sidebar-nav-link" [ngClass]="{'justify-content-center': !sidebarOpen}">
+        <i class="bi bi-graph-up"></i>
+        <span *ngIf="sidebarOpen">Dashboard Coordenação</span>
+      </a>
+
+      <a routerLink="/app/coordenacao/professores" class="sidebar-nav-link" [ngClass]="{'justify-content-center': !sidebarOpen}">
+        <i class="bi bi-person-workspace"></i>
+        <span *ngIf="sidebarOpen">Gestão de Professores</span>
+      </a>
+
+      <a routerLink="/app/coordenacao/horarios" class="sidebar-nav-link" [ngClass]="{'justify-content-center': !sidebarOpen}">
+        <i class="bi bi-calendar3"></i>
+        <span *ngIf="sidebarOpen">Gestão de Horários</span>
+      </a>
+
+      <a routerLink="/app/coordenacao/relatorios" class="sidebar-nav-link" [ngClass]="{'justify-content-center': !sidebarOpen}">
+        <i class="bi bi-file-earmark-bar-graph"></i>
+        <span *ngIf="sidebarOpen">Relatórios</span>
+      </a>
+
       <a routerLink="/app/vinculo-professor-disciplina" class="sidebar-nav-link" [ngClass]="{'justify-content-center': !sidebarOpen}">
         <i class="bi bi-person-lines-fill"></i>
         <span *ngIf="sidebarOpen">Vínculo Prof./Disciplina</span>
@@ -59,19 +80,31 @@
     </ng-container>
 
     <ng-container *ngIf="isAdmin">
-      <div *ngIf="sidebarOpen" class="sidebar-menu-category">ADMINISTRADOR</div>
-      <a routerLink="/configuracoes"
-         class="sidebar-nav-link"
-         [ngClass]="{'justify-content-center': !sidebarOpen}">
+      <div *ngIf="sidebarOpen" class="sidebar-menu-category">ADMINISTRAÇÃO</div>
+
+      <a routerLink="/app/admin/dashboard" class="sidebar-nav-link" [ngClass]="{'justify-content-center': !sidebarOpen}">
+        <i class="bi bi-speedometer2"></i>
+        <span *ngIf="sidebarOpen">Dashboard Admin</span>
+      </a>
+
+      <a routerLink="/app/usuarios" class="sidebar-nav-link" [ngClass]="{'justify-content-center': !sidebarOpen}">
+        <i class="bi bi-people-fill"></i>
+        <span *ngIf="sidebarOpen">Gerenciar usuários</span>
+      </a>
+
+      <a routerLink="/app/admin/sistema" class="sidebar-nav-link" [ngClass]="{'justify-content-center': !sidebarOpen}">
+        <i class="bi bi-server"></i>
+        <span *ngIf="sidebarOpen">Sistema</span>
+      </a>
+
+      <a routerLink="/app/admin/configuracoes" class="sidebar-nav-link" [ngClass]="{'justify-content-center': !sidebarOpen}">
         <i class="bi bi-gear"></i>
         <span *ngIf="sidebarOpen">Configurações</span>
       </a>
 
-      <a routerLink="/app/usuarios"
-      class="sidebar-nav-link"
-          [ngClass]="{'justify-content-center': !sidebarOpen}">
-        <i class="bi bi-people-fill"></i>
-        <span *ngIf="sidebarOpen">Gerenciar usuários</span>
+      <a routerLink="/app/admin/logs" class="sidebar-nav-link" [ngClass]="{'justify-content-center': !sidebarOpen}">
+        <i class="bi bi-file-text"></i>
+        <span *ngIf="sidebarOpen">Logs do Sistema</span>
       </a>
     </ng-container>
   </div>
