@@ -2,7 +2,10 @@
 
   <div class="container-fluid my-5 px-lg-5">
     <div class="row g-4">
-
+          
+      <div class="mb-4 text-center">
+        <app-profile-switcher></app-profile-switcher>
+      </div>
       <!-- Coluna da Esquerda: Painel de Controle e Formulários -->
       <div class="col-lg-4 col-xl-3">
         <div class="control-panel">
@@ -10,10 +13,6 @@
             <h1 class="h4 fw-bold text-success">{{ perms.canManage ? 'Planta do Campus' : 'Mapa do Campus' }}</h1>
             <p class="text-muted small">{{ perms.canManage ? 'Gerencie blocos e salas.' : 'Explore os blocos e salas.' }}</p>
           </header>
-          
-          <div class="mb-4">
-            <app-profile-switcher></app-profile-switcher>
-          </div>
           
           <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
             {{ error }}
