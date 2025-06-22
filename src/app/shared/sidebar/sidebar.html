@@ -37,10 +37,6 @@
         <i class="bi bi-journal-bookmark"></i>
         <span *ngIf="sidebarOpen">Disciplinas</span>
       </a>
-      <a routerLink="/app/vinculo-professor-disciplina" class="sidebar-nav-link" [ngClass]="{'justify-content-center': !sidebarOpen}">
-        <i class="bi bi-person-lines-fill"></i>
-        <span *ngIf="sidebarOpen">Vínculo Prof./Disciplina</span>
-      </a>
     </ng-container>
 
     <ng-container *ngIf="isProfessor || isCoordenador || isAdmin">
@@ -56,11 +52,9 @@
 
     <ng-container *ngIf="isCoordenador || isAdmin">
       <div *ngIf="sidebarOpen" class="sidebar-menu-category">COORDENADOR</div>
-      <a routerLink="/app/usuarios"
-         class="sidebar-nav-link"
-         [ngClass]="{'justify-content-center': !sidebarOpen}">
-        <i class="bi bi-people-fill"></i>
-        <span *ngIf="sidebarOpen">Gerenciar usuários</span>
+      <a routerLink="/app/vinculo-professor-disciplina" class="sidebar-nav-link" [ngClass]="{'justify-content-center': !sidebarOpen}">
+        <i class="bi bi-person-lines-fill"></i>
+        <span *ngIf="sidebarOpen">Vínculo Prof./Disciplina</span>
       </a>
     </ng-container>
 
@@ -71,6 +65,13 @@
          [ngClass]="{'justify-content-center': !sidebarOpen}">
         <i class="bi bi-gear"></i>
         <span *ngIf="sidebarOpen">Configurações</span>
+      </a>
+
+      <a routerLink="/app/usuarios"
+      class="sidebar-nav-link"
+          [ngClass]="{'justify-content-center': !sidebarOpen}">
+        <i class="bi bi-people-fill"></i>
+        <span *ngIf="sidebarOpen">Gerenciar usuários</span>
       </a>
     </ng-container>
   </div>
