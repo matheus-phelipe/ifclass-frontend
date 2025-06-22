@@ -20,9 +20,22 @@ declare var bootstrap: any;
 })
 export class Gerenciarusuarios implements OnInit {
   
+  // Propriedade Math para usar no template
+  Math = Math;
+  
   usuarios: Usuario[] = [];
   usuariosFiltrados: Usuario[] = [];
   termoBusca = '';
+
+  // Propriedades de filtro
+  filtroPermissao = 'TODOS';
+  permissoesDisponiveis = ['TODOS', 'ROLE_COORDENADOR', 'ROLE_PROFESSOR', 'ROLE_ALUNO'];
+
+  // Propriedades de paginação
+  paginaAtual = 1;
+  itensPorPagina = 10;
+  totalPaginas = 0;
+  usuariosPaginados: Usuario[] = [];
 
   usuarioSelecionado: Usuario | null = null;
   usuarioParaEditar: Usuario = {
@@ -63,10 +76,7 @@ export class Gerenciarusuarios implements OnInit {
     this.usuarioService.listarTodos().subscribe({
       next: (data) => {
         this.usuarios = data;
-        this.usuariosFiltrados = data;
-        if (this.usuariosFiltrados.length > 0 && !this.usuarioSelecionado) {
-          this.selecionarUsuario(this.usuariosFiltrados[0]);
-        }
+        this.filtrarUsuarios();
       },
       error: () => this.mostrarAlerta("Erro ao carregar usuários.", 'danger')
     });
@@ -76,30 +86,125 @@ export class Gerenciarusuarios implements OnInit {
     this.usuarioSelecionado = usuario;
   }
 
+  filtrarPorPermissao(permissao: string): void {
+    this.filtroPermissao = permissao;
+    this.filtrarUsuarios();
+  }
+
   filtrarUsuarios(): void {
+    let usuariosFiltradosTemp = this.usuarios;
+
+    // 1. Filtrar por permissão
+    if (this.filtroPermissao !== 'TODOS') {
+      usuariosFiltradosTemp = usuariosFiltradosTemp.filter(usuario => 
+        usuario.authorities && usuario.authorities.includes(this.filtroPermissao)
+      );
+    }
+    
+    // 2. Filtrar por termo de busca
     const busca = this.termoBusca.toLowerCase();
-    if (!busca) {
-      this.usuariosFiltrados = this.usuarios;
-    } else {
-      this.usuariosFiltrados = this.usuarios.filter(usuario =>
+    if (busca) {
+      usuariosFiltradosTemp = usuariosFiltradosTemp.filter(usuario =>
         usuario.nome.toLowerCase().includes(busca) ||
         usuario.email.toLowerCase().includes(busca)
       );
     }
     
-    if (this.usuarioSelecionado && !this.usuariosFiltrados.some(u => u.id === this.usuarioSelecionado?.id)) {
-        this.usuarioSelecionado = this.usuariosFiltrados.length > 0 ? this.usuariosFiltrados[0] : null;
-    } else if (!this.usuarioSelecionado && this.usuariosFiltrados.length > 0) {
-        this.usuarioSelecionado = this.usuariosFiltrados[0];
+    this.usuariosFiltrados = usuariosFiltradosTemp;
+    
+    // Reset para primeira página e recalcular paginação
+    this.paginaAtual = 1;
+    this.calcularPaginas();
+    this.atualizarUsuariosPaginados();
+    
+    // Atualizar usuário selecionado
+    if (this.usuarioSelecionado && !this.usuariosPaginados.some(u => u.id === this.usuarioSelecionado?.id)) {
+        this.usuarioSelecionado = this.usuariosPaginados.length > 0 ? this.usuariosPaginados[0] : null;
+    } else if (!this.usuarioSelecionado && this.usuariosPaginados.length > 0) {
+        this.usuarioSelecionado = this.usuariosPaginados[0];
     }
   }
+
+  // Métodos de paginação
+  calcularPaginas(): void {
+    this.totalPaginas = Math.ceil(this.usuariosFiltrados.length / this.itensPorPagina);
+  }
+
+  atualizarUsuariosPaginados(): void {
+    const inicio = (this.paginaAtual - 1) * this.itensPorPagina;
+    const fim = inicio + this.itensPorPagina;
+    this.usuariosPaginados = this.usuariosFiltrados.slice(inicio, fim);
+  }
+
+  irParaPagina(pagina: number): void {
+    if (pagina >= 1 && pagina <= this.totalPaginas) {
+      this.paginaAtual = pagina;
+      this.atualizarUsuariosPaginados();
+    }
+  }
+
+  paginaAnterior(): void {
+    if (this.paginaAtual > 1) {
+      this.irParaPagina(this.paginaAtual - 1);
+    }
+  }
+
+  proximaPagina(): void {
+    if (this.paginaAtual < this.totalPaginas) {
+      this.irParaPagina(this.paginaAtual + 1);
+    }
+  }
+
+  getPaginasVisiveis(): number[] {
+    const paginas: number[] = [];
+    const maxPaginasVisiveis = 5;
+    
+    if (this.totalPaginas <= maxPaginasVisiveis) {
+      // Se temos poucas páginas, mostra todas
+      for (let i = 1; i <= this.totalPaginas; i++) {
+        paginas.push(i);
+      }
+    } else {
+      // Se temos muitas páginas, mostra um range inteligente
+      let inicio = Math.max(1, this.paginaAtual - 2);
+      let fim = Math.min(this.totalPaginas, inicio + maxPaginasVisiveis - 1);
+      
+      // Ajusta o início se estamos no final
+      if (fim === this.totalPaginas) {
+        inicio = Math.max(1, fim - maxPaginasVisiveis + 1);
+      }
+      
+      for (let i = inicio; i <= fim; i++) {
+        paginas.push(i);
+      }
+    }
+    
+    return paginas;
+  }
+
+  alterarItensPorPagina(): void {
+    this.paginaAtual = 1; // Volta para primeira página
+    this.calcularPaginas();
+    this.atualizarUsuariosPaginados();
+  }
   
+  formatarNomePermissao(permissao: string): string {
+    if (permissao === 'TODOS') return 'Todos';
+    const nome = permissao.replace('ROLE_', '').charAt(0).toUpperCase() + permissao.replace('ROLE_', '').slice(1).toLowerCase();
+    return nome + 's';
+  }
+
   /**
    * Prepara a alteração de uma permissão para um usuário.
    * Em vez de abrir um modal, calcula as novas permissões e chama o serviço diretamente
    * para uma experiência de usuário mais fluida.
    */
   onRoleChange(usuario: Usuario, papel: string) {
+    if (papel === 'ROLE_ADMIN') {
+      this.mostrarAlerta('A permissão de Administrador não pode ser alterada pela interface.', 'danger');
+      return;
+    }
+    
     if (!this.authService.isRoleActiveOrHigher('ROLE_ADMIN')) {
       this.mostrarAlerta('Você não tem permissão para alterar papéis.', 'danger');
       return;
@@ -157,21 +262,28 @@ export class Gerenciarusuarios implements OnInit {
   removerUsuario(usuario: Usuario) {
     if (!this.authService.isRoleActiveOrHigher('ROLE_ADMIN')) return;
     this.usuarioParaRemover = usuario;
-    this.modalConfirm.open('danger', 'Confirmar Remoção', `Tem certeza que deseja remover o usuário ${usuario.nome}?`);
+    
+    // Passa a função de confirmação como um callback para o modal
+    const action = () => {
+      this.usuarioService.remover(this.usuarioParaRemover.id).subscribe({
+          next: () => {
+            this.usuarios = this.usuarios.filter(u => u.id !== this.usuarioParaRemover.id);
+            this.filtrarUsuarios();
+            this.mostrarAlerta('Usuário removido com sucesso!');
+          },
+          error: () => this.mostrarAlerta('Erro ao remover usuário.', 'danger')
+      });
+    };
+    
+    this.modalConfirm.open(
+      'danger', 
+      'Confirmar Remoção', 
+      `Tem certeza que deseja remover o usuário ${usuario.nome}?`,
+      action // Passando a função de callback aqui
+    );
   }
 
-  confirmarRemocao() {
-    this.usuarioService.remover(this.usuarioParaRemover.id).subscribe({
-        next: () => {
-          this.usuarios = this.usuarios.filter(u => u.id !== this.usuarioParaRemover.id);
-          this.filtrarUsuarios();
-          this.mostrarAlerta('Usuário removido com sucesso!');
-          this.modalConfirm.close();
-        },
-        error: () => this.mostrarAlerta('Erro ao remover usuário.', 'danger')
-    });
-  }
-  
+  // A lógica de cancelamento é necessária para fechar o modal
   cancelarRemocao() {
     this.modalConfirm.close();
   }

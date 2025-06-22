@@ -3,10 +3,43 @@
 
 .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
 .page-title { font-size: 2rem; font-weight: 700; color: var(--cor-primaria, #198754); }
-.search-container { position: relative; width: 350px; }
+
+.filter-controls-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  align-items: center;
+  margin-bottom: 2rem !important;
+}
+
+.search-container { position: relative; width: 100%; max-width: 350px; }
 .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #adb5bd; }
 .search-input { padding-left: 40px; border-radius: 0.5rem; border: 1px solid #dee2e6; transition: all 0.2s ease-in-out; }
 .search-input:focus { border-color: var(--cor-primaria, #198754); box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.15); }
+
+.permission-filter-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.filter-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #495057;
+  margin-bottom: 0;
+}
+
+.permission-filter-container .btn-group .btn {
+  border-radius: 0.375rem !important;
+  font-weight: 500;
+  padding: 0.4rem 0.8rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.permission-filter-container .btn-group .btn.btn-primary {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
 
 .table-container { background-color: #fff; border-radius: var(--raio-borda, 0.75rem); box-shadow: var(--sombra-suave, 0 4px 12px rgba(0, 0, 0, 0.08)); overflow: hidden; }
 .table { margin-bottom: 0; }
@@ -71,4 +104,125 @@
 #editarUsuarioModal .modal-footer {
   background-color: #f8f9fa;
   padding: 1rem;
+}
+
+/* Estilos para Paginação */
+.pagination-container {
+  background-color: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+  padding: 1.5rem;
+}
+
+.pagination-controls-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.pagination-info {
+  font-size: 0.9rem;
+}
+
+.items-per-page {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.items-per-page .form-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #495057;
+  margin-bottom: 0;
+}
+
+.items-per-page .form-select {
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+  font-size: 0.9rem;
+  padding: 0.375rem 2.5rem 0.375rem 0.75rem;
+  background-color: #fff;
+  transition: border-color 0.2s ease-in-out;
+  
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 16px 12px;
+}
+
+.items-per-page .form-select:focus {
+  border-color: var(--cor-primaria, #198754);
+  box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.15);
+}
+
+/* Estilos para os botões de paginação */
+.pagination {
+  margin-bottom: 0;
+}
+
+.pagination .page-item .page-link {
+  border: 1px solid #dee2e6;
+  color: #495057;
+  background-color: #fff;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.pagination .page-item .page-link:hover {
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+  color: #495057;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: var(--cor-primaria, #198754);
+  border-color: var(--cor-primaria, #198754);
+  color: #fff;
+  font-weight: 600;
+}
+
+.pagination .page-item.disabled .page-link {
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+.pagination .page-item .page-link:focus {
+  box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.15);
+  z-index: 3;
+}
+
+/* Responsividade para paginação */
+@media (max-width: 768px) {
+  .pagination-controls-top {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start !important;
+  }
+  
+  .pagination-info {
+    text-align: center;
+    width: 100%;
+  }
+  
+  .items-per-page {
+    justify-content: center;
+    width: 100%;
+  }
+  
+  .pagination {
+    justify-content: center;
+  }
+  
+  .pagination .page-item .page-link {
+    padding: 0.375rem 0.5rem;
+    font-size: 0.85rem;
+  }
 }

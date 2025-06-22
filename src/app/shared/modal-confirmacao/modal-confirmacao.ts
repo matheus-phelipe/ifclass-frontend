@@ -23,6 +23,8 @@ export class ModalConfirmacaoComponent implements AfterViewInit, OnChanges {
 
   @Output() onConfirm = new EventEmitter<void>();
   @Output() onCancel = new EventEmitter<void>();
+  
+  private confirmAction: (() => void) | null = null;
 
   @ViewChild('modalRef') modalRef!: ElementRef;
 
@@ -51,11 +53,12 @@ export class ModalConfirmacaoComponent implements AfterViewInit, OnChanges {
     }
   }
 
-  // Método open atualizado para receber os parâmetros
-  public open(type: ModalType = 'primary', title: string, message: string): void {
+  // Método open atualizado para receber os parâmetros E a ação de callback
+  public open(type: ModalType = 'primary', title: string, message: string, action: () => void): void {
     this.type = type;
     this.title = title;
     this.message = message;
+    this.confirmAction = action; // Armazena a ação a ser executada
     if (this.bsModal) {
       this.bsModal.show();
     }
@@ -69,8 +72,9 @@ export class ModalConfirmacaoComponent implements AfterViewInit, OnChanges {
 
   private confirmedEmitted = false;
   confirm(): void {
-    this.confirmedEmitted = true; // Marca que a confirmação foi emitida
-    this.onConfirm.emit();
+    if (this.confirmAction) {
+      this.confirmAction(); // Executa a ação armazenada
+    }
     this.close();
   }
 
