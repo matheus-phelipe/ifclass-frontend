@@ -219,6 +219,11 @@ export class AdminLogsComponent implements OnInit {
 
   ngOnInit(): void {
     this.carregarLogs();
+    // Ativar auto-refresh automaticamente
+    this.autoRefresh = true;
+    this.refreshInterval = setInterval(() => {
+      this.carregarLogs();
+    }, 30000); // Atualizar a cada 30 segundos
   }
 
   ngOnDestroy(): void {

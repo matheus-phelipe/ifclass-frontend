@@ -72,14 +72,18 @@ export class ModalConfirmacaoComponent implements AfterViewInit, OnChanges {
 
   private confirmedEmitted = false;
   confirm(): void {
+    this.confirmedEmitted = true;
     if (this.confirmAction) {
       this.confirmAction(); // Executa a ação armazenada
+    } else {
+      this.onConfirm.emit(); // Emite o evento se não há callback
     }
     this.close();
   }
 
   cancel(): void {
     this.onCancel.emit();
+    this.close();
   }
 
   // Getters para classes dinâmicas no template
