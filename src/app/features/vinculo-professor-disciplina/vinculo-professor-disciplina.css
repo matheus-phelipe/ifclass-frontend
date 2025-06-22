@@ -146,3 +146,54 @@ input:checked + .slider:before {
     max-width: 100%;
   }
 }
+
+.vinculo-card {
+    transition: all 0.3s ease-in-out;
+    border: 1px solid #dee2e6;
+  }
+  
+  .vinculo-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  }
+  
+  .vinculo-card.active {
+    border-color: #198754;
+    box-shadow: 0 4px 15px rgba(25, 135, 84, 0.2);
+  }
+  
+  .vinculo-card .card-header {
+    cursor: pointer;
+    background-color: #fff;
+    border-bottom: 1px solid #f1f3f5;
+  }
+  
+  .vinculo-card.active .card-header {
+    border-bottom-color: transparent;
+  }
+  
+  .vinculo-card .card-body {
+    background-color: #f8f9fa;
+  }
+  
+  .form-check-input:checked {
+    background-color: #198754;
+    border-color: #198754;
+  }
+  
+  .form-check-input:focus {
+    box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+    border-color: #198754;
+  }
+  
+  .list-group-item {
+    background-color: transparent;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  
+  .badge {
+    font-size: 0.9em;
+    padding: 0.5em 0.9em;
+  }
+  
