@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CoordenacaoService, ProfessorCarga, EstatisticasCoordenacao } from '../services/coordenacao.service';
+import { RelatorioService, RelatorioRequest } from '../services/relatorio.service';
 
 @Component({
   selector: 'app-relatorios-coordenacao',
@@ -131,7 +132,10 @@ export class RelatoriosCoordenacaoComponent implements OnInit {
   dataInicio = '';
   dataFim = '';
 
-  constructor(private coordenacaoService: CoordenacaoService) {
+  constructor(
+    private coordenacaoService: CoordenacaoService,
+    private relatorioService: RelatorioService
+  ) {
     // Definir datas padrão (último mês)
     const hoje = new Date();
     const mesPassado = new Date(hoje.getFullYear(), hoje.getMonth() - 1, hoje.getDate());
@@ -178,8 +182,31 @@ export class RelatoriosCoordenacaoComponent implements OnInit {
 
 
   gerarRelatorio(): void {
-    console.log('Gerando relatório:', this.tipoRelatorio);
-    alert(`Relatório ${this.getTituloRelatorio()} gerado com sucesso!`);
+    if (!this.tipoRelatorio) {
+      alert('Por favor, selecione um tipo de relatório.');
+      return;
+    }
+
+    const request: RelatorioRequest = {
+      tipo: this.tipoRelatorio,
+      dataInicio: this.dataInicio,
+      dataFim: this.dataFim,
+      formato: 'html'
+    };
+
+    this.carregando = true;
+    this.relatorioService.gerarRelatorio(request).subscribe({
+      next: (resultado) => {
+        this.carregando = false;
+        alert(`✅ ${resultado}`);
+        console.log('Relatório gerado:', this.tipoRelatorio);
+      },
+      error: (error) => {
+        this.carregando = false;
+        console.error('Erro ao gerar relatório:', error);
+        alert('❌ Erro ao gerar relatório. Tente novamente.');
+      }
+    });
   }
 
   getTituloRelatorio(): string {
@@ -205,12 +232,36 @@ export class RelatoriosCoordenacaoComponent implements OnInit {
   }
 
   exportarPDF(): void {
-    console.log('Exportar PDF:', this.tipoRelatorio);
-    alert('Exportação PDF iniciada! (simulado)');
+    if (!this.tipoRelatorio) {
+      alert('Por favor, selecione um tipo de relatório.');
+      return;
+    }
+
+    const request: RelatorioRequest = {
+      tipo: this.tipoRelatorio,
+      dataInicio: this.dataInicio,
+      dataFim: this.dataFim,
+      formato: 'pdf'
+    };
+
+    console.log('Exportando PDF:', this.tipoRelatorio);
+    this.relatorioService.downloadPDF(request);
   }
 
   exportarExcel(): void {
-    console.log('Exportar Excel:', this.tipoRelatorio);
-    alert('Exportação Excel iniciada! (simulado)');
+    if (!this.tipoRelatorio) {
+      alert('Por favor, selecione um tipo de relatório.');
+      return;
+    }
+
+    const request: RelatorioRequest = {
+      tipo: this.tipoRelatorio,
+      dataInicio: this.dataInicio,
+      dataFim: this.dataFim,
+      formato: 'excel'
+    };
+
+    console.log('Exportando Excel:', this.tipoRelatorio);
+    this.relatorioService.downloadExcel(request);
   }
 }
