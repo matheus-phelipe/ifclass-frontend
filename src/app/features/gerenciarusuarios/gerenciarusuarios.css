@@ -79,6 +79,38 @@
 .detail-value { font-weight: 500; color: #343a40; }
 .detail-role { background-color: #e6f9f0; color: var(--cor-primaria); padding: 0.25rem 0.6rem; border-radius: 50rem; font-weight: 600; font-size: 0.85rem; }
 
+/* Estilos para as seções de detalhes adicionais */
+.detail-section {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e9ecef;
+}
+
+.detail-section-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--cor-primaria, #198754);
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.disciplinas-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.disciplina-pill {
+  background-color: #f8f9fa;
+  color: #495057;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: 1px solid #dee2e6;
+}
+
 /* Estilos para o Modal de Edição */
 #editarUsuarioModal .modal-content {
   border-radius: var(--raio-borda, 0.75rem);

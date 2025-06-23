@@ -186,6 +186,40 @@
               <span class="detail-label">ID do Usuário</span>
               <span class="detail-value">#{{ usuarioSelecionado.id }}</span>
             </div>
+
+            <!-- Informações específicas para Alunos -->
+            <div *ngIf="temPapel(usuarioSelecionado, 'ROLE_ALUNO') && usuarioSelecionado.turma" class="detail-section">
+              <h6 class="detail-section-title">Informações Acadêmicas</h6>
+              <div class="detail-item">
+                <span class="detail-label">Curso</span>
+                <span class="detail-value">{{ usuarioSelecionado.turma.curso?.nome }} ({{ usuarioSelecionado.turma.curso?.codigo }})</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Turma</span>
+                <span class="detail-value">{{ usuarioSelecionado.turma.ano }}º ano - {{ usuarioSelecionado.turma.semestre }}º semestre</span>
+              </div>
+            </div>
+
+            <!-- Informações específicas para Professores -->
+            <div *ngIf="temPapel(usuarioSelecionado, 'ROLE_PROFESSOR') && usuarioSelecionado.disciplinas && usuarioSelecionado.disciplinas.length > 0" class="detail-section">
+              <h6 class="detail-section-title">Disciplinas</h6>
+              <div class="disciplinas-list">
+                <span *ngFor="let disciplina of usuarioSelecionado.disciplinas; let last = last"
+                      class="disciplina-pill">
+                  {{ disciplina.nome }}
+                  <span *ngIf="!last">, </span>
+                </span>
+              </div>
+            </div>
+
+            <!-- Mensagem quando não há informações adicionais -->
+            <div *ngIf="temPapel(usuarioSelecionado, 'ROLE_ALUNO') && !usuarioSelecionado.turma" class="detail-section">
+              <p class="text-muted">Aluno não está vinculado a nenhuma turma.</p>
+            </div>
+
+            <div *ngIf="temPapel(usuarioSelecionado, 'ROLE_PROFESSOR') && (!usuarioSelecionado.disciplinas || usuarioSelecionado.disciplinas.length === 0)" class="detail-section">
+              <p class="text-muted">Professor não possui disciplinas vinculadas.</p>
+            </div>
           </div>
         </div>
         <div class="details-panel placeholder-panel" *ngIf="!usuarioSelecionado">
