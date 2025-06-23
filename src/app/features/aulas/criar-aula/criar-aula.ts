@@ -1,6 +1,9 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+
+declare var bootstrap: any;
 import { AulaService } from '../aula.service';
 import { Sala } from '../../aluno/sala.model';
 import { Turma } from '../../turmas/turma.model';
@@ -19,11 +22,11 @@ import { ModalConfirmacaoComponent } from '../../../shared/modal-confirmacao/mod
 @Component({
   selector: 'app-criar-aula',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ProfileSwitcherComponent, ModalConfirmacaoComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, ProfileSwitcherComponent, ModalConfirmacaoComponent],
   templateUrl: './criar-aula.html',
   styleUrls: ['./criar-aula.css']
 })
-export class CriarAulaComponent implements OnInit {
+export class CriarAulaComponent implements OnInit, AfterViewInit {
   form: FormGroup;
   salas: Sala[] = [];
   turmas: Turma[] = [];
@@ -40,6 +43,20 @@ export class CriarAulaComponent implements OnInit {
   isModalVisible = false;
   modalConfig = { title: '', message: '', type: 'primary' as 'primary' | 'danger' | 'success' };
 
+  // Melhorias na tela
+  conflitos: string[] = [];
+  salasDisponiveis: Sala[] = [];
+  salasRecomendadas: Sala[] = [];
+  agendaProfessor: Aula[] = [];
+  isValidatingConflicts = false;
+  showSuggestions = false;
+
+  // Paginação
+  currentPage = 1;
+  itemsPerPage = 10;
+  totalPages = 0;
+  paginatedAulas: Aula[] = [];
+
   @ViewChild('modalConfirm') modalConfirm!: ModalConfirmacaoComponent;
 
   constructor(
@@ -49,7 +66,8 @@ export class CriarAulaComponent implements OnInit {
     private disciplinaService: DisciplinaService,
     private usuarioService: UsuarioService,
     private blocoService: BlocoService,
-    private authService: AuthService
+    private authService: AuthService,
+    private elementRef: ElementRef
   ) {
     this.form = this.fb.group({
       sala: [null, Validators.required],
@@ -74,12 +92,36 @@ export class CriarAulaComponent implements OnInit {
     this.usuarioId = this.authService.getIdUsuario();
     this.perfil = this.authService.getActiveRole();
     this.carregarAulas();
+    this.setupFormValidation();
+  }
+
+  ngAfterViewInit(): void {
+    // Inicializar tooltips do Bootstrap
+    this.initializeTooltips();
+  }
+
+  initializeTooltips(): void {
+    setTimeout(() => {
+      const tooltipTriggerList = this.elementRef.nativeElement.querySelectorAll('[data-bs-toggle="tooltip"]');
+      if (typeof bootstrap !== 'undefined') {
+        tooltipTriggerList.forEach((tooltipTriggerEl: any) => {
+          new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+      }
+    }, 100);
   }
 
   criarAula() {
     this.sucesso = '';
     this.erro = '';
     if (this.form.invalid) return;
+
+    // Verificar conflitos antes de criar
+    if (this.conflitos.length > 0) {
+      this.erro = 'Não é possível criar a aula devido a conflitos: ' + this.conflitos.join(', ');
+      return;
+    }
+
     this.carregando = true;
     const sala = this.salas.find(s => s.id === Number(this.form.value.sala));
     const turma = this.turmas.find(t => t.id === Number(this.form.value.turma));
@@ -167,11 +209,17 @@ export class CriarAulaComponent implements OnInit {
   carregarAulas() {
     if (this.perfil === 'ROLE_PROFESSOR' && this.usuarioId) {
       this.aulaService.buscarPorProfessor(this.usuarioId).subscribe({
-        next: aulas => this.aulas = this.ordenarAulas(aulas)
+        next: aulas => {
+          this.aulas = this.ordenarAulas(aulas);
+          this.updatePagination();
+        }
       });
     } else {
       this.aulaService.buscarTodas().subscribe({
-        next: aulas => this.aulas = this.ordenarAulas(aulas)
+        next: aulas => {
+          this.aulas = this.ordenarAulas(aulas);
+          this.updatePagination();
+        }
       });
     }
   }
@@ -186,5 +234,159 @@ export class CriarAulaComponent implements OnInit {
       }
       return a.hora.localeCompare(b.hora);
     });
+  }
+
+  setupFormValidation() {
+    // Observar mudanças nos campos para validar conflitos
+    this.form.valueChanges.subscribe(() => {
+      this.validarConflitos();
+      this.sugerirSalas();
+    });
+  }
+
+  validarConflitos() {
+    this.conflitos = [];
+    this.isValidatingConflicts = true;
+
+    const formValue = this.form.value;
+    if (!formValue.diaSemana || !formValue.hora || !formValue.professor || !formValue.sala) {
+      this.isValidatingConflicts = false;
+      return;
+    }
+
+    // Verificar conflito de professor
+    const conflitoProfessor = this.aulas.find(aula =>
+      aula.professor.id === formValue.professor &&
+      aula.diaSemana === formValue.diaSemana &&
+      aula.hora === formValue.hora
+    );
+
+    if (conflitoProfessor) {
+      this.conflitos.push(`Professor já tem aula de ${conflitoProfessor.disciplina.nome} neste horário`);
+    }
+
+    // Verificar conflito de sala
+    const conflitoSala = this.aulas.find(aula =>
+      aula.sala.id === formValue.sala &&
+      aula.diaSemana === formValue.diaSemana &&
+      aula.hora === formValue.hora
+    );
+
+    if (conflitoSala) {
+      this.conflitos.push(`Sala já está ocupada com aula de ${conflitoSala.disciplina.nome}`);
+    }
+
+    // Verificar conflito de turma
+    const conflitoTurma = this.aulas.find(aula =>
+      aula.turma.id === formValue.turma &&
+      aula.diaSemana === formValue.diaSemana &&
+      aula.hora === formValue.hora
+    );
+
+    if (conflitoTurma) {
+      this.conflitos.push(`Turma já tem aula de ${conflitoTurma.disciplina.nome} neste horário`);
+    }
+
+    this.isValidatingConflicts = false;
+  }
+
+  sugerirSalas() {
+    const formValue = this.form.value;
+    if (!formValue.diaSemana || !formValue.hora) {
+      this.salasDisponiveis = [];
+      this.salasRecomendadas = [];
+      this.showSuggestions = false;
+      return;
+    }
+
+    // Salas disponíveis (não ocupadas no horário)
+    this.salasDisponiveis = this.salas.filter(sala => {
+      return !this.aulas.some(aula =>
+        aula.sala.id === sala.id &&
+        aula.diaSemana === formValue.diaSemana &&
+        aula.hora === formValue.hora
+      );
+    });
+
+    // Salas recomendadas (baseado na capacidade e disponibilidade)
+    this.salasRecomendadas = this.salasDisponiveis
+      .sort((a, b) => (a.capacidade || 0) - (b.capacidade || 0))
+      .slice(0, 3);
+
+    this.showSuggestions = this.salasDisponiveis.length > 0;
+  }
+
+  carregarAgendaProfessor(professorId: number) {
+    if (!professorId) {
+      this.agendaProfessor = [];
+      return;
+    }
+
+    this.agendaProfessor = this.aulas.filter(aula => aula.professor.id === professorId);
+  }
+
+  selecionarSalaRecomendada(sala: Sala) {
+    this.form.patchValue({ sala: sala.id });
+    this.showSuggestions = false;
+  }
+
+  onProfessorChange() {
+    const professorId = this.form.value.professor;
+    if (professorId) {
+      this.carregarAgendaProfessor(professorId);
+    }
+  }
+
+  // Métodos de Paginação
+  updatePagination() {
+    this.totalPages = Math.ceil(this.aulas.length / this.itemsPerPage);
+    if (this.currentPage > this.totalPages) {
+      this.currentPage = 1;
+    }
+    this.updatePaginatedAulas();
+  }
+
+  updatePaginatedAulas() {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    this.paginatedAulas = this.aulas.slice(startIndex, endIndex);
+  }
+
+  goToPage(page: number) {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.updatePaginatedAulas();
+    }
+  }
+
+  onItemsPerPageChange() {
+    this.currentPage = 1;
+    this.updatePagination();
+  }
+
+  getStartIndex(): number {
+    return (this.currentPage - 1) * this.itemsPerPage;
+  }
+
+  getEndIndex(): number {
+    const endIndex = this.currentPage * this.itemsPerPage;
+    return Math.min(endIndex, this.aulas.length);
+  }
+
+  getVisiblePages(): number[] {
+    const pages: number[] = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, this.currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(this.totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+
+    return pages;
   }
 }

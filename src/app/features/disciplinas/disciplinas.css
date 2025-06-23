@@ -56,6 +56,7 @@
   transition: all 0.3s ease-in-out;
   border: 1px solid transparent;
   min-height: 220px;
+  position: relative;
 }
 .disciplina-card:hover {
   transform: translateY(-6px);
@@ -67,12 +68,50 @@
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 12px;
+  padding-right: 60px; /* Espaço adequado para o badge */
 }
 .disciplina-nome {
   font-size: 1.25rem;
   font-weight: 600;
   color: #146c43;
 }
+/* Status Badge para Disciplinas */
+.disciplina-status-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 2px 6px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  z-index: 1001;
+  min-width: 35px;
+  text-align: center;
+  line-height: 1.2;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.disciplina-status-badge.longa {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.disciplina-status-badge.media {
+  background-color: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
+}
+
+.disciplina-status-badge.curta {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
 .disciplina-badge {
   background-color: #e9ecef;
   color: #495057;

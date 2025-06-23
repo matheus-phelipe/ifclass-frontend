@@ -28,6 +28,69 @@ import { CoordenacaoService, EstatisticasCoordenacao } from '../services/coorden
         <p>{{erro}}</p>
       </div>
 
+      <!-- Estatísticas Detalhadas -->
+      <div class="row mb-4" *ngIf="estatisticas && !carregando">
+        <div class="col-md-6 mb-3">
+          <div class="card border-success">
+            <div class="card-header bg-success text-white">
+              <h6 class="mb-0"><i class="bi bi-people me-2"></i>Carga Horária dos Professores</h6>
+            </div>
+            <div class="card-body">
+              <div class="row text-center">
+                <div class="col-4">
+                  <h4 class="text-success">{{estatisticas.professoresNormal || 0}}</h4>
+                  <small class="text-muted">Normal</small>
+                </div>
+                <div class="col-4">
+                  <h4 class="text-warning">{{estatisticas.professoresSobrecarregados || 0}}</h4>
+                  <small class="text-muted">Sobrecarregados</small>
+                </div>
+                <div class="col-4">
+                  <h4 class="text-info">{{estatisticas.professoresSubutilizados || 0}}</h4>
+                  <small class="text-muted">Subutilizados</small>
+                </div>
+              </div>
+              <hr>
+              <div class="text-center">
+                <h5 class="text-primary">{{(estatisticas.mediaHorasPorProfessor || 0) | number:'1.1-1'}}h</h5>
+                <small class="text-muted">Média de horas por professor</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <div class="card border-info">
+            <div class="card-header bg-info text-white">
+              <h6 class="mb-0"><i class="bi bi-building me-2"></i>Ocupação de Salas</h6>
+            </div>
+            <div class="card-body">
+              <div class="row text-center mb-3">
+                <div class="col-6">
+                  <h4 class="text-primary">{{estatisticas.salasOcupadas || 0}}</h4>
+                  <small class="text-muted">Salas Ocupadas</small>
+                </div>
+                <div class="col-6">
+                  <h4 class="text-secondary">{{estatisticas.totalSalas || 0}}</h4>
+                  <small class="text-muted">Total de Salas</small>
+                </div>
+              </div>
+              <div class="progress mb-2" style="height: 10px;">
+                <div class="progress-bar bg-info"
+                     [style.width.%]="estatisticas.percentualOcupacaoSalas || 0"
+                     [attr.aria-valuenow]="estatisticas.percentualOcupacaoSalas || 0"
+                     aria-valuemin="0"
+                     aria-valuemax="100">
+                </div>
+              </div>
+              <div class="text-center">
+                <small class="text-muted">{{(estatisticas.percentualOcupacaoSalas || 0) | number:'1.1-1'}}% de ocupação</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="alert alert-success" *ngIf="estatisticas && !carregando && !erro">
         <h4>✅ Dados Atualizados!</h4>
         <p>Dashboard conectado com sucesso ao backend. Dados em tempo real carregados.</p>

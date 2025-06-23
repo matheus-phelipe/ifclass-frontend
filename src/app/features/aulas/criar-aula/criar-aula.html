@@ -1,141 +1,372 @@
-<div class="main-content">
-  <header class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-      <h2 class="h2 fw-bold">Criar Nova Aula</h2>
-      <p class="text-muted">Preencha os detalhes para agendar uma nova aula recorrente.</p>
+<div class="criar-aula-page">
+  <!-- Header Moderno -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-info">
+        <div class="header-icon">
+          <i class="bi bi-calendar-plus"></i>
+        </div>
+        <div class="header-text">
+          <h1 class="page-title">Criar Nova Aula</h1>
+          <p class="page-subtitle">Configure uma nova aula recorrente no sistema</p>
+        </div>
+      </div>
+      <app-profile-switcher></app-profile-switcher>
     </div>
-    <app-profile-switcher></app-profile-switcher>
-  </header>
+  </div>
 
-  <div class="row">
-    <!-- Formulário de Criação -->
-    <div class="col-lg-5">
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <form [formGroup]="form" (ngSubmit)="criarAula()" class="needs-validation" novalidate>
-            <div class="row g-3">
+  <div class="criar-aula-layout">
+    <!-- Formulário Moderno -->
+    <div class="form-section">
+      <div class="form-card">
+        <div class="form-header">
+          <h3 class="form-title">
+            <i class="bi bi-gear-fill"></i>
+            Configurações da Aula
+          </h3>
+          <p class="form-description">Defina os parâmetros básicos da aula</p>
+        </div>
 
-              <!-- Seletor de Dia da Semana -->
-              <div class="col-12">
-                <label for="diaSemana" class="form-label">Dia da Semana <span class="text-danger">*</span></label>
-                <select id="diaSemana" class="form-select" formControlName="diaSemana">
-                  <option [ngValue]="null" disabled>Selecione o dia</option>
-                  <option value="MONDAY">Segunda-feira</option>
-                  <option value="TUESDAY">Terça-feira</option>
-                  <option value="WEDNESDAY">Quarta-feira</option>
-                  <option value="THURSDAY">Quinta-feira</option>
-                  <option value="FRIDAY">Sexta-feira</option>
-                  <option value="SATURDAY">Sábado</option>
-                </select>
+        <form [formGroup]="form" (ngSubmit)="criarAula()" class="modern-form">
+            <!-- Seção de Tempo -->
+            <div class="form-section-group">
+              <div class="section-title">
+                <i class="bi bi-clock"></i>
+                <span>Horário da Aula</span>
               </div>
 
-              <!-- Seletor de Horário -->
-              <div class="col-12">
-                <label for="hora" class="form-label">Horário <span class="text-danger">*</span></label>
-                <input type="time" id="hora" class="form-control" formControlName="hora">
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="diaSemana" class="field-label">
+                    <i class="bi bi-calendar-week"></i>
+                    Dia da Semana
+                    <span class="required">*</span>
+                  </label>
+                  <select id="diaSemana" class="modern-select" formControlName="diaSemana">
+                    <option [ngValue]="null" disabled>Selecione o dia</option>
+                    <option value="MONDAY">Segunda-feira</option>
+                    <option value="TUESDAY">Terça-feira</option>
+                    <option value="WEDNESDAY">Quarta-feira</option>
+                    <option value="THURSDAY">Quinta-feira</option>
+                    <option value="FRIDAY">Sexta-feira</option>
+                    <option value="SATURDAY">Sábado</option>
+                  </select>
+                </div>
+
+                <div class="form-field">
+                  <label for="hora" class="field-label">
+                    <i class="bi bi-clock"></i>
+                    Horário
+                    <span class="required">*</span>
+                  </label>
+                  <input type="time" id="hora" class="modern-input" formControlName="hora">
+                </div>
               </div>
-              
-              <!-- Seletor de Turma -->
-              <div class="col-12">
-                <label for="turma" class="form-label">Turma <span class="text-danger">*</span></label>
-                <select id="turma" class="form-select" formControlName="turma">
+            </div>
+            <!-- Seção Acadêmica -->
+            <div class="form-section-group">
+              <div class="section-title">
+                <i class="bi bi-mortarboard"></i>
+                <span>Informações Acadêmicas</span>
+              </div>
+
+              <div class="form-field">
+                <label for="turma" class="field-label">
+                  <i class="bi bi-people"></i>
+                  Turma
+                  <span class="required">*</span>
+                </label>
+                <select id="turma" class="modern-select" formControlName="turma">
                   <option [ngValue]="null" disabled>Selecione a turma</option>
-                  <option *ngFor="let turma of turmas" [value]="turma.id">{{ turma.id }} - {{ turma.curso?.nome }} ({{turma.ano}}.{{turma.semestre}})</option>
+                  <option *ngFor="let turma of turmas" [value]="turma.id">
+                    {{ turma.curso?.nome }} - {{ turma.ano }}º Sem {{ turma.semestre }}
+                  </option>
                 </select>
               </div>
 
-              <!-- Seletor de Disciplina -->
-              <div class="col-12">
-                <label for="disciplina" class="form-label">Disciplina <span class="text-danger">*</span></label>
-                <select id="disciplina" class="form-select" formControlName="disciplina">
+              <div class="form-field">
+                <label for="disciplina" class="field-label">
+                  <i class="bi bi-book"></i>
+                  Disciplina
+                  <span class="required">*</span>
+                </label>
+                <select id="disciplina" class="modern-select" formControlName="disciplina">
                   <option [ngValue]="null" disabled>Selecione a disciplina</option>
-                  <option *ngFor="let disciplina of disciplinas" [value]="disciplina.id">{{ disciplina.nome }}</option>
+                  <option *ngFor="let disciplina of disciplinas" [value]="disciplina.id">
+                    {{ disciplina.nome }}
+                  </option>
                 </select>
               </div>
-              
-              <!-- Seletor de Professor -->
-              <div class="col-12">
-                <label for="professor" class="form-label">Professor <span class="text-danger">*</span></label>
-                <select id="professor" class="form-select" formControlName="professor">
+
+              <div class="form-field">
+                <label for="professor" class="field-label">
+                  <i class="bi bi-person-badge"></i>
+                  Professor
+                  <span class="required">*</span>
+                </label>
+                <select id="professor" class="modern-select" formControlName="professor" (change)="onProfessorChange()">
                   <option [ngValue]="null" disabled>Selecione o professor</option>
                   <option *ngFor="let p of professores" [value]="p.id">{{ p.nome }}</option>
                 </select>
               </div>
-              
-              <!-- Seletor de Sala -->
-              <div class="col-12">
-                <label for="sala" class="form-label">Sala <span class="text-danger">*</span></label>
-                <select id="sala" class="form-select" formControlName="sala">
+            </div>
+
+            <!-- Validação de Conflitos -->
+            <div class="validation-section" *ngIf="isValidatingConflicts">
+              <div class="validation-card validating">
+                <div class="validation-icon">
+                  <i class="bi bi-hourglass-split"></i>
+                </div>
+                <div class="validation-content">
+                  <h4>Verificando conflitos...</h4>
+                  <p>Analisando disponibilidade de horários</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="validation-section" *ngIf="conflitos.length > 0">
+              <div class="validation-card error">
+                <div class="validation-icon">
+                  <i class="bi bi-exclamation-triangle"></i>
+                </div>
+                <div class="validation-content">
+                  <h4>Conflitos Detectados</h4>
+                  <ul class="conflict-list">
+                    <li *ngFor="let conflito of conflitos">{{ conflito }}</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Seção de Local -->
+            <div class="form-section-group">
+              <div class="section-title">
+                <i class="bi bi-geo-alt"></i>
+                <span>Local da Aula</span>
+              </div>
+
+              <div class="form-field">
+                <label for="sala" class="field-label">
+                  <i class="bi bi-door-open"></i>
+                  Sala
+                  <span class="required">*</span>
+                </label>
+                <select id="sala" class="modern-select" formControlName="sala">
                   <option [ngValue]="null" disabled>Selecione a sala</option>
                   <optgroup *ngFor="let bloco of blocos" [label]="bloco.nome">
                     <option *ngFor="let sala of bloco.salas" [value]="sala.id">
-                      {{ sala.codigo }}
+                      {{ sala.codigo }} (Capacidade: {{ sala.capacidade }})
                     </option>
                   </optgroup>
                 </select>
               </div>
 
+              <!-- Sugestões de Salas -->
+              <div class="suggestions-section" *ngIf="showSuggestions && salasRecomendadas.length > 0">
+                <div class="suggestions-card">
+                  <div class="suggestions-header">
+                    <i class="bi bi-lightbulb"></i>
+                    <span>Salas Recomendadas</span>
+                  </div>
+                  <div class="suggestions-grid">
+                    <button
+                      *ngFor="let sala of salasRecomendadas"
+                      class="suggestion-btn"
+                      (click)="selecionarSalaRecomendada(sala)">
+                      <div class="suggestion-info">
+                        <span class="suggestion-name">{{ sala.codigo }}</span>
+                        <span class="suggestion-capacity">{{ sala.capacidade }} lugares</span>
+                      </div>
+                    </button>
+                  </div>
+                  <div class="suggestions-footer">
+                    {{ salasDisponiveis.length }} salas disponíveis neste horário
+                  </div>
+                </div>
+              </div>
             </div>
 
             <!-- Botão de Submissão -->
-            <div class="d-grid mt-4">
-              <button type="submit" class="btn btn-success btn-lg" [disabled]="form.invalid || carregando">
-                <span *ngIf="!carregando"><i class="bi bi-plus-circle-fill me-2"></i>Criar Aula Recorrente</span>
-                <span *ngIf="carregando" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <div class="form-actions">
+              <button type="submit" class="submit-btn"
+                      [disabled]="form.invalid || carregando || conflitos.length > 0"
+                      [class.loading]="carregando"
+                      [class.disabled]="conflitos.length > 0">
+                <div class="btn-content" *ngIf="!carregando">
+                  <i class="bi bi-plus-circle-fill"></i>
+                  <span>{{ conflitos.length > 0 ? 'Resolva os conflitos primeiro' : 'Criar Aula Recorrente' }}</span>
+                </div>
+                <div class="btn-loading" *ngIf="carregando">
+                  <div class="loading-spinner"></div>
+                  <span>Criando aula...</span>
+                </div>
               </button>
             </div>
           </form>
 
-          <!-- Alertas -->
-          <div *ngIf="sucesso" class="alert alert-success mt-3" role="alert">{{ sucesso }}</div>
-          <div *ngIf="erro" class="alert alert-danger mt-3" role="alert">{{ erro }}</div>
+          <!-- Alertas Modernos -->
+          <div class="alert-section" *ngIf="sucesso || erro">
+            <div class="modern-alert success" *ngIf="sucesso">
+              <div class="alert-icon">
+                <i class="bi bi-check-circle-fill"></i>
+              </div>
+              <div class="alert-content">
+                <h4>Sucesso!</h4>
+                <p>{{ sucesso }}</p>
+              </div>
+            </div>
+
+            <div class="modern-alert error" *ngIf="erro">
+              <div class="alert-icon">
+                <i class="bi bi-exclamation-circle-fill"></i>
+              </div>
+              <div class="alert-content">
+                <h4>Erro</h4>
+                <p>{{ erro }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Agenda do Professor -->
+          <div class="professor-agenda" *ngIf="agendaProfessor.length > 0">
+            <div class="agenda-header">
+              <i class="bi bi-calendar-week"></i>
+              <span>Agenda do Professor</span>
+            </div>
+            <div class="agenda-grid">
+              <div class="agenda-item" *ngFor="let aula of agendaProfessor">
+                <div class="agenda-day">{{ formatarDiaSemana(aula.diaSemana) }}</div>
+                <div class="agenda-time">{{ aula.hora }}</div>
+                <div class="agenda-subject">{{ aula.disciplina.nome }}</div>
+                <div class="agenda-class">{{ aula.turma.curso?.nome }} {{ aula.turma.ano }}.{{ aula.turma.semestre }}</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-    
-    <!-- Listagem de Aulas -->
-    <div class="col-lg-7">
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title">Aulas Agendadas</h5>
-          <div class="table-responsive">
-            <table class="table table-hover align-middle">
-              <thead>
-                <tr>
-                  <th>Dia</th>
-                  <th>Horário</th>
-                  <th>Turma</th>
-                  <th>Disciplina</th>
-                  <th>Professor</th>
-                  <th>Sala</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let aula of aulas">
-                  <td>{{ formatarDiaSemana(aula.diaSemana) }}</td>
-                  <td>{{ aula.hora }}</td>
-                  <td>{{ aula.turma.curso?.nome }} / {{ aula.turma.ano }}.{{ aula.turma.semestre }}</td>
-                  <td>{{ aula.disciplina.nome }}</td>
-                  <td>{{ aula.professor.nome }}</td>
-                  <td>{{ getBlocoNome(aula.sala.id) }} - {{ aula.sala.codigo }}</td>
-                  <td>
-                    <button class="btn btn-sm btn-outline-danger" (click)="abrirModalRemocao(aula)"><i class="bi bi-trash"></i></button>
-                  </td>
-                </tr>
-                <tr *ngIf="aulas.length === 0">
-                  <td colspan="7" class="text-center text-muted">Nenhuma aula agendada.</td>
-                </tr>
-              </tbody>
-            </table>
+
+    <!-- Listagem de Aulas Moderna -->
+    <div class="aulas-section">
+      <div class="aulas-card">
+        <div class="aulas-header">
+          <div class="header-info">
+            <h3 class="aulas-title">
+              <i class="bi bi-calendar-check"></i>
+              Aulas Agendadas
+            </h3>
+            <p class="aulas-subtitle">Visualize e gerencie todas as aulas criadas</p>
+          </div>
+          <div class="aulas-stats">
+            <div class="stat-item">
+              <span class="stat-number">{{ aulas.length }}</span>
+              <span class="stat-label">Aulas</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="aulas-content">
+          <div class="aulas-grid" *ngIf="paginatedAulas.length > 0">
+            <div class="aula-card" *ngFor="let aula of paginatedAulas">
+              <div class="aula-header">
+                <div class="aula-day">
+                  <i class="bi bi-calendar3"></i>
+                  <span>{{ formatarDiaSemana(aula.diaSemana) }}</span>
+                </div>
+                <div class="aula-time">{{ aula.hora }}</div>
+              </div>
+
+              <div class="aula-info">
+                <div class="info-row">
+                  <i class="bi bi-book"></i>
+                  <span class="info-label">Disciplina:</span>
+                  <span class="info-value">{{ aula.disciplina.nome }}</span>
+                </div>
+
+                <div class="info-row">
+                  <i class="bi bi-people"></i>
+                  <span class="info-label">Turma:</span>
+                  <span class="info-value">{{ aula.turma.curso?.nome }} {{ aula.turma.ano }}.{{ aula.turma.semestre }}</span>
+                </div>
+
+                <div class="info-row">
+                  <i class="bi bi-person-badge"></i>
+                  <span class="info-label">Professor:</span>
+                  <span class="info-value">{{ aula.professor.nome }}</span>
+                </div>
+
+                <div class="info-row">
+                  <i class="bi bi-geo-alt"></i>
+                  <span class="info-label">Sala:</span>
+                  <span class="info-value">{{ getBlocoNome(aula.sala.id) }} - {{ aula.sala.codigo }}</span>
+                </div>
+              </div>
+
+              <div class="aula-actions">
+                <button class="action-btn delete"
+                        (click)="abrirModalRemocao(aula)"
+                        title="Remover aula permanentemente">
+                  <i class="bi bi-trash"></i>
+                  <span>Remover</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="empty-state" *ngIf="aulas.length === 0">
+            <div class="empty-icon">
+              <i class="bi bi-calendar-x"></i>
+            </div>
+            <h4>Nenhuma aula agendada</h4>
+            <p>Crie sua primeira aula usando o formulário ao lado</p>
+          </div>
+        </div>
+
+        <!-- Paginação -->
+        <div class="pagination-container" *ngIf="aulas.length > 0">
+          <div class="pagination-info">
+            Mostrando {{ getStartIndex() + 1 }}-{{ getEndIndex() }} de {{ aulas.length }} aulas
+          </div>
+
+          <div class="pagination-controls">
+            <button
+              class="pagination-btn"
+              [disabled]="currentPage === 1"
+              (click)="goToPage(currentPage - 1)">
+              <i class="bi bi-chevron-left"></i>
+            </button>
+
+            <button
+              *ngFor="let page of getVisiblePages()"
+              class="pagination-btn"
+              [class.active]="page === currentPage"
+              (click)="goToPage(page)">
+              {{ page }}
+            </button>
+
+            <button
+              class="pagination-btn"
+              [disabled]="currentPage === totalPages"
+              (click)="goToPage(currentPage + 1)">
+              <i class="bi bi-chevron-right"></i>
+            </button>
+          </div>
+
+          <div class="items-per-page">
+            <span>Itens por página:</span>
+            <select [(ngModel)]="itemsPerPage" (change)="onItemsPerPageChange()">
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+              <option value="20">20</option>
+            </select>
           </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 
-<app-modal-confirmacao 
+<app-modal-confirmacao
   [isVisible]="isModalVisible"
   [title]="modalConfig.title"
   [message]="modalConfig.message"

@@ -12,13 +12,33 @@
       </button>
     </div>
 
-    <div class="mb-4">
-      <input
-        type="text"
-        class="form-control form-control-lg"
-        placeholder="Pesquisar por nome, código ou departamento..."
-        (input)="onSearch($event)"
-      />
+    <!-- Dashboard de Estatísticas -->
+    <app-dashboard-stats
+       [stats]="statsCards"
+       *ngIf="!isLoadingStats && statsCards.length > 0">
+    </app-dashboard-stats>
+
+    <!-- Loading das estatísticas -->
+    <div *ngIf="isLoadingStats" class="text-center py-3 mb-4">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Carregando estatísticas...</span>
+      </div>
+    </div>
+
+    <!-- Busca Simples -->
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <div class="input-group">
+          <span class="input-group-text">
+            <i class="bi bi-search"></i>
+          </span>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Pesquisar por nome, código, departamento..."
+            [(ngModel)]="termoBusca">
+        </div>
+      </div>
     </div>
 
     <div *ngIf="isLoading" class="text-center py-5">
@@ -27,7 +47,7 @@
       </div>
     </div>
 
-    <div *ngIf="!isLoading && cursosFiltrados.length === 0" class="text-center py-5">
+    <div *ngIf="!isLoading && cursos.length === 0" class="text-center py-5">
       <div class="display-4 text-muted mb-3">
         <i class="bi bi-mortarboard-fill"></i>
       </div>
@@ -36,31 +56,92 @@
     </div>
 
     <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
-      <div class="col" *ngFor="let curso of cursosFiltrados">
-        <div class="curso-card">
+      <div class="col" *ngFor="let curso of cursos | filter:termoBusca:'nome,codigo,departamento,descricao'">
+        <div class="curso-card"
+             [class.featured]="curso.cargaHoraria > 100"
+             [class.high-workload]="curso.cargaHoraria > 120"
+             [class.low-workload]="curso.cargaHoraria < 60">
+
+          <!-- Status Badge -->
+          <div class="status-badge"
+               [class.popular]="curso.cargaHoraria > 100"
+               [class.intensive]="curso.cargaHoraria > 120"
+               [class.new]="curso.cargaHoraria < 60">
+            {{ curso.cargaHoraria > 120 ? 'Intensivo' : curso.cargaHoraria > 100 ? 'Popular' : 'Básico' }}
+          </div>
+
           <div class="curso-card-header">
             <h5 class="curso-nome">{{ curso.nome }}</h5>
             <span class="curso-badge">{{ curso.codigo }}</span>
           </div>
+
           <div class="curso-card-body">
-            <p class="curso-descricao">{{ curso.descricao | slice:0:100 }}{{ curso.descricao.length > 100 ? '...' : '' }}</p>
+            <p class="curso-descricao">{{ curso.descricao | slice:0:100 }}{{ curso.descricao && curso.descricao.length > 100 ? '...' : '' }}</p>
+
             <div class="curso-info">
               <span><i class="bi bi-clock-history me-2"></i>{{ curso.cargaHoraria }}h</span>
               <span><i class="bi bi-building me-2"></i>{{ curso.departamento }}</span>
             </div>
+
+            <!-- Meta informações adicionais -->
+            <div class="curso-meta">
+              <div class="meta-item">
+                <i class="bi bi-calendar-check"></i>
+                <span>Ativo</span>
+              </div>
+              <div class="meta-item" *ngIf="curso.cargaHoraria > 80">
+                <i class="bi bi-star-fill"></i>
+                <span>Destaque</span>
+              </div>
+              <div class="meta-item">
+                <i class="bi bi-people"></i>
+                <span>Curso completo</span>
+              </div>
+            </div>
           </div>
+
           <div class="curso-card-footer">
-            <button class="btn-acao ver" (click)="verDetalhes(curso)" title="Ver Detalhes">
+            <button class="btn-acao ver"
+                    (click)="verDetalhes(curso)"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    title="Ver detalhes completos do curso">
               <i class="bi bi-eye-fill"></i>
             </button>
             <ng-container *ngIf="authService.isRoleActiveOrHigher('ROLE_COORDENADOR')">
-              <button class="btn-acao editar" (click)="abrirModal(curso)" title="Editar">
+              <button class="btn-acao editar"
+                      (click)="abrirModal(curso)"
+                      data-bs-toggle="tooltip"
+                      data-bs-placement="top"
+                      title="Editar informações do curso">
                 <i class="bi bi-pencil-fill"></i>
               </button>
-              <button class="btn-acao deletar" (click)="confirmarDelecao(curso)" title="Excluir">
+              <button class="btn-acao deletar"
+                      (click)="confirmarDelecao(curso)"
+                      data-bs-toggle="tooltip"
+                      data-bs-placement="top"
+                      title="Excluir curso permanentemente">
                 <i class="bi bi-trash-fill"></i>
               </button>
             </ng-container>
+          </div>
+
+          <!-- Preview Card (aparece no hover) -->
+          <div class="curso-card-preview">
+            <div class="preview-title">{{ curso.nome }}</div>
+            <div class="preview-stats">
+              <div class="preview-stat">
+                <div class="preview-stat-value">{{ curso.cargaHoraria }}</div>
+                <div class="preview-stat-label">Horas</div>
+              </div>
+              <div class="preview-stat">
+                <div class="preview-stat-value">{{ curso.departamento }}</div>
+                <div class="preview-stat-label">Departamento</div>
+              </div>
+            </div>
+            <div class="preview-description">
+              {{ curso.descricao || 'Sem descrição disponível' }}
+            </div>
           </div>
         </div>
       </div>
