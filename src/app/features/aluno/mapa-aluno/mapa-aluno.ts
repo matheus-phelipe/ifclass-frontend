@@ -110,6 +110,10 @@ export class MapaAlunoComponent implements OnInit {
   aulasSemana: Aula[] = [];
   alunoTemTurmaMasSemAulas = false;
 
+  // Propriedades para o novo layout
+  mobileMenuOpen = false;
+  legendExpanded = false;
+
   constructor(
     private blocoService: BlocoService,
     public authService: AuthService,
@@ -470,5 +474,37 @@ export class MapaAlunoComponent implements OnInit {
       this.authService.setActiveRole('ROLE_ADMIN');
       this.router.navigate(['/app/home']);
     }
+  }
+
+  // Métodos para o novo layout
+  toggleMobileMenu(): void {
+    this.mobileMenuOpen = !this.mobileMenuOpen;
+  }
+
+  selectBloco(blocoId: number): void {
+    this.activeBlocoId = blocoId;
+    this.mobileMenuOpen = false; // Fecha o menu mobile após seleção
+    this.cancelarEdicao();
+  }
+
+  toggleLegend(): void {
+    this.legendExpanded = !this.legendExpanded;
+  }
+
+  showCreateBlocoModal(): void {
+    // Implementar modal para criar bloco no mobile
+    // Por enquanto, usar prompt simples
+    const nome = prompt('Nome do novo bloco:');
+    if (nome?.trim()) {
+      this.novoBlocoNome = nome.trim();
+      this.handleCreateBloco();
+    }
+  }
+
+  showCreateSalaModal(): void {
+    // Implementar modal para criar sala no mobile
+    // Por enquanto, redirecionar para o formulário desktop
+    this.mobileMenuOpen = false;
+    // Scroll para o formulário se estiver visível
   }
 }

@@ -79,4 +79,41 @@ export class CadastroComponent {
     this.mensagemDoModal = mensagem;
     this.modal.open();
   }
+
+  // Métodos para o novo template
+  trackByCampo(index: number, campo: any): string {
+    return campo.nome;
+  }
+
+  getInputType(campo: any): string {
+    if (campo.nome === 'senha' || campo.nome === 'confirmarSenha') {
+      return this.mostrarSenha[campo.nome] ? 'text' : 'password';
+    }
+    return campo.nome === 'email' ? 'email' : campo.tipo;
+  }
+
+  getFieldIcon(campo: any): string {
+    if (campo.nome === 'senha' || campo.nome === 'confirmarSenha') {
+      return 'bi-lock';
+    }
+    return campo.icone.replace('-fill', '');
+  }
+
+  getAutocomplete(fieldName: string): string {
+    const autocompleteMap: { [key: string]: string } = {
+      'nome': 'name',
+      'email': 'email',
+      'prontuario': 'username',
+      'senha': 'new-password',
+      'confirmarSenha': 'new-password'
+    };
+    return autocompleteMap[fieldName] || 'off';
+  }
+
+  senhasConferem(): boolean {
+    if (!this.usuario.senha || !this.usuario.confirmarSenha) {
+      return false;
+    }
+    return this.usuario.senha === this.usuario.confirmarSenha;
+  }
 }
