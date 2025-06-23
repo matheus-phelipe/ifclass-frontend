@@ -788,69 +788,102 @@
   }
 }
 
-/* ===== RESPONSIVIDADE ===== */
-@media (max-width: 768px) {
+/* ===== RESPONSIVIDADE EXTREMA ===== */
+
+/* Extra Small devices (smartphones pequenos) */
+@media (max-width: 319.98px) {
   .criar-aula-page {
     padding: 0;
   }
 
   .page-header {
-    margin: 16px;
+    margin: 0.25rem;
   }
 
   .criar-aula-layout {
-    padding: 0 16px 16px 16px;
+    padding: 0 0.25rem 0.25rem 0.25rem;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .page-title {
+    font-size: 1.25rem;
+  }
+
+  .form-card, .aulas-card {
+    border-radius: 0.5rem;
+  }
+
+  .modern-form {
+    padding: 0.5rem;
+  }
+}
+
+/* Small devices (smartphones) */
+@media (max-width: 575.98px) {
+  .criar-aula-page {
+    padding: 0;
+  }
+
+  .page-header {
+    margin: 0.5rem;
+  }
+
+  .criar-aula-layout {
+    padding: 0 0.5rem 0.5rem 0.5rem;
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 
   .header-content {
-    padding: 20px;
+    padding: 1.5rem;
     flex-direction: column;
-    gap: 16px;
+    gap: 1rem;
     text-align: center;
   }
 
   .page-title {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
   }
 
-  .form-card,
-  .aulas-card {
-    border-radius: 16px;
+  .form-card, .aulas-card {
+    border-radius: 1rem;
   }
 
   .modern-form {
-    padding: 24px;
+    padding: 1.5rem;
   }
 
   .form-section-group {
-    padding: 20px;
+    padding: 1rem;
   }
 
   .agenda-item {
     grid-template-columns: 1fr;
-    gap: 8px;
+    gap: 0.25rem;
     text-align: center;
   }
 
   .aulas-header {
-    padding: 24px;
+    padding: 1.5rem;
     flex-direction: column;
-    gap: 16px;
+    gap: 1rem;
     text-align: center;
   }
 
   .aulas-content {
-    padding: 24px;
+    padding: 1.5rem;
   }
 
   .pagination-container {
-    padding: 16px;
+    padding: 1rem;
     flex-direction: column;
-    gap: 16px;
+    gap: 1rem;
   }
 
   .pagination-controls {
     order: 2;
+    justify-content: center;
   }
 
   .pagination-info {
@@ -861,5 +894,140 @@
   .items-per-page {
     order: 3;
     justify-content: center;
+  }
+
+  /* Botões maiores em mobile */
+  .submit-btn, .action-btn, .pagination-btn {
+    min-height: 48px;
+    font-size: 1rem;
+  }
+
+  /* Inputs maiores em mobile */
+  .modern-input, .modern-select {
+    padding: 1rem;
+    font-size: 1rem;
+  }
+}
+
+/* Medium devices (tablets) */
+@media (min-width: 576px) and (max-width: 767.98px) {
+  .criar-aula-layout {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 0 1rem 1rem 1rem;
+  }
+
+  .page-header {
+    margin: 1rem;
+  }
+
+  .header-content {
+    padding: 2rem;
+  }
+
+  .page-title {
+    font-size: 2rem;
+  }
+
+  .modern-form {
+    padding: 2rem;
+  }
+
+  .form-section-group {
+    padding: 1.5rem;
+  }
+
+  .aulas-header {
+    padding: 2rem;
+  }
+
+  .aulas-content {
+    padding: 2rem;
+  }
+}
+
+/* Large devices (desktops pequenos) */
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .criar-aula-layout {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    padding: 0 1.5rem 1.5rem 1.5rem;
+  }
+
+  .page-header {
+    margin: 1.5rem;
+  }
+
+  .page-title {
+    font-size: 2rem;
+  }
+}
+
+/* Extra Large devices (desktops) */
+@media (min-width: 992px) {
+  .criar-aula-layout {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    padding: 0 2rem 2rem 2rem;
+  }
+
+  .page-header {
+    margin: 2rem;
+  }
+
+  .page-title {
+    font-size: 2.5rem;
+  }
+
+  /* Hover effects apenas em desktop */
+  .form-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
+  }
+
+  .aula-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  }
+
+  .pagination-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+}
+
+/* Landscape mobile */
+@media (max-width: 767.98px) and (orientation: landscape) {
+  .criar-aula-layout {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  .page-header {
+    margin: 0.5rem;
+  }
+
+  .header-content {
+    padding: 1rem;
+  }
+
+  .aulas-card {
+    max-height: 60vh;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .header-icon, .aula-card::before {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
