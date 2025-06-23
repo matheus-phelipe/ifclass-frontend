@@ -1,0 +1,136 @@
+<div class="container-fluid">
+  <!-- Header -->
+  <div class="page-header d-flex justify-content-between align-items-start">
+    <div>
+      <h2 class="page-title">
+        <i class="bi bi-calendar-day me-2"></i>
+        Aulas do Dia
+      </h2>
+      <p class="page-subtitle">{{ diaSemanaAtual }}, {{ dataAtual | date:'dd/MM/yyyy' }}</p>
+    </div>
+    <div class="d-flex gap-2 align-items-center">
+      <button class="btn btn-outline-primary" (click)="recarregarAulas()" [disabled]="carregando">
+        <i class="bi bi-arrow-clockwise me-1"></i>
+        Atualizar
+      </button>
+      <app-profile-switcher></app-profile-switcher>
+    </div>
+  </div>
+
+  <!-- Estatísticas -->
+  <div class="row mb-4">
+    <div class="col-md-3 mb-3">
+      <div class="stat-card stat-primary">
+        <div class="stat-icon">
+          <i class="bi bi-calendar-check"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ totalAulas }}</h3>
+          <p>Total de Aulas</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="stat-card stat-success">
+        <div class="stat-icon">
+          <i class="bi bi-sunrise"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ aulasMatutino }}</h3>
+          <p>Matutino</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="stat-card stat-warning">
+        <div class="stat-icon">
+          <i class="bi bi-sun"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ aulasVespertino }}</h3>
+          <p>Vespertino</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="stat-card stat-info">
+        <div class="stat-icon">
+          <i class="bi bi-moon"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ aulasNoturno }}</h3>
+          <p>Noturno</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="carregando" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Carregando...</span>
+    </div>
+    <p class="mt-2 text-muted">Carregando aulas do dia...</p>
+  </div>
+
+  <!-- Lista de Aulas -->
+  <div *ngIf="!carregando" class="aulas-container">
+    <div *ngIf="aulas.length === 0" class="empty-state">
+      <div class="empty-icon">
+        <i class="bi bi-calendar-x"></i>
+      </div>
+      <h4>Nenhuma aula hoje</h4>
+      <p class="text-muted">Não há aulas agendadas para {{ diaSemanaAtual.toLowerCase() }}.</p>
+    </div>
+
+    <div *ngIf="aulas.length > 0" class="aulas-grid">
+      <div *ngFor="let aula of aulas" class="aula-card" [class]="getClassePeriodo(aula.hora)">
+        <div class="aula-header">
+          <div class="aula-horario">
+            <i class="bi bi-clock"></i>
+            {{ aula.hora }}
+          </div>
+          <div class="aula-periodo">
+            {{ getPeriodoAula(aula.hora) }}
+          </div>
+        </div>
+        
+        <div class="aula-content">
+          <h5 class="aula-disciplina">{{ aula.disciplina.nome }}</h5>
+          <div class="aula-info">
+            <div class="info-item">
+              <i class="bi bi-person"></i>
+              <span>{{ aula.professor.nome }}</span>
+            </div>
+            <div class="info-item">
+              <i class="bi bi-geo-alt"></i>
+              <span>{{ getBlocoNome(aula.sala.id) }} - {{ aula.sala.codigo }}</span>
+            </div>
+            <div class="info-item">
+              <i class="bi bi-people"></i>
+              <span>Turma {{ aula.turma.ano }}º ano - {{ aula.turma.semestre }}º sem</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Informações Adicionais -->
+  <div *ngIf="!carregando && aulas.length > 0" class="mt-4">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="info-panel">
+          <h6><i class="bi bi-building me-2"></i>Salas em Uso</h6>
+          <p class="mb-0">{{ salasOcupadas }} salas ocupadas hoje</p>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="info-panel">
+          <h6><i class="bi bi-clock-history me-2"></i>Última Atualização</h6>
+          <p class="mb-0">{{ dataAtual | date:'HH:mm' }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

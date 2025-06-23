@@ -12,6 +12,7 @@ import { TurmasComponent } from './features/turmas/turmas';
 import { DisciplinasComponent } from './features/disciplinas/disciplinas';
 import { VinculoProfessorDisciplinaComponent } from './features/vinculo-professor-disciplina/vinculo-professor-disciplina';
 import { CriarAulaComponent } from './features/aulas/criar-aula/criar-aula';
+import { AulasDoDiaComponent } from './features/aulas/aulas-do-dia/aulas-do-dia';
 
 // Componentes de Coordenação
 import { CoordenacaoDashboardComponent } from './features/coordenacao/dashboard/coordenacao-dashboard.component';
@@ -90,6 +91,12 @@ export const routes: Routes = [
       {
         path: 'criar-aula',
         component: CriarAulaComponent,
+        canActivate: [authGuard],
+        data: { authorities: ['ROLE_PROFESSOR', 'ROLE_ADMIN', 'ROLE_COORDENADOR'] }
+      },
+      {
+        path: 'aulas-do-dia',
+        component: AulasDoDiaComponent,
         canActivate: [authGuard],
         data: { authorities: ['ROLE_PROFESSOR', 'ROLE_ADMIN', 'ROLE_COORDENADOR'] }
       },

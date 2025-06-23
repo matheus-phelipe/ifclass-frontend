@@ -17,7 +17,7 @@
     <ng-container *ngIf="isProfessor || isCoordenador || isAdmin">
       <div *ngIf="sidebarOpen" class="sidebar-menu-category">GERAL</div>
 
-      <a routerLink="/app/aulas" class="sidebar-nav-link" [ngClass]="{'justify-content-center': !sidebarOpen}">
+      <a routerLink="/app/aulas-do-dia" class="sidebar-nav-link" [ngClass]="{'justify-content-center': !sidebarOpen}">
         <i class="bi bi-calendar-week"></i>
         <span *ngIf="sidebarOpen">Aulas do dia</span>
       </a>

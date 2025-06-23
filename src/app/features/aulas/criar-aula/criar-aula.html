@@ -115,7 +115,7 @@
                 <tr *ngFor="let aula of aulas">
                   <td>{{ formatarDiaSemana(aula.diaSemana) }}</td>
                   <td>{{ aula.hora }}</td>
-                  <td>{{ aula.turma.id }}</td>
+                  <td>{{ aula.turma.curso?.nome }} / {{ aula.turma.ano }}.{{ aula.turma.semestre }}</td>
                   <td>{{ aula.disciplina.nome }}</td>
                   <td>{{ aula.professor.nome }}</td>
                   <td>{{ getBlocoNome(aula.sala.id) }} - {{ aula.sala.codigo }}</td>

@@ -37,4 +37,8 @@ export class AulaService {
   remover(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+
+  buscarAulasDeHoje(): Observable<Aula[]> {
+    return this.http.get<Aula[]>(`${this.apiUrl}/hoje`);
+  }
 } 
