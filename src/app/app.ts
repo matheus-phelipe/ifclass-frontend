@@ -18,7 +18,7 @@ import { LoaderComponent } from './shared/loader/loader.component';
     LoaderComponent
   ],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrls: ['./app.css', './layout-fixes.css']
 })
 export class App implements OnInit, OnDestroy {
   title = 'ifclass-frontend';

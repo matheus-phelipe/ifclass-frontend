@@ -13,7 +13,7 @@
   overflow-y: auto;
   overflow-x: hidden;
   transition: all 0.3s ease;
-  margin-left: 250px; /* Largura padrão da sidebar */
+  margin-left: 280px; /* Largura correta da sidebar */
 }
 
 .main-content.sidebar-collapsed {
@@ -57,7 +57,7 @@
 @media (min-width: 768px) and (max-width: 991.98px) {
   .main-content {
     padding: 1rem;
-    margin-left: 200px; /* Sidebar um pouco menor em tablet */
+    margin-left: 280px; /* Manter largura consistente */
   }
 
   .main-content.sidebar-collapsed {
@@ -69,10 +69,10 @@
 @media (min-width: 992px) {
   .main-content {
     padding: 2rem;
-    margin-left: 260px;
+    margin-left: 280px; /* Manter largura consistente */
   }
 
   .main-content.sidebar-collapsed {
-    margin-left: 64px;
+    margin-left: 60px;
   }
 }

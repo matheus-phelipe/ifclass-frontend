@@ -59,6 +59,7 @@ export class MapaAlunoComponent implements OnInit {
   error: string | null = null;
   public activeBlocoId: number | null = null;
   public editingSala: Sala | null = null;
+  public blocoSelecionadoId: number | null = null;
 
   // --- Propriedades para o Drag and Drop ---
   public isDragging = false;
@@ -103,7 +104,6 @@ export class MapaAlunoComponent implements OnInit {
     altura: 100,
     cor: '#FFFFFF'
   };
-  blocoSelecionadoId: number | null = null;
 
   aulasHoje: Aula[] = [];
   salasAulaHoje: number[] = [];
@@ -336,6 +336,7 @@ export class MapaAlunoComponent implements OnInit {
     const bloco = this.blocos.find(b => b.nome.toUpperCase().includes(nomeBloco.toUpperCase()));
     if (bloco && bloco.id) {
       this.activeBlocoId = bloco.id;
+      this.blocoSelecionadoId = bloco.id; // Define também para adicionar salas
       this.cancelarEdicao();
     }
   }
@@ -378,6 +379,10 @@ export class MapaAlunoComponent implements OnInit {
 
   toggleBloco(blocoId: number): void {
     this.activeBlocoId = this.activeBlocoId === blocoId ? null : blocoId;
+    // Quando um bloco é selecionado, definir como padrão para adicionar novas salas
+    if (this.activeBlocoId !== null) {
+      this.blocoSelecionadoId = this.activeBlocoId;
+    }
     this.cancelarEdicao();
   }
 
@@ -402,7 +407,8 @@ export class MapaAlunoComponent implements OnInit {
         
         // Seleciona o primeiro bloco da lista por padrão
         if (!this.activeBlocoId && this.blocos.length > 0) {
-          this.activeBlocoId = this.blocos[0].id; 
+          this.activeBlocoId = this.blocos[0].id;
+          this.blocoSelecionadoId = this.blocos[0].id; // Define também para adicionar salas
         }
         
         this.isLoading = false;
@@ -446,18 +452,28 @@ export class MapaAlunoComponent implements OnInit {
       posY: this.formSala.posY,
       largura: this.formSala.largura,
       altura: this.formSala.altura,
-      cor: this.formSala.cor 
+      cor: this.formSala.cor
     };
 
     if (this.editingSala) {
       this.blocoService.updateSala(this.blocoSelecionadoId, this.editingSala.id, salaData).subscribe({
-        next: () => { this.cancelarEdicao(); this.carregarBlocos(); },
-        error: () => { this.error = 'Falha ao atualizar a sala.'; }
+        next: () => {
+          this.cancelarEdicao();
+          this.carregarBlocos();
+        },
+        error: (err) => {
+          this.error = 'Falha ao atualizar a sala.';
+        }
       });
     } else {
       this.blocoService.addSala(this.blocoSelecionadoId, salaData).subscribe({
-        next: () => { this.cancelarEdicao(); this.carregarBlocos(); },
-        error: () => { this.error = 'Falha ao criar a sala.'; }
+        next: (response) => {
+          this.cancelarEdicao();
+          this.carregarBlocos();
+        },
+        error: (err) => {
+          this.error = 'Falha ao criar a sala.';
+        }
       });
     }
   }

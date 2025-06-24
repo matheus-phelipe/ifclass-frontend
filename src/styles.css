@@ -1,7 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import './app/shared/sweetalert/sweetalert-custom.css';
  
 /* Definição de variáveis de cor e estilos globais para o corpo da página */
 :root {
+  /* ===== CORES ===== */
   --cor-primaria: #198754;
   --cor-primaria-hover: #157347;
   --cor-primaria-rgb: 25, 135, 84;
@@ -16,18 +18,73 @@
   --raio-borda: 8px;
   --sombra-suave: 0 2px 4px rgba(0,0,0,0.05);
 
+  /* ===== ESPAÇAMENTO GENEROSO ===== */
+  /* Sistema de espaçamento baseado em múltiplos de 8px para consistência */
+  --spacing-xs: 0.5rem;    /* 8px */
+  --spacing-sm: 1rem;      /* 16px */
+  --spacing-md: 1.5rem;    /* 24px */
+  --spacing-lg: 2rem;      /* 32px */
+  --spacing-xl: 3rem;      /* 48px */
+  --spacing-2xl: 4rem;     /* 64px */
+  --spacing-3xl: 6rem;     /* 96px */
+  --spacing-4xl: 8rem;     /* 128px */
+  --spacing-5xl: 12rem;    /* 192px */
 
+  /* ===== ESPAÇAMENTO ESPECÍFICO PARA COMPONENTES ===== */
+  --container-padding: var(--spacing-xl);
+  --card-padding: var(--spacing-lg);
+  --card-gap: var(--spacing-lg);
+  --section-spacing: var(--spacing-2xl);
+  --element-gap: var(--spacing-md);
+  --button-padding-x: var(--spacing-lg);
+  --button-padding-y: var(--spacing-md);
+  --form-spacing: var(--spacing-lg);
+  --header-padding: var(--spacing-xl);
+
+  /* ===== TIPOGRAFIA COM ESPAÇAMENTO GENEROSO ===== */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+  --font-size-5xl: 3rem;
+
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  --line-height-loose: 2;
+
+  /* ===== BREAKPOINTS PARA RESPONSIVIDADE ===== */
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 992px;
+  --breakpoint-xl: 1200px;
+  --breakpoint-2xl: 1400px;
+  --breakpoint-iphone14-landscape: 932px; /* iPhone 14 Pro Max landscape */
 }
 
-body {
+html, body {
   font-family: 'Inter', sans-serif;
   background-color: var(--cor-fundo);
   color: var(--cor-texto);
   margin: 0;
   padding: 0;
+  height: 100%;
 }
 
-/* Estilos globais para melhorar todos os cards */
+app-root {
+  display: block;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+/* ===== ESTILOS GLOBAIS COM ESPAÇAMENTO GENEROSO ===== */
+
+/* Cards com espaçamento melhorado (sem conflitos) */
 .card {
   border-radius: var(--raio-borda) !important;
   border: none !important;
@@ -40,16 +97,72 @@ body {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1) !important;
 }
 
-/* Estilos globais para melhorar todos os botões */
+/* Aplicar espaçamento generoso apenas quando necessário */
+.card.generous-spacing {
+  padding: var(--card-padding) !important;
+  margin-bottom: var(--card-gap) !important;
+}
+
+.card.generous-spacing .card-header {
+  padding: var(--spacing-lg) var(--card-padding) var(--spacing-md) var(--card-padding) !important;
+  margin-bottom: var(--spacing-md) !important;
+}
+
+.card.generous-spacing .card-body {
+  padding: var(--card-padding) !important;
+}
+
+.card.generous-spacing .card-footer {
+  padding: var(--spacing-md) var(--card-padding) var(--spacing-lg) var(--card-padding) !important;
+  margin-top: var(--spacing-md) !important;
+}
+
+/* Botões com espaçamento melhorado (sem conflitos) */
 .btn {
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   font-weight: 600;
   transition: all 0.2s ease-in-out;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  min-height: 44px; /* Reduzir para evitar problemas de layout */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+/* Aplicar espaçamento generoso apenas quando necessário */
+.btn.generous-spacing {
+  padding: var(--button-padding-y) var(--button-padding-x) !important;
+  margin: var(--spacing-xs) !important;
+  min-height: 48px;
 }
 
 .btn:hover {
   transform: translateY(-2px);
   filter: brightness(1.05);
+}
+
+.btn-sm {
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  font-size: var(--font-size-sm);
+  min-height: 40px;
+}
+
+.btn-lg {
+  padding: var(--spacing-lg) var(--spacing-xl) !important;
+  font-size: var(--font-size-lg);
+  min-height: 56px;
+}
+
+/* Grupos de botões com espaçamento */
+.btn-group .btn,
+.btn-toolbar .btn {
+  margin: 0 !important;
+}
+
+.btn + .btn {
+  margin-left: var(--spacing-sm) !important;
 }
 
 /* Classe utilitária que você já tinha, agora no global */

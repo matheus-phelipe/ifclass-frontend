@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AdminService, EstatisticasAdmin } from '../services/admin.service';
+import { NotificationService } from '../../../shared/sweetalert/notification.service';
 
 
 
@@ -11,18 +12,22 @@ import { AdminService, EstatisticasAdmin } from '../services/admin.service';
   imports: [CommonModule, RouterModule],
   template: `
     <div class="container-fluid">
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><i class="bi bi-speedometer2 me-2"></i>Dashboard Administrativo</h2>
-        <div class="d-flex gap-2">
-          <button class="btn btn-outline-warning" (click)="verificarSistema()">
-            <i class="bi bi-shield-check me-1"></i>Verificar Sistema
-          </button>
-          <button class="btn btn-outline-success" (click)="criarBackup()">
-            <i class="bi bi-cloud-arrow-up me-1"></i>Backup
-          </button>
-          <button class="btn btn-primary" (click)="atualizarDados()">
-            <i class="bi bi-arrow-clockwise me-1"></i>Atualizar
-          </button>
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+            <h2 class="mb-0"><i class="bi bi-speedometer2 me-2"></i>Dashboard Administrativo</h2>
+            <div class="d-flex flex-column flex-md-row gap-2">
+              <button class="btn btn-outline-warning" (click)="verificarSistema()">
+                <i class="bi bi-shield-check me-1"></i>Verificar Sistema
+              </button>
+              <button class="btn btn-outline-success" (click)="criarBackup()">
+                <i class="bi bi-cloud-arrow-up me-1"></i>Backup
+              </button>
+              <button class="btn btn-primary" (click)="atualizarDados()">
+                <i class="bi bi-arrow-clockwise me-1"></i>Atualizar
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -43,12 +48,14 @@ import { AdminService, EstatisticasAdmin } from '../services/admin.service';
 
       <!-- Métricas Principais -->
       <div class="row mb-4">
-        <div class="col-md-3 mb-3">
-          <div class="card border-primary">
-            <div class="card-body text-center">
-              <i class="bi bi-people-fill text-primary fs-1"></i>
-              <h3 class="mt-2">{{estatisticas?.totalUsuarios || 0}}</h3>
-              <p class="text-muted mb-1">Total de Usuários</p>
+        <div class="col-12 col-sm-6 col-lg-3 mb-3">
+          <div class="card border-primary h-100">
+            <div class="card-body text-center d-flex flex-column justify-content-between">
+              <div>
+                <i class="bi bi-people-fill text-primary fs-1"></i>
+                <h3 class="mt-2 mb-1">{{estatisticas?.totalUsuarios || 0}}</h3>
+                <p class="text-muted mb-2">Total de Usuários</p>
+              </div>
               <small class="text-success">
                 <i class="bi bi-person-check"></i> {{estatisticas?.totalProfessores || 0}} professores
               </small>
@@ -56,12 +63,14 @@ import { AdminService, EstatisticasAdmin } from '../services/admin.service';
           </div>
         </div>
 
-        <div class="col-md-3 mb-3">
-          <div class="card border-success">
-            <div class="card-body text-center">
-              <i class="bi bi-mortarboard-fill text-success fs-1"></i>
-              <h3 class="mt-2">{{estatisticas?.totalCursos || 0}}</h3>
-              <p class="text-muted mb-1">Cursos Ativos</p>
+        <div class="col-12 col-sm-6 col-lg-3 mb-3">
+          <div class="card border-success h-100">
+            <div class="card-body text-center d-flex flex-column justify-content-between">
+              <div>
+                <i class="bi bi-mortarboard-fill text-success fs-1"></i>
+                <h3 class="mt-2 mb-1">{{estatisticas?.totalCursos || 0}}</h3>
+                <p class="text-muted mb-2">Cursos Ativos</p>
+              </div>
               <small class="text-info">
                 <i class="bi bi-collection"></i> {{estatisticas?.totalTurmas || 0}} turmas
               </small>
@@ -69,12 +78,14 @@ import { AdminService, EstatisticasAdmin } from '../services/admin.service';
           </div>
         </div>
 
-        <div class="col-md-3 mb-3">
-          <div class="card border-warning">
-            <div class="card-body text-center">
-              <i class="bi bi-door-open-fill text-warning fs-1"></i>
-              <h3 class="mt-2">{{estatisticas?.totalSalas || 0}}</h3>
-              <p class="text-muted mb-1">Salas Cadastradas</p>
+        <div class="col-12 col-sm-6 col-lg-3 mb-3">
+          <div class="card border-warning h-100">
+            <div class="card-body text-center d-flex flex-column justify-content-between">
+              <div>
+                <i class="bi bi-door-open-fill text-warning fs-1"></i>
+                <h3 class="mt-2 mb-1">{{estatisticas?.totalSalas || 0}}</h3>
+                <p class="text-muted mb-2">Salas Cadastradas</p>
+              </div>
               <small class="text-warning">
                 <i class="bi bi-hdd"></i> {{(estatisticas?.percentualUsoMemoria || 0) | number:'1.0-1'}}% memória
               </small>
@@ -82,12 +93,14 @@ import { AdminService, EstatisticasAdmin } from '../services/admin.service';
           </div>
         </div>
 
-        <div class="col-md-3 mb-3">
-          <div class="card border-info">
-            <div class="card-body text-center">
-              <i class="bi bi-clock-fill text-info fs-1"></i>
-              <h3 class="mt-2">{{formatarTempo(estatisticas?.tempoOnline || 0)}}</h3>
-              <p class="text-muted mb-1">Tempo Online</p>
+        <div class="col-12 col-sm-6 col-lg-3 mb-3">
+          <div class="card border-info h-100">
+            <div class="card-body text-center d-flex flex-column justify-content-between">
+              <div>
+                <i class="bi bi-clock-fill text-info fs-1"></i>
+                <h3 class="mt-2 mb-1">{{formatarTempo(estatisticas?.tempoOnline || 0)}}</h3>
+                <p class="text-muted mb-2">Tempo Online</p>
+              </div>
               <small class="text-success">
                 <i class="bi bi-check-circle"></i> {{estatisticas?.statusSistema || 'OFFLINE'}}
               </small>
@@ -97,8 +110,8 @@ import { AdminService, EstatisticasAdmin } from '../services/admin.service';
       </div>
 
       <!-- Ações Rápidas -->
-      <div class="row">
-        <div class="col-md-12">
+      <div class="row mb-4">
+        <div class="col-12">
           <div class="card">
             <div class="card-header">
               <h5 class="mb-0">
@@ -106,25 +119,29 @@ import { AdminService, EstatisticasAdmin } from '../services/admin.service';
               </h5>
             </div>
             <div class="card-body">
-              <div class="row">
-                <div class="col-md-3">
-                  <button class="btn btn-outline-primary w-100" routerLink="/app/usuarios">
-                    <i class="bi bi-people me-2"></i>Gerenciar Usuários
+              <div class="row g-3">
+                <div class="col-12 col-sm-6 col-lg-3">
+                  <button class="btn btn-outline-primary w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3" routerLink="/app/usuarios">
+                    <i class="bi bi-people fs-2 mb-2"></i>
+                    <span>Gerenciar Usuários</span>
                   </button>
                 </div>
-                <div class="col-md-3">
-                  <button class="btn btn-outline-success w-100" routerLink="/app/admin/sistema">
-                    <i class="bi bi-server me-2"></i>Monitorar Sistema
+                <div class="col-12 col-sm-6 col-lg-3">
+                  <button class="btn btn-outline-success w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3" routerLink="/app/admin/sistema">
+                    <i class="bi bi-server fs-2 mb-2"></i>
+                    <span>Monitorar Sistema</span>
                   </button>
                 </div>
-                <div class="col-md-3">
-                  <button class="btn btn-outline-warning w-100" routerLink="/app/admin/configuracoes">
-                    <i class="bi bi-gear me-2"></i>Configurações
+                <div class="col-12 col-sm-6 col-lg-3">
+                  <button class="btn btn-outline-warning w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3" routerLink="/app/admin/configuracoes">
+                    <i class="bi bi-gear fs-2 mb-2"></i>
+                    <span>Configurações</span>
                   </button>
                 </div>
-                <div class="col-md-3">
-                  <button class="btn btn-outline-info w-100" routerLink="/app/admin/logs">
-                    <i class="bi bi-file-text me-2"></i>Logs do Sistema
+                <div class="col-12 col-sm-6 col-lg-3">
+                  <button class="btn btn-outline-info w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3" routerLink="/app/admin/logs">
+                    <i class="bi bi-file-text fs-2 mb-2"></i>
+                    <span>Logs do Sistema</span>
                   </button>
                 </div>
               </div>
@@ -134,8 +151,8 @@ import { AdminService, EstatisticasAdmin } from '../services/admin.service';
       </div>
 
       <!-- Status do Sistema -->
-      <div class="row mt-4">
-        <div class="col-md-12">
+      <div class="row">
+        <div class="col-12">
           <div class="card">
             <div class="card-header">
               <h5 class="mb-0">
@@ -143,36 +160,48 @@ import { AdminService, EstatisticasAdmin } from '../services/admin.service';
               </h5>
             </div>
             <div class="card-body">
-              <div class="alert" [class]="getStatusAlertClass()">
+              <div class="alert text-center" [class]="getStatusAlertClass()">
                 <i class="bi" [class]="getStatusIconClass()"></i>
-                <h5 class="mt-3" [class]="getStatusTextClass()">{{getStatusMessage()}}</h5>
-                <p class="text-muted">{{getStatusDescription()}}</p>
+                <h5 class="mt-3 mb-2" [class]="getStatusTextClass()">{{getStatusMessage()}}</h5>
+                <p class="mb-0">{{getStatusDescription()}}</p>
               </div>
 
-              <div class="row text-center">
-                <div class="col-md-2">
-                  <h4 class="text-primary">{{estatisticas?.totalUsuarios || 0}}</h4>
-                  <small class="text-muted">Total Usuários</small>
+              <div class="row g-3 text-center">
+                <div class="col-6 col-md-4 col-lg-2">
+                  <div class="p-3 bg-light rounded">
+                    <h4 class="text-primary mb-1">{{estatisticas?.totalUsuarios || 0}}</h4>
+                    <small class="text-muted">Total Usuários</small>
+                  </div>
                 </div>
-                <div class="col-md-2">
-                  <h4 class="text-success">{{estatisticas?.totalAulas || 0}}</h4>
-                  <small class="text-muted">Aulas Cadastradas</small>
+                <div class="col-6 col-md-4 col-lg-2">
+                  <div class="p-3 bg-light rounded">
+                    <h4 class="text-success mb-1">{{estatisticas?.totalAulas || 0}}</h4>
+                    <small class="text-muted">Aulas Cadastradas</small>
+                  </div>
                 </div>
-                <div class="col-md-2">
-                  <h4 class="text-warning">{{estatisticas?.aulasHoje || 0}}</h4>
-                  <small class="text-muted">Aulas Hoje</small>
+                <div class="col-6 col-md-4 col-lg-2">
+                  <div class="p-3 bg-light rounded">
+                    <h4 class="text-warning mb-1">{{estatisticas?.aulasHoje || 0}}</h4>
+                    <small class="text-muted">Aulas Hoje</small>
+                  </div>
                 </div>
-                <div class="col-md-2">
-                  <h4 class="text-info">{{(estatisticas?.percentualUsoCPU || 0) | number:'1.0-1'}}%</h4>
-                  <small class="text-muted">Uso CPU</small>
+                <div class="col-6 col-md-4 col-lg-2">
+                  <div class="p-3 bg-light rounded">
+                    <h4 class="text-info mb-1">{{(estatisticas?.percentualUsoCPU || 0) | number:'1.0-1'}}%</h4>
+                    <small class="text-muted">Uso CPU</small>
+                  </div>
                 </div>
-                <div class="col-md-2">
-                  <h4 class="text-secondary">{{estatisticas?.totalDisciplinas || 0}}</h4>
-                  <small class="text-muted">Disciplinas</small>
+                <div class="col-6 col-md-4 col-lg-2">
+                  <div class="p-3 bg-light rounded">
+                    <h4 class="text-secondary mb-1">{{estatisticas?.totalDisciplinas || 0}}</h4>
+                    <small class="text-muted">Disciplinas</small>
+                  </div>
                 </div>
-                <div class="col-md-2">
-                  <h4 class="text-dark">{{estatisticas?.aulasEstaSemana || 0}}</h4>
-                  <small class="text-muted">Aulas Semana</small>
+                <div class="col-6 col-md-4 col-lg-2">
+                  <div class="p-3 bg-light rounded">
+                    <h4 class="text-dark mb-1">{{estatisticas?.aulasEstaSemana || 0}}</h4>
+                    <small class="text-muted">Aulas Semana</small>
+                  </div>
                 </div>
               </div>
             </div>
@@ -182,33 +211,151 @@ import { AdminService, EstatisticasAdmin } from '../services/admin.service';
     </div>
   `,
   styles: [`
+    /* Corrigir problemas de layout */
+    .container-fluid {
+      max-width: 100%;
+      padding-left: 1rem;
+      padding-right: 1rem;
+      overflow-x: hidden;
+    }
+
+    .row {
+      margin-left: -0.5rem;
+      margin-right: -0.5rem;
+    }
+
+    .row > * {
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
+    }
+
     .card {
       transition: transform 0.2s;
+      margin-bottom: 1rem;
+      border: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-    
+
     .card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
-    
+
+    .card-body {
+      padding: 1.5rem;
+    }
+
     .progress {
       border-radius: 10px;
     }
-    
+
     .alert {
       border-left: 4px solid;
+      margin-bottom: 1.5rem;
     }
-    
+
     .alert-danger {
       border-left-color: #dc3545;
     }
-    
+
     .alert-warning {
       border-left-color: #ffc107;
     }
-    
+
     .alert-info {
       border-left-color: #0dcaf0;
+    }
+
+    .alert-success {
+      border-left-color: #198754;
+    }
+
+    /* Cards de métricas com altura igual */
+    .h-100 {
+      height: 100% !important;
+    }
+
+    /* Botões de ação rápida */
+    .btn.h-100 {
+      min-height: 120px;
+      transition: all 0.2s ease;
+    }
+
+    .btn.h-100:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    /* Status cards */
+    .bg-light {
+      background-color: #f8f9fa !important;
+      transition: all 0.2s ease;
+    }
+
+    .bg-light:hover {
+      background-color: #e9ecef !important;
+      transform: translateY(-1px);
+    }
+
+    /* Botões do header */
+    .gap-2 {
+      gap: 0.5rem !important;
+    }
+
+    .btn {
+      white-space: nowrap;
+      min-height: auto;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+      .gap-2 {
+        gap: 0.5rem !important;
+      }
+
+      .btn {
+        font-size: 0.875rem;
+        padding: 0.5rem 0.75rem;
+      }
+
+      .btn.h-100 {
+        min-height: 100px;
+        padding: 1rem;
+      }
+
+      .card-body {
+        padding: 1rem;
+      }
+
+      .container-fluid {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+      }
+
+      h2 {
+        font-size: 1.5rem;
+      }
+
+      .fs-1 {
+        font-size: 2rem !important;
+      }
+
+      .fs-2 {
+        font-size: 1.5rem !important;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .btn.h-100 {
+        min-height: 80px;
+        padding: 0.75rem;
+      }
+
+      .btn.h-100 span {
+        font-size: 0.875rem;
+      }
     }
   `]
 })
@@ -217,7 +364,10 @@ export class AdminDashboardComponent implements OnInit {
   carregando = false;
   erro: string | null = null;
 
-  constructor(private adminService: AdminService) {}
+  constructor(
+    private adminService: AdminService,
+    private notificationService: NotificationService
+  ) {}
 
   ngOnInit(): void {
     this.carregarEstatisticas();
@@ -261,47 +411,72 @@ export class AdminDashboardComponent implements OnInit {
     this.adminService.healthCheck().subscribe({
       next: (response) => {
         console.log('Sistema OK:', response);
-        alert('Sistema funcionando normalmente!');
+        this.notificationService.showSuccess(
+          'Sistema funcionando normalmente!',
+          'Verificação Concluída'
+        );
       },
       error: (error) => {
         console.error('Erro no sistema:', error);
-        alert('Erro ao verificar sistema!');
+        this.notificationService.showError(
+          'Erro ao verificar sistema. Tente novamente.',
+          'Erro na Verificação'
+        );
       }
     });
   }
 
-  criarBackup(): void {
-    if (confirm('Deseja criar um backup completo do sistema?')) {
-      this.carregando = true;
+  async criarBackup(): Promise<void> {
+    const confirmado = await this.notificationService.confirm(
+      'Criar Backup do Sistema',
+      'Deseja criar um backup completo do sistema? Este processo pode levar alguns minutos.',
+      'Sim, criar backup'
+    );
 
+    if (confirmado) {
+      this.carregando = true;
       console.log('Iniciando backup do sistema...');
 
       this.adminService.criarBackup().subscribe({
         next: (response) => {
           this.carregando = false;
           const timestamp = new Date().toLocaleString('pt-BR');
-          alert(`✅ Backup criado com sucesso!\n\n${response}\nData: ${timestamp}`);
-          this.carregarEstatisticas(); // Recarregar dados
+          this.notificationService.success(
+            'Backup Criado!',
+            `Backup criado com sucesso!\n\n${response}\nData: ${timestamp}`
+          );
+          this.carregarEstatisticas();
         },
         error: (error) => {
           this.carregando = false;
           console.error('Erro ao criar backup:', error);
-          alert('❌ Erro ao criar backup. Tente novamente.');
+          this.notificationService.showError(
+            'Erro ao criar backup. Tente novamente.',
+            'Erro no Backup'
+          );
         }
       });
     }
   }
 
-  reiniciarServicos(): void {
-    if (confirm('⚠️ Tem certeza que deseja reiniciar os serviços?\n\nIsso causará indisponibilidade temporária.')) {
-      this.carregando = true;
+  async reiniciarServicos(): Promise<void> {
+    const confirmado = await this.notificationService.confirmCritical(
+      'Reiniciar Serviços do Sistema',
+      'Tem certeza que deseja reiniciar os serviços?\n\nIsso causará indisponibilidade temporária e todos os usuários conectados serão desconectados.',
+      'Sim, reiniciar'
+    );
 
+    if (confirmado) {
+      this.carregando = true;
       console.log('Reiniciando serviços do sistema...');
 
       setTimeout(() => {
         this.carregando = false;
-        alert('✅ Serviços reiniciados com sucesso!');
-        this.carregarEstatisticas(); // Recarregar dados
+        this.notificationService.showSuccess(
+          'Serviços reiniciados com sucesso!',
+          'Reinicialização Concluída'
+        );
+        this.carregarEstatisticas();
       }, 4000);
     }
   }

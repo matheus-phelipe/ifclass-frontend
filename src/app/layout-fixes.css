@@ -1,0 +1,374 @@
+/* ===== CORREÇÕES DE LAYOUT PARA BUGS VISUAIS ===== */
+/* IMPORTANTE: Estas correções são aplicadas APENAS em páginas específicas, NÃO no mapa do aluno */
+
+/* Aplicar correções apenas em páginas administrativas e de gestão */
+.admin-layout,
+.dashboard-layout,
+.management-layout {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Aplicar apenas para páginas com sidebar normal (não mapa do aluno) */
+.admin-layout .main-content,
+.dashboard-layout .main-content,
+.management-layout .main-content {
+  flex: 1;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: all 0.3s ease;
+  margin-left: 280px;
+  width: calc(100% - 280px);
+  min-height: 100vh;
+}
+
+.admin-layout .main-content.sidebar-collapsed,
+.dashboard-layout .main-content.sidebar-collapsed,
+.management-layout .main-content.sidebar-collapsed {
+  margin-left: 60px;
+  width: calc(100% - 60px);
+}
+
+/* Corrigir containers Bootstrap apenas em layouts administrativos */
+.admin-layout .container-fluid,
+.dashboard-layout .container-fluid,
+.management-layout .container-fluid {
+  max-width: 100%;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  overflow-x: hidden;
+}
+
+.admin-layout .row,
+.dashboard-layout .row,
+.management-layout .row {
+  margin-left: -0.5rem;
+  margin-right: -0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.admin-layout .row > *,
+.dashboard-layout .row > *,
+.management-layout .row > * {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* Corrigir cards apenas em layouts administrativos */
+.admin-layout .card,
+.dashboard-layout .card,
+.management-layout .card {
+  border: none;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-bottom: 1rem;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+.admin-layout .card:hover,
+.dashboard-layout .card:hover,
+.management-layout .card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.admin-layout .card-body,
+.dashboard-layout .card-body,
+.management-layout .card-body {
+  padding: 1.5rem;
+}
+
+.admin-layout .card-header,
+.dashboard-layout .card-header,
+.management-layout .card-header {
+  padding: 1rem 1.5rem;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+/* Corrigir botões apenas em layouts administrativos */
+.admin-layout .btn,
+.dashboard-layout .btn,
+.management-layout .btn {
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  min-height: 38px;
+  padding: 0.5rem 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.admin-layout .btn:hover,
+.dashboard-layout .btn:hover,
+.management-layout .btn:hover {
+  transform: translateY(-1px);
+}
+
+/* Corrigir alertas apenas em layouts administrativos */
+.admin-layout .alert,
+.dashboard-layout .alert,
+.management-layout .alert {
+  border-left: 4px solid;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.5rem;
+}
+
+.admin-layout .alert-success,
+.dashboard-layout .alert-success,
+.management-layout .alert-success {
+  border-left-color: #198754;
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
+.admin-layout .alert-info,
+.dashboard-layout .alert-info,
+.management-layout .alert-info {
+  border-left-color: #0dcaf0;
+  background-color: #d1ecf1;
+  color: #055160;
+}
+
+.admin-layout .alert-warning,
+.dashboard-layout .alert-warning,
+.management-layout .alert-warning {
+  border-left-color: #ffc107;
+  background-color: #fff3cd;
+  color: #664d03;
+}
+
+.admin-layout .alert-danger,
+.dashboard-layout .alert-danger,
+.management-layout .alert-danger {
+  border-left-color: #dc3545;
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+/* Corrigir sidebar apenas em layouts administrativos */
+.admin-layout .sidebar,
+.dashboard-layout .sidebar,
+.management-layout .sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 280px;
+  height: 100vh;
+  z-index: 999;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.admin-layout .sidebar.collapsed-sidebar,
+.dashboard-layout .sidebar.collapsed-sidebar,
+.management-layout .sidebar.collapsed-sidebar {
+  width: 60px;
+}
+
+/* Responsividade apenas para layouts administrativos */
+@media (max-width: 767.98px) {
+  .admin-layout .main-content,
+  .dashboard-layout .main-content,
+  .management-layout .main-content {
+    margin-left: 0;
+    width: 100%;
+    padding: 0.5rem;
+  }
+
+  .admin-layout .main-content.sidebar-collapsed,
+  .dashboard-layout .main-content.sidebar-collapsed,
+  .management-layout .main-content.sidebar-collapsed {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .admin-layout .sidebar,
+  .dashboard-layout .sidebar,
+  .management-layout .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  .admin-layout .sidebar.open,
+  .dashboard-layout .sidebar.open,
+  .management-layout .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .admin-layout .container-fluid,
+  .dashboard-layout .container-fluid,
+  .management-layout .container-fluid {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  .admin-layout .card-body,
+  .dashboard-layout .card-body,
+  .management-layout .card-body {
+    padding: 1rem;
+  }
+
+  .admin-layout .btn,
+  .dashboard-layout .btn,
+  .management-layout .btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  .admin-layout .d-flex.gap-2,
+  .dashboard-layout .d-flex.gap-2,
+  .management-layout .d-flex.gap-2 {
+    flex-direction: column;
+    gap: 0.5rem !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .admin-layout .main-content,
+  .dashboard-layout .main-content,
+  .management-layout .main-content {
+    margin-left: 280px;
+    width: calc(100% - 280px);
+    padding: 1rem;
+  }
+
+  .admin-layout .main-content.sidebar-collapsed,
+  .dashboard-layout .main-content.sidebar-collapsed,
+  .management-layout .main-content.sidebar-collapsed {
+    margin-left: 60px;
+    width: calc(100% - 60px);
+  }
+}
+
+@media (min-width: 992px) {
+  .admin-layout .main-content,
+  .dashboard-layout .main-content,
+  .management-layout .main-content {
+    margin-left: 280px;
+    width: calc(100% - 280px);
+    padding: 2rem;
+  }
+
+  .admin-layout .main-content.sidebar-collapsed,
+  .dashboard-layout .main-content.sidebar-collapsed,
+  .management-layout .main-content.sidebar-collapsed {
+    margin-left: 60px;
+    width: calc(100% - 60px);
+  }
+}
+
+/* Corrigir z-index conflicts apenas em layouts administrativos */
+.admin-layout .modal,
+.dashboard-layout .modal,
+.management-layout .modal {
+  z-index: 1050;
+}
+
+.admin-layout .modal-backdrop,
+.dashboard-layout .modal-backdrop,
+.management-layout .modal-backdrop {
+  z-index: 1040;
+}
+
+.admin-layout .dropdown-menu,
+.dashboard-layout .dropdown-menu,
+.management-layout .dropdown-menu {
+  z-index: 1000;
+}
+
+/* Corrigir overflow issues apenas em layouts administrativos */
+.admin-layout .row,
+.dashboard-layout .row,
+.management-layout .row,
+.admin-layout .col,
+.dashboard-layout .col,
+.management-layout .col,
+.admin-layout [class*="col-"],
+.dashboard-layout [class*="col-"],
+.management-layout [class*="col-"] {
+  overflow: visible;
+}
+
+/* Garantir que elementos não quebrem o layout apenas em layouts administrativos */
+.admin-layout img,
+.dashboard-layout img,
+.management-layout img {
+  max-width: 100%;
+  height: auto;
+}
+
+.admin-layout table,
+.dashboard-layout table,
+.management-layout table {
+  width: 100%;
+  table-layout: auto;
+}
+
+/* Corrigir problemas de texto apenas em layouts administrativos */
+.admin-layout h1, .admin-layout h2, .admin-layout h3, .admin-layout h4, .admin-layout h5, .admin-layout h6,
+.dashboard-layout h1, .dashboard-layout h2, .dashboard-layout h3, .dashboard-layout h4, .dashboard-layout h5, .dashboard-layout h6,
+.management-layout h1, .management-layout h2, .management-layout h3, .management-layout h4, .management-layout h5, .management-layout h6 {
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.admin-layout p,
+.dashboard-layout p,
+.management-layout p {
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+/* Corrigir problemas de formulários apenas em layouts administrativos */
+.admin-layout .form-control, .admin-layout .form-select,
+.dashboard-layout .form-control, .dashboard-layout .form-select,
+.management-layout .form-control, .management-layout .form-select {
+  border-radius: 0.5rem;
+  border: 1px solid #ced4da;
+  padding: 0.5rem 0.75rem;
+}
+
+.admin-layout .form-control:focus, .admin-layout .form-select:focus,
+.dashboard-layout .form-control:focus, .dashboard-layout .form-select:focus,
+.management-layout .form-control:focus, .management-layout .form-select:focus {
+  border-color: #198754;
+  box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+}
+
+/* Corrigir problemas de loading apenas em layouts administrativos */
+.admin-layout .loader-overlay,
+.dashboard-layout .loader-overlay,
+.management-layout .loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.9);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Corrigir problemas de animação */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

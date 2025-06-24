@@ -315,7 +315,7 @@
   border-right: 1px solid #d1d5db;
   display: flex;
   flex-direction: column;
-  padding: 2rem;
+  padding: 0 2rem 2rem 2rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
@@ -323,7 +323,7 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 2rem;
+  margin: 1.5rem 0 2rem 0;
 }
 
 .sidebar-header img {

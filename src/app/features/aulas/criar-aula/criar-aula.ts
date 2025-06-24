@@ -174,6 +174,7 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
         this.sucesso = 'Aula removida com sucesso!';
         this.aulas = this.aulas.filter(a => a.id !== this.aulaParaRemover!.id);
         this.cancelarRemocao();
+        this.carregarAulas();
       },
       error: () => {
         this.erro = 'Erro ao remover a aula.';

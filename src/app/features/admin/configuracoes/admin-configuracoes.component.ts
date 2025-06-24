@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
+import { NotificationService } from '../../../shared/sweetalert/notification.service';
 
 @Component({
   selector: 'app-admin-configuracoes',
@@ -255,7 +256,10 @@ export class AdminConfiguracoesComponent implements OnInit {
 
   configsOriginais = { ...this.configs };
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private notificationService: NotificationService
+  ) {}
 
   ngOnInit(): void {
     this.carregarConfiguracoes();
@@ -342,7 +346,10 @@ export class AdminConfiguracoesComponent implements OnInit {
             this.configsOriginais = { ...this.configs };
             this.carregando = false;
             console.log('Todas as configurações salvas');
-            alert('Configurações salvas com sucesso!');
+            this.notificationService.showSuccess(
+              'Configurações salvas com sucesso!',
+              'Configurações Atualizadas'
+            );
           }
         },
         error: (error) => {
@@ -360,21 +367,37 @@ export class AdminConfiguracoesComponent implements OnInit {
             mensagem = `Erro: ${error.error.message}`;
           }
 
-          alert(mensagem);
+          this.notificationService.showError(mensagem, 'Erro ao Salvar');
         }
       });
     });
   }
 
-  descartarAlteracoes(): void {
-    if (confirm('Tem certeza que deseja descartar todas as alterações?')) {
+  async descartarAlteracoes(): Promise<void> {
+    const confirmado = await this.notificationService.confirm(
+      'Descartar Alterações',
+      'Tem certeza que deseja descartar todas as alterações?',
+      'Sim, descartar'
+    );
+
+    if (confirmado) {
       this.configs = { ...this.configsOriginais };
+      this.notificationService.showInfo(
+        'Alterações descartadas com sucesso.',
+        'Alterações Descartadas'
+      );
       console.log('Alterações descartadas');
     }
   }
 
-  resetarTodasConfiguracoes(): void {
-    if (confirm('Tem certeza que deseja resetar todas as configurações para os valores padrão? Esta ação não pode ser desfeita.')) {
+  async resetarTodasConfiguracoes(): Promise<void> {
+    const confirmado = await this.notificationService.confirmCritical(
+      'Resetar Configurações',
+      'Tem certeza que deseja resetar todas as configurações para os valores padrão?\n\nEsta ação não pode ser desfeita.',
+      'Sim, resetar tudo'
+    );
+
+    if (confirmado) {
       this.configs = {
         appName: 'IFClass',
         sessionTimeout: 3600,
@@ -382,6 +405,10 @@ export class AdminConfiguracoesComponent implements OnInit {
         backupEnabled: true,
         backupTime: '03:00'
       };
+      this.notificationService.showWarning(
+        'Configurações resetadas para valores padrão.',
+        'Configurações Resetadas'
+      );
       console.log('Configurações resetadas para valores padrão');
     }
   }
