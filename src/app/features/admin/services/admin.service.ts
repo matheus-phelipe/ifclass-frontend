@@ -82,6 +82,10 @@ export class AdminService {
     return this.http.get(`${this.apiUrl}/sistema/health`, { responseType: 'text' });
   }
 
+  getPerformanceMetrics(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/performance`);
+  }
+
   criarBackup(): Observable<string> {
     return this.http.post(`${this.apiUrl}/sistema/backup`, {}, { responseType: 'text' });
   }
