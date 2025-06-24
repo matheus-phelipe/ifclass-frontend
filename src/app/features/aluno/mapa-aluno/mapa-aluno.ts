@@ -246,13 +246,15 @@ export class MapaAlunoComponent implements OnInit {
     let newX = Math.round(point.x - this.dragOffset.x);
     let newY = Math.round(point.y - this.dragOffset.y);
 
-    const viewBox = { width: 1600, height: 900 };
+    // Corrigido: usar o viewBox real do SVG (3200x1800)
+    const viewBox = { width: 3200, height: 1800 };
     const salaWidth = this.draggingSala.largura ?? 150;
     const salaHeight = this.draggingSala.altura ?? 100;
 
+    // Permite movimento em toda a área do viewBox
     newX = Math.max(0, Math.min(newX, viewBox.width - salaWidth));
     newY = Math.max(0, Math.min(newY, viewBox.height - salaHeight));
-    
+
     this.draggingSala.posX = newX;
     this.draggingSala.posY = newY;
 
@@ -308,6 +310,51 @@ export class MapaAlunoComponent implements OnInit {
   }
 
   // --- Fim da Lógica de Drag and Drop ---
+
+  // --- Métodos para a Imagem Aérea do Campus ---
+
+  onImageError(event: any): void {
+    // Esconde a imagem e mostra o fallback
+    event.target.style.display = 'none';
+    const fallback = document.getElementById('image-fallback');
+    if (fallback) {
+      fallback.style.display = 'flex';
+    }
+  }
+
+  onImageLoad(event: any): void {
+    // Garante que a imagem está visível e o fallback escondido
+    event.target.style.display = 'block';
+    const fallback = document.getElementById('image-fallback');
+    if (fallback) {
+      fallback.style.display = 'none';
+    }
+  }
+
+  selecionarBlocoFisico(nomeBloco: string): void {
+    // Encontra o bloco pelo nome e seleciona
+    const bloco = this.blocos.find(b => b.nome.toUpperCase().includes(nomeBloco.toUpperCase()));
+    if (bloco && bloco.id) {
+      this.activeBlocoId = bloco.id;
+      this.cancelarEdicao();
+    }
+  }
+
+  blocoTemAulasHoje(nomeBloco: string): boolean {
+    // Verifica se alguma sala do bloco tem aulas hoje
+    const bloco = this.blocos.find(b => b.nome.toUpperCase().includes(nomeBloco.toUpperCase()));
+    if (!bloco) return false;
+
+    return bloco.salas.some(sala => this.isSalaAulaHoje(sala.id));
+  }
+
+  getSalasCount(nomeBloco: string): number {
+    // Retorna o número de salas do bloco
+    const bloco = this.blocos.find(b => b.nome.toUpperCase().includes(nomeBloco.toUpperCase()));
+    return bloco?.salas?.length || 0;
+  }
+
+  // --- Fim dos Métodos da Imagem Aérea ---
 
   selectSala(sala: Sala): void {
     // A seleção para edição só é permitida se for admin.
