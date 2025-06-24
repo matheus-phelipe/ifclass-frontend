@@ -45,30 +45,17 @@ export class LoginComponent implements OnInit {
         this.authService.salvarToken(response.token);
 
         const availableRoles = this.authService.getAvailableRoles();
+        const isStudent = availableRoles.includes('ROLE_ALUNO');
 
-        // Se o usuário tem múltiplas roles, define a mais alta como ativa
-        if (availableRoles.length > 1) {
-          // Hierarquia: ADMIN > COORDENADOR > PROFESSOR > ALUNO
-          if (availableRoles.includes('ROLE_ADMIN')) {
-            this.authService.setActiveRole('ROLE_ADMIN');
-          } else if (availableRoles.includes('ROLE_COORDENADOR')) {
-            this.authService.setActiveRole('ROLE_COORDENADOR');
-          } else if (availableRoles.includes('ROLE_PROFESSOR')) {
-            this.authService.setActiveRole('ROLE_PROFESSOR');
-          } else {
-            this.authService.setActiveRole('ROLE_ALUNO');
+        if (isStudent) {
+          this.authService.setActiveRole('ROLE_ALUNO');
+          this.router.navigate(['/aluno/mapa']);
+        } else {
+          const primaryRole = availableRoles.length > 0 ? availableRoles[0] : null;
+          if (primaryRole) {
+            this.authService.setActiveRole(primaryRole);
           }
           this.router.navigate(['/app/home']);
-        } else {
-          // Se tem apenas uma role
-          const singleRole = availableRoles[0];
-          this.authService.setActiveRole(singleRole);
-
-          if (singleRole === 'ROLE_ALUNO') {
-            this.router.navigate(['/aluno/mapa']);
-          } else {
-            this.router.navigate(['/app/home']);
-          }
         }
       }
     });
