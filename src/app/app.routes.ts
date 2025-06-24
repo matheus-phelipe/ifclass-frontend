@@ -136,6 +136,18 @@ export const routes: Routes = [
         canActivate: [authGuard],
         data: { authorities: ['ROLE_ADMIN'] }
       },
+      {
+        path: 'admin/analytics',
+        loadComponent: () => import('./features/admin/analytics/analytics-dashboard.component').then(m => m.AnalyticsDashboardComponent),
+        canActivate: [authGuard],
+        data: { authorities: ['ROLE_ADMIN'] }
+      },
+      {
+        path: 'admin/analytics',
+        loadComponent: () => import('./features/admin/analytics/analytics-dashboard.component').then(m => m.AnalyticsDashboardComponent),
+        canActivate: [authGuard],
+        data: { authorities: ['ROLE_ADMIN'] }
+      },
 
       { path: '', redirectTo: 'home', pathMatch: 'full' }
     ]

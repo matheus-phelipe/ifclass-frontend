@@ -114,6 +114,10 @@
             <i class="bi bi-speedometer2"></i>
             <span *ngIf="!sidebarCollapsed">Dashboard</span>
           </a>
+          <a routerLink="/app/admin/analytics" class="sidebar-nav-link" [ngClass]="{'justify-content-center': sidebarCollapsed}" title="Analytics e insights avançados">
+            <i class="bi bi-graph-up-arrow"></i>
+            <span *ngIf="!sidebarCollapsed">Analytics</span>
+          </a>
           <a routerLink="/app/usuarios" class="sidebar-nav-link" [ngClass]="{'justify-content-center': sidebarCollapsed}" title="Gerenciar usuários">
             <i class="bi bi-person-gear"></i>
             <span *ngIf="!sidebarCollapsed">Usuários</span>
