@@ -190,10 +190,9 @@ export class PerformanceService {
   }
 
   public preloadRoute(route: string): void {
-    // Preload route components
-    import(`../../../features${route}/${route}`).catch(() => {
-      console.warn(`Failed to preload route: ${route}`);
-    });
+    // Preload route components - simplified for production
+    console.log(`Preloading route: ${route}`);
+    // Dynamic imports disabled for production build stability
   }
 
   public optimizeImages(): void {
