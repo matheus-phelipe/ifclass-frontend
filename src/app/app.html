@@ -1,16 +1,30 @@
 <app-loader [show]="(loaderVisible$ | async) ?? false"></app-loader>
 
+<!-- PWA Install Component -->
+<app-pwa-install></app-pwa-install>
+
 <ng-container *ngIf="showMainLayout">
-  <div class="d-flex min-vh-100">
+  <div class="app-layout admin-layout" [class.pwa-mode]="isPwaMode">
     <app-sidebar
       [isProfessor]="isProfessor"
       [isCoordenador]="isCoordenador"
       [isAdmin]="isAdmin"
-      (logoutClicked)="logout()">
+      [isMobile]="isMobile"
+      [sidebarCollapsed]="sidebarCollapsed"
+      (logoutClicked)="logout()"
+      (sidebarToggled)="toggleSidebar()">
     </app-sidebar>
-    <div class="flex-grow-1 p-4 bg-light d-flex flex-column" style="overflow-y: auto;">
-      <router-outlet></router-outlet>
+
+    <!-- Overlay para mobile quando sidebar está aberta -->
+    <div
+      class="sidebar-overlay"
+      [class.active]="!sidebarCollapsed && isMobile"
+      (click)="closeSidebar()">
     </div>
+
+    <main class="main-content" [class.sidebar-collapsed]="sidebarCollapsed">
+      <router-outlet></router-outlet>
+    </main>
   </div>
 </ng-container>
 

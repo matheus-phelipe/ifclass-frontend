@@ -1,5 +1,83 @@
+<!-- Container Principal do Totem -->
 <div class="totem-container">
 
+  <!-- Header Mobile/Tablet -->
+  <header class="mobile-header">
+    <div class="header-content">
+      <div class="logo-section">
+        <img src="assets/ifclass.png" alt="Logo IFClass" class="header-logo">
+        <div class="header-title">
+          <h1>IFClass</h1>
+          <span>Mapa do Campus</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button class="menu-toggle" (click)="toggleMobileMenu()" [class.active]="mobileMenuOpen">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Mobile -->
+    <nav class="mobile-nav" [class.open]="mobileMenuOpen">
+      <div class="nav-section">
+        <h3>Blocos do Campus</h3>
+        <div class="mobile-bloco-grid">
+          <button
+            *ngFor="let bloco of blocos"
+            class="mobile-bloco-card"
+            [class.active]="bloco.id === activeBlocoId"
+            (click)="selectBloco(bloco.id!)"
+          >
+            <i class="bi bi-building-fill"></i>
+            <span>{{ bloco.nome }}</span>
+            <div class="sala-count">{{ bloco.salas.length || 0 }} salas</div>
+          </button>
+
+          <div *ngIf="blocos.length === 0" class="empty-state">
+            <i class="bi bi-info-circle"></i>
+            <span>Nenhum bloco encontrado</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Admin Panel Mobile -->
+      <div *ngIf="authService.isAdmin$ | async" class="mobile-admin-panel">
+        <h3>Painel Administrativo</h3>
+
+        <div class="admin-actions">
+          <button class="admin-action-btn" (click)="showCreateBlocoModal()">
+            <i class="bi bi-plus-circle"></i>
+            <span>Novo Bloco</span>
+          </button>
+
+          <button class="admin-action-btn" (click)="showCreateSalaModal()">
+            <i class="bi bi-door-open"></i>
+            <span>Nova Sala</span>
+          </button>
+
+          <button *ngIf="activeBlocoId" class="admin-action-btn danger" (click)="handleDeleteBloco(activeBlocoId)">
+            <i class="bi bi-trash"></i>
+            <span>Excluir Bloco</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- User Actions -->
+      <div class="mobile-user-section">
+        <app-profile-switcher></app-profile-switcher>
+        <button class="logout-btn" (click)="logout()">
+          <i class="bi bi-box-arrow-right"></i>
+          <span>Sair</span>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Sidebar Desktop -->
   <aside class="sidebar">
     <div class="sidebar-header">
       <img src="assets/ifclass.png" alt="Logo IFClass" />
@@ -24,7 +102,7 @@
 
         <form #salaForm="ngForm" (ngSubmit)="handleSubmitSala()">
           <h3 class="form-label fw-bold">{{ editingSala ? 'Editar Sala' : 'Adicionar Nova Sala' }}</h3>
-          
+
           <div *ngIf="editingSala" class="alert alert-success p-2 d-flex justify-content-between align-items-center mb-3">
             <span class="small">Editando: <strong>{{ editingSala.codigo }}</strong></span>
             <button class="btn btn-sm btn-outline-danger" type="button" (click)="handleDeleteSala(activeBlocoId!, editingSala.id!)" title="Excluir Sala">
@@ -79,10 +157,10 @@
         </li>
       </ul>
     </nav>
-    
+
     <footer class="sidebar-footer">
       <app-profile-switcher></app-profile-switcher>
-      
+
       <button class="btn btn-outline-danger logout-button" (click)="logout()" title="Sair do sistema">
         <i class="bi bi-box-arrow-right"></i>
         <span>Sair</span>
@@ -127,12 +205,12 @@
                       [class.dragging]="draggingSala?.id === sala.id"
                       (mousedown)="onMouseDown($event, sala)"
                       (touchstart)="onTouchStart($event, sala)">
-                    <rect 
-                        [attr.x]="sala.posX ?? 0" 
-                        [attr.y]="sala.posY ?? 0" 
-                        [attr.width]="sala.largura ?? 150" 
-                        [attr.height]="sala.altura ?? 100" 
-                        class="sala-rect" 
+                    <rect
+                        [attr.x]="sala.posX ?? 0"
+                        [attr.y]="sala.posY ?? 0"
+                        [attr.width]="sala.largura ?? 150"
+                        [attr.height]="sala.altura ?? 100"
+                        class="sala-rect"
                         [class.editing]="editingSala?.id === sala.id"
                         [class.sala-aula-hoje]="isSalaAulaHoje(sala.id)"
                         [attr.fill]="sala.cor || '#FFFFFF'">
@@ -175,10 +253,100 @@
     </ng-container>
 
     <ng-template #welcomeScreen>
-      <div class="welcome-screen">
-        <i class="bi bi-map-fill welcome-icon"></i>
-        <h2 class="display-6">Bem-vindo ao IFClass!</h2>
-        <p class="lead text-muted">Selecione um bloco no menu à esquerda para começar a explorar o campus.</p>
+      <!-- Modo: Visão Geral do Campus -->
+      <div class="campus-overview">
+        <!-- Título da Seção -->
+        <div class="campus-header">
+          <h1 class="campus-title">
+            <i class="bi bi-geo-alt-fill"></i>
+            Mapa do Campus
+          </h1>
+          <p class="campus-subtitle">Clique em um bloco para explorar suas salas e horários</p>
+        </div>
+
+        <div class="campus-image-container">
+          <!-- Imagem aérea real do campus -->
+          <img
+            src="assets/images/campus-aereo.jpg"
+            alt="Vista aérea do campus"
+            class="campus-image"
+            (error)="onImageError($event)"
+            (load)="onImageLoad($event)">
+
+          <!-- Fallback caso a imagem não carregue -->
+          <div class="campus-placeholder" style="display: none;" id="image-fallback">
+            <div class="placeholder-content">
+              <i class="bi bi-building"></i>
+              <h3>Campus do Instituto Federal</h3>
+              <p>Imagem não pôde ser carregada</p>
+            </div>
+          </div>
+
+          <!-- Overlay com blocos clicáveis -->
+          <div class="blocos-overlay">
+            <!-- Bloco A -->
+            <div class="bloco-hotspot bloco-a"
+                 (click)="selecionarBlocoFisico('A')"
+                 [class.has-classes]="blocoTemAulasHoje('A')">
+              <div class="bloco-info">
+                <h3>BLOCO A</h3>
+                <span>{{ getSalasCount('A') }} salas</span>
+                <div *ngIf="blocoTemAulasHoje('A')" class="aulas-indicator">
+                  <i class="bi bi-clock"></i>
+                  Aulas hoje
+                </div>
+              </div>
+            </div>
+
+            <!-- Bloco B -->
+            <div class="bloco-hotspot bloco-b"
+                 (click)="selecionarBlocoFisico('B')"
+                 [class.has-classes]="blocoTemAulasHoje('B')">
+              <div class="bloco-info">
+                <h3>BLOCO B</h3>
+                <span>{{ getSalasCount('B') }} salas</span>
+                <div *ngIf="blocoTemAulasHoje('B')" class="aulas-indicator">
+                  <i class="bi bi-clock"></i>
+                  Aulas hoje
+                </div>
+              </div>
+            </div>
+
+            <!-- Bloco C -->
+            <div class="bloco-hotspot bloco-c"
+                 (click)="selecionarBlocoFisico('C')"
+                 [class.has-classes]="blocoTemAulasHoje('C')">
+              <div class="bloco-info">
+                <h3>BLOCO C</h3>
+                <span>{{ getSalasCount('C') }} salas</span>
+                <div *ngIf="blocoTemAulasHoje('C')" class="aulas-indicator">
+                  <i class="bi bi-clock"></i>
+                  Aulas hoje
+                </div>
+              </div>
+            </div>
+
+            <!-- Bloco D -->
+            <div class="bloco-hotspot bloco-d"
+                 (click)="selecionarBlocoFisico('D')"
+                 [class.has-classes]="blocoTemAulasHoje('D')">
+              <div class="bloco-info">
+                <h3>BLOCO D</h3>
+                <span>{{ getSalasCount('D') }} salas</span>
+                <div *ngIf="blocoTemAulasHoje('D')" class="aulas-indicator">
+                  <i class="bi bi-clock"></i>
+                  Aulas hoje
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Instruções -->
+          <div class="campus-instructions">
+            <i class="bi bi-hand-pointer"></i>
+            Clique em um bloco para ver suas salas
+          </div>
+        </div>
       </div>
     </ng-template>
   </main>

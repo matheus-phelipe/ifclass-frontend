@@ -10,9 +10,9 @@ export const ALL_MENU_CARDS: MenuCard[] = [
   {
     icon: 'bi bi-calendar-week-fill',
     title: 'Aulas do dia',
-    text: 'Confira quais aulas você tem hoje.',
-    link: '/app/aulas',
-    roles: ['ROLE_ALUNO', 'ROLE_PROFESSOR', 'ROLE_COORDENADOR', 'ROLE_ADMIN']
+    text: 'Confira quais aulas estão acontecendo hoje.',
+    link: '/app/aulas-do-dia',
+    roles: ['ROLE_PROFESSOR', 'ROLE_COORDENADOR', 'ROLE_ADMIN']
   },
   {
     icon: 'bi bi-door-open-fill',

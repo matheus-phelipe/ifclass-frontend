@@ -1,7 +1,9 @@
 import { Curso } from './../cursos/pagina/curso.model';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+
+declare var bootstrap: any;
 import { TurmaService } from './turma.service';
 import { ToastrService } from 'ngx-toastr';
 import { Turma } from './turma.model';
@@ -11,6 +13,8 @@ import { CursoService } from '../cursos/pagina/curso.service';
 import { UsuarioService } from '../usuario/usuario.service';
 import { Usuario } from '../usuario/usuario.model';
 import { Router } from '@angular/router';
+import { DashboardStatsComponent, StatCard } from '../../shared/dashboard-stats/dashboard-stats.component';
+import { FilterPipe } from '../../shared/pipes/filter.pipe';
 
 @Component({
   selector: 'app-turmas',
@@ -19,12 +23,14 @@ import { Router } from '@angular/router';
     CommonModule,
     ReactiveFormsModule,
     FormsModule,
-    ProfileSwitcherComponent
+    ProfileSwitcherComponent,
+    FilterPipe,
+    DashboardStatsComponent
   ],
   templateUrl: './turmas.html',
   styleUrls: ['./turmas.css']
 })
-export class TurmasComponent implements OnInit {
+export class TurmasComponent implements OnInit, AfterViewInit {
   turmas: Turma[] = [];
   cursos: Curso[] = [];
   turmaForm: FormGroup;
@@ -39,6 +45,14 @@ export class TurmasComponent implements OnInit {
   alunosVinculados: Usuario[] = [];
   isAlunosVinculadosModalOpen = false;
 
+  // Busca simples
+  termoBusca = '';
+  currentYear = new Date().getFullYear();
+
+  // Estatísticas
+  statsCards: StatCard[] = [];
+  isLoadingStats = true;
+
   constructor(
     private turmaService: TurmaService,
     private cursoService: CursoService,
@@ -46,7 +60,8 @@ export class TurmasComponent implements OnInit {
     private toastr: ToastrService,
     private authService: AuthService,
     private usuarioService: UsuarioService,
-    private router: Router
+    private router: Router,
+    private elementRef: ElementRef
   ) {
     this.turmaForm = this.fb.group({
       id: [null],
@@ -63,17 +78,36 @@ export class TurmasComponent implements OnInit {
     }
     this.carregarTurmas();
     this.carregarCursos();
+    // Filtros já configurados na declaração
     this.canEditTurmas = this.authService.isRoleActiveOrHigher('ROLE_COORDENADOR') || this.authService.isRoleActiveOrHigher('ROLE_ADMIN');
     this.canVincularAlunos = this.canEditTurmas;
     if (this.canVincularAlunos) {
       this.carregarAlunos();
     }
+    this.carregarEstatisticas();
+  }
+
+  ngAfterViewInit(): void {
+    // Inicializar tooltips do Bootstrap
+    this.initializeTooltips();
+  }
+
+  initializeTooltips(): void {
+    setTimeout(() => {
+      const tooltipTriggerList = this.elementRef.nativeElement.querySelectorAll('[data-bs-toggle="tooltip"]');
+      if (typeof bootstrap !== 'undefined') {
+        tooltipTriggerList.forEach((tooltipTriggerEl: any) => {
+          new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+      }
+    }, 100);
   }
 
   carregarTurmas(): void {
     this.turmaService.listar().subscribe({
       next: (turmas: Turma[]) => {
         this.turmas = turmas;
+        this.carregarEstatisticas();
       },
       error: (error: any) => {
         console.error('Erro ao carregar turmas:', error);
@@ -81,6 +115,8 @@ export class TurmasComponent implements OnInit {
       }
     });
   }
+
+  // Funcionalidades simplificadas
 
   carregarCursos(): void {
     this.cursoService.listar().subscribe({
@@ -254,4 +290,75 @@ export class TurmasComponent implements OnInit {
     this.isAlunosVinculadosModalOpen = false;
     this.alunosVinculados = [];
   }
-} 
+
+  getStatusText(turma: Turma): string {
+    if (turma.ano === this.currentYear) {
+      return 'Atual';
+    } else if (turma.ano < this.currentYear) {
+      return 'Passado';
+    } else {
+      return 'Futuro';
+    }
+  }
+
+  getStatusTooltip(turma: Turma): string {
+    if (turma.ano === this.currentYear) {
+      return `Turma em andamento - ${turma.ano}/${turma.semestre}º semestre`;
+    } else if (turma.ano < this.currentYear) {
+      return `Turma finalizada em ${turma.ano}/${turma.semestre}º semestre`;
+    } else {
+      return `Turma programada para ${turma.ano}/${turma.semestre}º semestre`;
+    }
+  }
+
+  carregarEstatisticas(): void {
+    this.isLoadingStats = true;
+
+    // Calcular estatísticas baseadas nos dados carregados
+    const totalTurmas = this.turmas.length;
+    const turmasAtuais = this.turmas.filter(t => t.ano === this.currentYear).length;
+    const turmasPassadas = this.turmas.filter(t => t.ano < this.currentYear).length;
+    const turmasFuturas = this.turmas.filter(t => t.ano > this.currentYear).length;
+
+    // Agrupar por curso
+    const cursosUnicos = [...new Set(this.turmas.map(t => t.curso?.nome).filter(Boolean))];
+    const totalCursos = cursosUnicos.length;
+
+    // Semestres
+    const primeiroSemestre = this.turmas.filter(t => t.semestre === 1).length;
+    const segundoSemestre = this.turmas.filter(t => t.semestre === 2).length;
+
+    this.statsCards = [
+      {
+        title: 'Total de Turmas',
+        value: totalTurmas,
+        icon: 'bi-people',
+        color: 'primary',
+        subtitle: `${totalCursos} cursos diferentes`
+      },
+      {
+        title: 'Turmas Atuais',
+        value: turmasAtuais,
+        icon: 'bi-calendar-check',
+        color: 'success',
+        subtitle: `Ano ${this.currentYear}`
+      },
+      {
+        title: '1º Semestre',
+        value: primeiroSemestre,
+        icon: 'bi-1-circle',
+        color: 'warning',
+        subtitle: 'Turmas do 1º semestre'
+      },
+      {
+        title: '2º Semestre',
+        value: segundoSemestre,
+        icon: 'bi-2-circle',
+        color: 'info',
+        subtitle: 'Turmas do 2º semestre'
+      }
+    ];
+
+    this.isLoadingStats = false;
+  }
+}

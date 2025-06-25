@@ -323,7 +323,6 @@ export class GestaoHorariosComponent implements OnInit {
       next: (stats) => {
         this.estatisticas = stats;
         this.carregando = false;
-        console.log('Dados de horários carregados');
       },
       error: (error) => {
         console.error('Erro ao carregar dados:', error);
@@ -339,7 +338,6 @@ export class GestaoHorariosComponent implements OnInit {
       next: (aulas) => {
         this.aulas = aulas;
         this.aplicarFiltros();
-        console.log('Aulas carregadas:', aulas.length);
       },
       error: (error) => {
         console.error('Erro ao carregar aulas:', error);
@@ -353,7 +351,6 @@ export class GestaoHorariosComponent implements OnInit {
     this.cursoService.getTodosCursos().subscribe({
       next: (cursos) => {
         this.cursos = cursos;
-        console.log('Cursos carregados:', cursos.length);
       },
       error: (error) => {
         console.error('Erro ao carregar cursos:', error);
@@ -366,7 +363,6 @@ export class GestaoHorariosComponent implements OnInit {
     this.turmaService.listar().subscribe({
       next: (turmas) => {
         this.turmas = turmas;
-        console.log('Turmas carregadas:', turmas.length);
       },
       error: (error) => {
         console.error('Erro ao carregar turmas:', error);
@@ -395,9 +391,6 @@ export class GestaoHorariosComponent implements OnInit {
     this.aulasFiltradas = aulasFiltradas;
     this.organizarGradeHoraria();
     this.detectarConflitosAutomatico();
-
-    console.log(`Filtros aplicados: Curso=${this.cursoSelecionado}, Turma=${this.turmaSelecionada}`);
-    console.log(`Aulas filtradas: ${this.aulasFiltradas.length} de ${this.aulas.length}`);
   }
 
   organizarGradeHoraria(): void {
@@ -413,23 +406,15 @@ export class GestaoHorariosComponent implements OnInit {
 
     // Organizar aulas filtradas na grade
     const aulasParaOrganizar = this.aulasFiltradas || this.aulas;
-    console.log('Organizando aulas na grade. Total de aulas filtradas:', aulasParaOrganizar.length);
 
     aulasParaOrganizar.forEach(aula => {
       const horarioAula = this.formatarHorario(aula.hora);
       const diaAula = aula.diaSemana;
 
-      console.log(`Aula: ${aula.disciplina.nome}, Hora: ${aula.hora}, Horário formatado: ${horarioAula}, Dia: ${diaAula}`);
-
       if (this.gradeHoraria[horarioAula] && this.gradeHoraria[horarioAula][diaAula]) {
         this.gradeHoraria[horarioAula][diaAula].push(aula);
-        console.log(`Aula adicionada na grade: ${horarioAula} - ${diaAula}`);
-      } else {
-        console.log(`Horário não encontrado na grade: ${horarioAula} para dia ${diaAula}`);
       }
     });
-
-    console.log('Grade horária organizada:', this.gradeHoraria);
   }
 
   formatarHorario(hora: string): string {
@@ -476,7 +461,6 @@ export class GestaoHorariosComponent implements OnInit {
       }
     }
 
-    console.log(`Hora ${hora} mapeada para slot ${slotMaisProximo.slot}`);
     return slotMaisProximo.slot;
   }
 
@@ -486,12 +470,7 @@ export class GestaoHorariosComponent implements OnInit {
       : [];
   }
 
-
-
-
-
   detectarConflitos(): void {
-    console.log('Detectando conflitos...');
     this.detectarConflitosAutomatico();
     alert(`Análise concluída! ${this.conflitosDetectados} conflito(s) detectado(s).`);
   }
@@ -510,7 +489,6 @@ export class GestaoHorariosComponent implements OnInit {
     this.detectarConflitoTurma(aulasParaAnalisar);
 
     this.conflitosDetectados = this.conflitos.length;
-    console.log(`Conflitos detectados: ${this.conflitosDetectados}`, this.conflitos);
   }
 
   detectarConflitoProfessor(aulas: Aula[]): void {
@@ -625,12 +603,10 @@ export class GestaoHorariosComponent implements OnInit {
   }
 
   otimizarSalas(): void {
-    console.log('Otimizando salas...');
     alert('Otimização de salas iniciada! (simulado)');
   }
 
   atualizarGrade(): void {
-    console.log('Atualizando grade...');
     this.carregarDados();
     this.carregarAulas();
     this.carregarCursos();

@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy, HostListener } from '@angular/core';
 import { Router, RouterOutlet, NavigationEnd, Event as RouterEvent } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { filter, Subscription } from 'rxjs';
@@ -7,26 +7,38 @@ import { UsuarioService } from './features/usuario/usuario.service';
 import { LoaderService } from './shared/loader/loader.service';
 import { SidebarComponent } from './shared/sidebar/sidebar';
 import { LoaderComponent } from './shared/loader/loader.component';
+import { PwaInstallComponent } from './shared/pwa-install/pwa-install.component';
+import { PwaService } from './service/pwa/pwa.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
-    RouterOutlet, 
-    CommonModule, 
+    RouterOutlet,
+    CommonModule,
     SidebarComponent,
-    LoaderComponent
+    LoaderComponent,
+    PwaInstallComponent
   ],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrls: ['./app.css', './layout-fixes.css']
 })
-export class App implements OnInit {
+export class App implements OnInit, OnDestroy {
   title = 'ifclass-frontend';
 
   isAdmin = false;
   isProfessor = false;
   isCoordenador = false;
   showMainLayout = false;
+
+  // Responsividade
+  isMobile = false;
+  isTablet = false;
+  isDesktop = false;
+  sidebarCollapsed = false;
+
+  // PWA
+  isPwaMode = false;
 
   // Lista de rotas onde a sidebar NÃO deve aparecer.
   private standaloneRoutes = ['/login', '/cadastro', '/resetar-senha', '/aluno/mapa'];
@@ -41,7 +53,8 @@ export class App implements OnInit {
     private router: Router,
     private loaderService: LoaderService,
     private usuarioService: UsuarioService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private pwaService: PwaService
   ) {
     this.updateLayout(this.router.url);
   }
@@ -64,6 +77,12 @@ export class App implements OnInit {
     // Verificações iniciais
     this.updateLayoutVisibility(this.router.url);
     this.checkUserRoles();
+
+    // Inicializa responsividade após as subscriptions
+    this.checkScreenSize();
+
+    // Inicializa PWA
+    this.initializePwa();
   }
 
   ngOnDestroy(): void {
@@ -97,5 +116,53 @@ export class App implements OnInit {
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
+  }
+
+  // ===== MÉTODOS DE RESPONSIVIDADE =====
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any): void {
+    this.checkScreenSize();
+  }
+
+  private checkScreenSize(): void {
+    const width = window.innerWidth;
+
+    this.isMobile = width < 768;
+    this.isTablet = width >= 768 && width < 992;
+    this.isDesktop = width >= 992;
+
+    // Auto-colapsar sidebar em mobile
+    if (this.isMobile) {
+      this.sidebarCollapsed = true;
+    } else if (this.isDesktop) {
+      this.sidebarCollapsed = false;
+    }
+
+    // Só chama detectChanges se não estiver na inicialização
+    if (this.roleSubscription) {
+      this.cdr.detectChanges();
+    }
+  }
+
+  toggleSidebar(): void {
+    this.sidebarCollapsed = !this.sidebarCollapsed;
+  }
+
+  closeSidebar(): void {
+    if (this.isMobile) {
+      this.sidebarCollapsed = true;
+    }
+  }
+
+  // ===== MÉTODOS PWA =====
+
+  private initializePwa(): void {
+    this.isPwaMode = this.pwaService.isPwaMode();
+
+    // Registra service worker se disponível
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js');
+    }
   }
 }

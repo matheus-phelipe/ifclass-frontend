@@ -8,34 +8,129 @@
     </button>
   </div>
 
+  <!-- Dashboard de Estatísticas -->
+  <app-dashboard-stats
+     [stats]="statsCards"
+     *ngIf="!isLoadingStats && statsCards.length > 0">
+  </app-dashboard-stats>
+
+  <!-- Loading das estatísticas -->
+  <div *ngIf="isLoadingStats" class="text-center py-3 mb-4">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Carregando estatísticas...</span>
+    </div>
+  </div>
+
+  <!-- Filtros Avançados -->
+  <!-- Busca Simples -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="input-group">
+        <span class="input-group-text">
+          <i class="bi bi-search"></i>
+        </span>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Pesquisar por curso, ano ou semestre..."
+          [(ngModel)]="termoBusca">
+      </div>
+    </div>
+  </div>
+
   <div *ngIf="turmas.length === 0" class="text-center py-5">
     <div class="display-4 text-muted mb-3">
       <i class="bi bi-people"></i>
     </div>
-    <h4 class="text-muted">Nenhuma turma cadastrada</h4>
+    <h4 class="text-muted">Nenhuma turma encontrada</h4>
     <p *ngIf="canEditTurmas" class="text-muted">Clique em "Nova Turma" para começar.</p>
   </div>
 
   <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
-    <div class="col" *ngFor="let turma of turmas">
-      <div class="turma-card">
+    <div class="col" *ngFor="let turma of turmas | filter:termoBusca:'curso.nome,ano,semestre'">
+      <div class="turma-card"
+           [class.current-year]="turma.ano === currentYear"
+           [class.past-year]="turma.ano < currentYear"
+           [class.future-year]="turma.ano > currentYear">
+
+        <!-- Status Badge -->
+        <div class="turma-status-badge"
+             [class.current]="turma.ano === currentYear"
+             [class.past]="turma.ano < currentYear"
+             [class.future]="turma.ano > currentYear"
+             data-bs-toggle="tooltip"
+             data-bs-placement="top"
+             [title]="getStatusTooltip(turma)">
+          {{ getStatusText(turma) }}
+        </div>
+
         <div class="turma-card-header">
           <h5 class="turma-curso-nome">{{ turma.curso?.nome || 'Curso não definido' }}</h5>
           <span class="turma-badge">{{ turma.ano }}/{{ turma.semestre }}º</span>
         </div>
+
+        <!-- Meta informações -->
+        <div class="turma-meta">
+          <div class="turma-meta-item">
+            <i class="bi bi-calendar-event"></i>
+            <span>{{ turma.ano }}</span>
+          </div>
+          <div class="turma-meta-item">
+            <i class="bi bi-bookmark"></i>
+            <span>{{ turma.semestre }}º Sem</span>
+          </div>
+          <div class="turma-meta-item">
+            <i class="bi bi-people"></i>
+            <span>Alunos ativos</span>
+          </div>
+        </div>
+
         <div class="turma-card-actions" *ngIf="canEditTurmas">
-          <button class="btn-acao editar" (click)="abrirModal(turma)" title="Editar">
+          <button class="btn-acao editar"
+                  (click)="abrirModal(turma)"
+                  data-bs-toggle="tooltip"
+                  data-bs-placement="top"
+                  title="Editar informações da turma">
             <i class="bi bi-pencil-fill"></i>
           </button>
-          <button class="btn-acao deletar" (click)="excluirTurma(turma.id!)" title="Excluir">
+          <button class="btn-acao deletar"
+                  (click)="excluirTurma(turma.id!)"
+                  data-bs-toggle="tooltip"
+                  data-bs-placement="top"
+                  title="Excluir turma permanentemente">
             <i class="bi bi-trash-fill"></i>
           </button>
-          <button class="btn-acao vincular" (click)="abrirVincularModal(turma.id!)" title="Vincular Alunos" *ngIf="canVincularAlunos">
+          <button class="btn-acao vincular"
+                  (click)="abrirVincularModal(turma.id!)"
+                  data-bs-toggle="tooltip"
+                  data-bs-placement="top"
+                  title="Vincular novos alunos à turma"
+                  *ngIf="canVincularAlunos">
             <i class="bi bi-person-plus-fill"></i>
           </button>
-          <button class="btn-acao ver" (click)="abrirAlunosVinculadosModal(turma.id!)" title="Ver Alunos Vinculados">
+          <button class="btn-acao ver"
+                  (click)="abrirAlunosVinculadosModal(turma.id!)"
+                  data-bs-toggle="tooltip"
+                  data-bs-placement="top"
+                  title="Ver lista de alunos vinculados">
             <i class="bi bi-people-fill"></i>
           </button>
+        </div>
+
+        <!-- Preview Card -->
+        <div class="turma-card-preview">
+          <div class="turma-preview-title">{{ turma.curso?.nome || 'Curso não definido' }}</div>
+          <div class="turma-preview-info">{{ turma.ano }}/{{ turma.semestre }}º Semestre</div>
+          <div class="turma-preview-stats">
+            <div class="turma-preview-stat">
+              <div class="turma-preview-stat-value">{{ turma.ano }}</div>
+              <div class="turma-preview-stat-label">Ano</div>
+            </div>
+            <div class="turma-preview-stat">
+              <div class="turma-preview-stat-value">{{ turma.semestre }}</div>
+              <div class="turma-preview-stat-label">Semestre</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

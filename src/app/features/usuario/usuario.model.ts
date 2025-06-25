@@ -5,6 +5,20 @@ export interface Usuario {
   nome: string;
   email: string;
   prontuario: string;
-  authorities: string[]; 
+  authorities: string[];
   disciplinas?: Disciplina[];
+  turma?: TurmaResumo;
+}
+
+export interface TurmaResumo {
+  id: number;
+  ano: number;
+  semestre: number;
+  curso?: CursoResumo;
+}
+
+export interface CursoResumo {
+  id: number;
+  nome: string;
+  codigo: string;
 }

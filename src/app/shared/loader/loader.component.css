@@ -1,26 +1,200 @@
+/* ===== LOADER OVERLAY ===== */
 .loader-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
+  transition: all 0.3s ease;
 }
 
+.loader-overlay.transparent {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(4px);
+}
+
+.loader-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.loader-text {
+  color: #198754;
+  font-weight: 600;
+  font-size: 1rem;
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+/* ===== SPINNER LOADER ===== */
 .loader-spinner {
-  border: 8px solid #f3f3f3;
-  border-top: 8px solid #198754;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #198754;
   border-radius: 50%;
-  width: 60px;
-  height: 60px;
+  width: 48px;
+  height: 48px;
   animation: spin 1s linear infinite;
 }
 
+.loader-spinner-inline {
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #198754;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+}
+
+/* ===== DOTS LOADER ===== */
+.loader-dots {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.loader-dots .dot {
+  width: 12px;
+  height: 12px;
+  background-color: #198754;
+  border-radius: 50%;
+  animation: dotPulse 1.4s infinite ease-in-out both;
+}
+
+.loader-dots .dot:nth-child(1) { animation-delay: -0.32s; }
+.loader-dots .dot:nth-child(2) { animation-delay: -0.16s; }
+.loader-dots .dot:nth-child(3) { animation-delay: 0s; }
+
+.loader-dots-inline {
+  display: inline-flex;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.loader-dots-inline .dot {
+  width: 6px;
+  height: 6px;
+  background-color: #198754;
+  border-radius: 50%;
+  animation: dotPulse 1.4s infinite ease-in-out both;
+}
+
+.loader-dots-inline .dot:nth-child(1) { animation-delay: -0.32s; }
+.loader-dots-inline .dot:nth-child(2) { animation-delay: -0.16s; }
+.loader-dots-inline .dot:nth-child(3) { animation-delay: 0s; }
+
+/* ===== PULSE LOADER ===== */
+.loader-pulse {
+  width: 48px;
+  height: 48px;
+  background-color: #198754;
+  border-radius: 50%;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.loader-pulse-inline {
+  width: 20px;
+  height: 20px;
+  background-color: #198754;
+  border-radius: 50%;
+  animation: pulse 1.5s infinite ease-in-out;
+  display: inline-block;
+}
+
+/* ===== SKELETON LOADER ===== */
+.skeleton-loader {
+  width: 100%;
+  padding: 1rem;
+}
+
+.skeleton-item {
+  height: 1rem;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+  margin-bottom: 0.75rem;
+}
+
+.skeleton-item:nth-child(1) { width: 100%; }
+.skeleton-item:nth-child(2) { width: 85%; }
+.skeleton-item:nth-child(3) { width: 70%; }
+
+/* ===== SIZE VARIATIONS ===== */
+.loader-sm .loader-spinner { width: 24px; height: 24px; border-width: 2px; }
+.loader-sm .loader-pulse { width: 24px; height: 24px; }
+.loader-sm .loader-dots .dot { width: 6px; height: 6px; }
+.loader-sm .loader-text { font-size: 0.875rem; }
+
+.loader-md .loader-spinner { width: 48px; height: 48px; border-width: 4px; }
+.loader-md .loader-pulse { width: 48px; height: 48px; }
+.loader-md .loader-dots .dot { width: 12px; height: 12px; }
+.loader-md .loader-text { font-size: 1rem; }
+
+.loader-lg .loader-spinner { width: 64px; height: 64px; border-width: 6px; }
+.loader-lg .loader-pulse { width: 64px; height: 64px; }
+.loader-lg .loader-dots .dot { width: 16px; height: 16px; }
+.loader-lg .loader-text { font-size: 1.125rem; }
+
+.loader-xl .loader-spinner { width: 80px; height: 80px; border-width: 8px; }
+.loader-xl .loader-pulse { width: 80px; height: 80px; }
+.loader-xl .loader-dots .dot { width: 20px; height: 20px; }
+.loader-xl .loader-text { font-size: 1.25rem; }
+
+/* ===== SKELETON SIZE VARIATIONS ===== */
+.skeleton-sm .skeleton-item { height: 0.75rem; margin-bottom: 0.5rem; }
+.skeleton-md .skeleton-item { height: 1rem; margin-bottom: 0.75rem; }
+.skeleton-lg .skeleton-item { height: 1.25rem; margin-bottom: 1rem; }
+.skeleton-xl .skeleton-item { height: 1.5rem; margin-bottom: 1.25rem; }
+
+/* ===== INLINE LOADER ===== */
+.loader-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ===== ANIMATIONS ===== */
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
-} 
+}
+
+@keyframes dotPulse {
+  0%, 80%, 100% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
