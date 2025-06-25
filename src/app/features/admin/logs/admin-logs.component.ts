@@ -240,7 +240,6 @@ export class AdminLogsComponent implements OnInit {
       next: (logs) => {
         this.logs = logs;
         this.carregando = false;
-        console.log('Logs carregados:', logs);
       },
       error: (error) => {
         console.error('Erro ao carregar logs:', error);
@@ -260,8 +259,6 @@ export class AdminLogsComponent implements OnInit {
       }
     });
   }
-
-
 
   atualizarLogs(): void {
     this.carregarLogs();
@@ -315,7 +312,6 @@ export class AdminLogsComponent implements OnInit {
     link.click();
     document.body.removeChild(link);
 
-    console.log(`Exportados ${logsFiltrados.length} logs para CSV`);
     alert(`${logsFiltrados.length} logs exportados com sucesso!`);
   }
 
@@ -339,7 +335,6 @@ export class AdminLogsComponent implements OnInit {
         this.logs = logsRecentes;
         this.carregando = false;
 
-        console.log(`${logsRemovidos} logs antigos removidos`);
         alert(`${logsRemovidos} logs antigos removidos com sucesso!`);
       }, 1500);
     }

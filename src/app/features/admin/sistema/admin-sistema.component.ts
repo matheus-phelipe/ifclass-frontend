@@ -277,7 +277,6 @@ export class AdminSistemaComponent implements OnInit {
       next: (dados) => {
         this.monitoramento = dados;
         this.carregando = false;
-        console.log('Dados de monitoramento carregados:', dados);
       },
       error: (error) => {
         console.error('Erro ao carregar monitoramento:', error);
@@ -297,8 +296,6 @@ export class AdminSistemaComponent implements OnInit {
     });
   }
 
-
-
   atualizarDados(): void {
     this.carregarDados();
   }
@@ -306,7 +303,6 @@ export class AdminSistemaComponent implements OnInit {
   verificarSaude(): void {
     this.adminService.healthCheck().subscribe({
       next: (response) => {
-        console.log('Sistema OK:', response);
         this.notificationService.showSuccess(
           'Sistema funcionando normalmente!',
           'Health Check Concluído'
@@ -338,7 +334,6 @@ export class AdminSistemaComponent implements OnInit {
 
     if (confirmado) {
       this.carregando = true;
-      console.log('Iniciando reinicialização dos serviços...');
 
       this.adminService.reiniciarServicos().subscribe({
         next: (response) => {
@@ -351,7 +346,6 @@ export class AdminSistemaComponent implements OnInit {
         },
         error: (error) => {
           this.carregando = false;
-          console.error('Erro ao reiniciar serviços:', error);
           this.notificationService.showError(
             'Erro ao reiniciar serviços. Tente novamente.',
             'Erro na Reinicialização'
@@ -370,7 +364,6 @@ export class AdminSistemaComponent implements OnInit {
 
     if (confirmado) {
       this.carregando = true;
-      console.log('Iniciando processo de backup...');
 
       this.adminService.criarBackup().subscribe({
         next: (response) => {
@@ -402,7 +395,6 @@ export class AdminSistemaComponent implements OnInit {
 
     if (confirmado) {
       this.carregando = true;
-      console.log('Limpando cache do sistema...');
 
       this.adminService.limparCache().subscribe({
         next: (response) => {
@@ -433,7 +425,6 @@ export class AdminSistemaComponent implements OnInit {
 
     if (confirmado) {
       this.carregando = true;
-      console.log('Iniciando otimização do banco de dados...');
 
       this.adminService.otimizarBanco().subscribe({
         next: (response) => {

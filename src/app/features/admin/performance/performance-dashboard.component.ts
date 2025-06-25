@@ -306,16 +306,13 @@ export class PerformanceDashboardComponent implements OnInit, OnDestroy {
 
   refreshMetrics(): void {
     this.loadMetrics();
-    console.log('📊 Métricas atualizadas');
   }
 
   clearCache(): void {
     this.performanceService.clearCache();
-    console.log('🗑️ Cache limpo');
   }
 
   generateReport(): void {
     this.performanceService.logPerformanceReport();
-    console.log('📋 Relatório gerado no console');
   }
 }

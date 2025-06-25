@@ -349,7 +349,6 @@ export class AnalyticsDashboardComponent implements OnInit, OnDestroy {
     // Usar o serviço de analytics que integra com os dados reais
     this.analyticsService.getAnalyticsData(request).subscribe({
       next: (data) => {
-        console.log('📊 Dados analytics recebidos:', data);
         this.analyticsData = data;
         this.loading = false;
 
@@ -360,7 +359,6 @@ export class AnalyticsDashboardComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         console.error('❌ Erro ao carregar dados analytics:', error);
-        console.log('🔄 Usando dados simulados como fallback');
 
         // Fallback para dados simulados se houver erro
         this.analyticsData = this.generateMockAnalyticsData();
@@ -655,7 +653,6 @@ export class AnalyticsDashboardComponent implements OnInit, OnDestroy {
           'Relatório completo gerado com sucesso!',
           'Relatório Gerado'
         );
-        console.log('📋 Relatório completo:', resultado);
       },
       error: (error) => {
         console.error('Erro ao gerar relatório:', error);

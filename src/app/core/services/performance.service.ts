@@ -186,12 +186,10 @@ export class PerformanceService {
   // Public methods for manual optimization
   public clearCache(): void {
     // Cache clearing will be handled by the cache interceptor
-    console.log('Cache clear requested');
   }
 
   public preloadRoute(route: string): void {
     // Preload route components - simplified for production
-    console.log(`Preloading route: ${route}`);
     // Dynamic imports disabled for production build stability
   }
 
@@ -216,10 +214,8 @@ export class PerformanceService {
     return () => {
       const endTime = performance.now();
       const renderTime = endTime - startTime;
-      console.log(`🎯 ${componentName} render time: ${renderTime.toFixed(2)}ms`);
       
       if (renderTime > 100) {
-        console.warn(`⚠️ Slow component detected: ${componentName} (${renderTime.toFixed(2)}ms)`);
       }
     };
   }
@@ -231,18 +227,6 @@ export class PerformanceService {
   public logPerformanceReport(): void {
     const metrics = this.getPerformanceReport();
     if (metrics) {
-      console.group('📊 Performance Report');
-      console.log('Load Time:', `${metrics.loadTime.toFixed(2)}ms`);
-      console.log('Render Time:', `${metrics.renderTime.toFixed(2)}ms`);
-      console.log('Cache Hit Rate:', `${metrics.cacheHitRate.toFixed(1)}%`);
-      console.log('Bundle Size:', `${(metrics.bundleSize / 1024).toFixed(2)}KB`);
-      console.log('Network Requests:', metrics.networkRequests);
-      
-      if (metrics.memoryUsage) {
-        console.log('Memory Usage:', `${(metrics.memoryUsage.usedJSHeapSize / 1024 / 1024).toFixed(2)}MB`);
-      }
-      
-      console.groupEnd();
     }
   }
 

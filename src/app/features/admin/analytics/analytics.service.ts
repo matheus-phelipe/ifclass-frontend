@@ -51,11 +51,6 @@ export class AnalyticsService {
       )
     }).pipe(
       map(({ estatisticas, aulas }) => {
-        console.log('📊 Analytics Service - Dados recebidos:', {
-          estatisticas: estatisticas,
-          totalAulas: aulas?.length || 0,
-          aulas: aulas?.slice(0, 3) // Mostrar apenas as 3 primeiras para debug
-        });
         return this.processAnalyticsData(estatisticas, aulas, request);
       })
     );

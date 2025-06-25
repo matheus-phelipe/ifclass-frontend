@@ -296,7 +296,6 @@ export class AdminConfiguracoesComponent implements OnInit {
         }
         this.configsOriginais = { ...this.configs };
         this.carregando = false;
-        console.log('Configurações carregadas do backend');
       },
       error: (error) => {
         console.error('Erro ao carregar configurações:', error);
@@ -345,7 +344,6 @@ export class AdminConfiguracoesComponent implements OnInit {
           if (configsSalvas === totalConfigs) {
             this.configsOriginais = { ...this.configs };
             this.carregando = false;
-            console.log('Todas as configurações salvas');
             this.notificationService.showSuccess(
               'Configurações salvas com sucesso!',
               'Configurações Atualizadas'
@@ -386,7 +384,6 @@ export class AdminConfiguracoesComponent implements OnInit {
         'Alterações descartadas com sucesso.',
         'Alterações Descartadas'
       );
-      console.log('Alterações descartadas');
     }
   }
 
@@ -409,7 +406,6 @@ export class AdminConfiguracoesComponent implements OnInit {
         'Configurações resetadas para valores padrão.',
         'Configurações Resetadas'
       );
-      console.log('Configurações resetadas para valores padrão');
     }
   }
 

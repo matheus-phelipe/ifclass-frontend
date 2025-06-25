@@ -231,7 +231,6 @@ export class CoordenacaoDashboardComponent implements OnInit {
       next: (dados) => {
         this.estatisticas = dados;
         this.carregando = false;
-        console.log('Estatísticas carregadas:', dados);
       },
       error: (error) => {
         console.error('Erro ao carregar estatísticas:', error);

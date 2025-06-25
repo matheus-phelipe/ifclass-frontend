@@ -145,18 +145,15 @@ export const cacheInterceptor: HttpInterceptorFn = (req, next) => {
   // Try to get from cache
   const cachedResponse = cacheService.get(cacheKey);
   if (cachedResponse) {
-    console.log(`🎯 Cache HIT for: ${req.url}`);
     return of(cachedResponse);
   }
 
   // Not in cache, make the request
-  console.log(`📡 Cache MISS for: ${req.url}`);
   return next(req).pipe(
     tap(event => {
       if (event instanceof HttpResponse && event.status === 200) {
         const ttl = cacheService.getTTL(req.url);
         cacheService.set(cacheKey, event, ttl);
-        console.log(`💾 Cached response for: ${req.url} (TTL: ${ttl}ms)`);
       }
     })
   );

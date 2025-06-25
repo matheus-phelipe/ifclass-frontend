@@ -168,7 +168,6 @@ export class RelatoriosCoordenacaoComponent implements OnInit {
       next: (professores) => {
         this.professores = professores;
         this.carregando = false;
-        console.log('Dados para relatórios carregados');
       },
       error: (error) => {
         console.error('Erro ao carregar professores:', error);
@@ -178,8 +177,6 @@ export class RelatoriosCoordenacaoComponent implements OnInit {
       }
     });
   }
-
-
 
   gerarRelatorio(): void {
     if (!this.tipoRelatorio) {
@@ -199,7 +196,6 @@ export class RelatoriosCoordenacaoComponent implements OnInit {
       next: (resultado) => {
         this.carregando = false;
         alert(`✅ ${resultado}`);
-        console.log('Relatório gerado:', this.tipoRelatorio);
       },
       error: (error) => {
         this.carregando = false;
@@ -244,7 +240,6 @@ export class RelatoriosCoordenacaoComponent implements OnInit {
       formato: 'pdf'
     };
 
-    console.log('Exportando PDF:', this.tipoRelatorio);
     this.relatorioService.downloadPDF(request);
   }
 
@@ -261,7 +256,6 @@ export class RelatoriosCoordenacaoComponent implements OnInit {
       formato: 'excel'
     };
 
-    console.log('Exportando Excel:', this.tipoRelatorio);
     this.relatorioService.downloadExcel(request);
   }
 }

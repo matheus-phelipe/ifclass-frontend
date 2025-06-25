@@ -645,7 +645,6 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       next: (dados) => {
         this.estatisticas = dados;
         this.carregando = false;
-        console.log('Estatísticas admin carregadas:', dados);
       },
       error: (error) => {
         console.error('Erro ao carregar estatísticas admin:', error);
@@ -665,8 +664,6 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-
-
   atualizarDados(): void {
     this.carregarEstatisticas();
   }
@@ -674,7 +671,6 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   verificarSistema(): void {
     this.adminService.healthCheck().subscribe({
       next: (response) => {
-        console.log('Sistema OK:', response);
         this.notificationService.showSuccess(
           'Sistema funcionando normalmente!',
           'Verificação Concluída'
@@ -699,7 +695,6 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
     if (confirmado) {
       this.carregando = true;
-      console.log('Iniciando backup do sistema...');
 
       this.adminService.criarBackup().subscribe({
         next: (response) => {
@@ -732,7 +727,6 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
     if (confirmado) {
       this.carregando = true;
-      console.log('Reiniciando serviços do sistema...');
 
       setTimeout(() => {
         this.carregando = false;
@@ -848,7 +842,6 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
         if (backendMetrics.cache) {
           this.performanceData.cacheHitRate = `${backendMetrics.cache.hitRate?.toFixed(0) || 85}%`;
         }
-        console.log('Backend performance metrics:', backendMetrics);
       },
       error: (error) => {
         console.warn('Could not load backend performance metrics:', error);
