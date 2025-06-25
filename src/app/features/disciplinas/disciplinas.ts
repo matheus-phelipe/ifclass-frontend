@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { DisciplinaService } from './disciplina.service';
 import { Disciplina } from './disciplina.model';
@@ -9,11 +9,13 @@ import { Curso } from '../cursos/pagina/curso.model';
 import { CursoService } from '../cursos/pagina/curso.service';
 import { ProfileSwitcherComponent } from '../../shared/profile-switcher/profile-switcher';
 import { Router } from '@angular/router';
+import { DashboardStatsComponent, StatCard } from '../../shared/dashboard-stats/dashboard-stats.component';
+import { FilterPipe } from '../../shared/pipes/filter.pipe';
 
 @Component({
   selector: 'app-disciplinas',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ProfileSwitcherComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, ProfileSwitcherComponent, FilterPipe, DashboardStatsComponent],
   templateUrl: './disciplinas.html',
   styleUrls: ['./disciplinas.css']
 })
@@ -25,13 +27,21 @@ export class DisciplinasComponent implements OnInit {
   canEditDisciplinas = false;
   cursos: Curso[] = [];
 
+  // Busca simples
+  termoBusca = '';
+
+  // Estatísticas
+  statsCards: StatCard[] = [];
+  isLoadingStats = true;
+
   constructor(
     private disciplinaService: DisciplinaService,
     private fb: FormBuilder,
     private toastr: ToastrService,
     private authService: AuthService,
     private cursoService: CursoService,
-    private router: Router
+    private router: Router,
+
   ) {
     this.disciplinaForm = this.fb.group({
       id: [null],
@@ -52,12 +62,14 @@ export class DisciplinasComponent implements OnInit {
     this.carregarDisciplinas();
     this.carregarCursos();
     this.canEditDisciplinas = this.authService.isRoleActiveOrHigher('ROLE_COORDENADOR') || this.authService.isRoleActiveOrHigher('ROLE_ADMIN');
+    this.carregarEstatisticas();
   }
 
   carregarDisciplinas(): void {
     this.disciplinaService.listar().subscribe({
       next: (disciplinas: Disciplina[]) => {
         this.disciplinas = disciplinas;
+        this.carregarEstatisticas();
       },
       error: (error: any) => {
         console.error('Erro ao carregar disciplinas:', error);
@@ -65,6 +77,8 @@ export class DisciplinasComponent implements OnInit {
       }
     });
   }
+
+  // Funcionalidades simplificadas
 
   carregarCursos(): void {
     this.cursoService.getTodosCursos().subscribe({
@@ -152,4 +166,55 @@ export class DisciplinasComponent implements OnInit {
       this.fecharModal();
     }
   }
-} 
+
+  carregarEstatisticas(): void {
+    this.isLoadingStats = true;
+
+    // Calcular estatísticas baseadas nos dados carregados
+    const totalDisciplinas = this.disciplinas.length;
+    const cargaHorariaTotal = this.disciplinas.reduce((total, disc) => total + (disc.cargaHoraria || 0), 0);
+    const cargaHorariaMedia = totalDisciplinas > 0 ? Math.round(cargaHorariaTotal / totalDisciplinas) : 0;
+
+    // Agrupar por departamento
+    const departamentos = [...new Set(this.disciplinas.map(d => d.departamento))];
+    const totalDepartamentos = departamentos.length;
+
+    // Classificar por carga horária
+    const disciplinasLongas = this.disciplinas.filter(d => (d.cargaHoraria || 0) >= 80).length;
+    const disciplinasMedias = this.disciplinas.filter(d => (d.cargaHoraria || 0) >= 40 && (d.cargaHoraria || 0) < 80).length;
+    const disciplinasCurtas = this.disciplinas.filter(d => (d.cargaHoraria || 0) < 40).length;
+
+    this.statsCards = [
+      {
+        title: 'Total de Disciplinas',
+        value: totalDisciplinas,
+        icon: 'bi-journal-bookmark',
+        color: 'primary',
+        subtitle: `${totalDepartamentos} departamentos`
+      },
+      {
+        title: 'Carga Horária Total',
+        value: cargaHorariaTotal,
+        icon: 'bi-clock-history',
+        color: 'success',
+        subtitle: `Média de ${cargaHorariaMedia}h por disciplina`
+      },
+      {
+        title: 'Disciplinas Longas',
+        value: disciplinasLongas,
+        icon: 'bi-hourglass-top',
+        color: 'warning',
+        subtitle: '80+ horas'
+      },
+      {
+        title: 'Disciplinas Curtas',
+        value: disciplinasCurtas,
+        icon: 'bi-hourglass-bottom',
+        color: 'info',
+        subtitle: 'Até 40 horas'
+      }
+    ];
+
+    this.isLoadingStats = false;
+  }
+}

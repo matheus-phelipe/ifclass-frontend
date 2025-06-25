@@ -8,17 +8,57 @@
     </button>
   </div>
 
+  <!-- Dashboard de Estatísticas -->
+  <app-dashboard-stats
+     [stats]="statsCards"
+     *ngIf="!isLoadingStats && statsCards.length > 0">
+  </app-dashboard-stats>
+
+  <!-- Loading das estatísticas -->
+  <div *ngIf="isLoadingStats" class="text-center py-3 mb-4">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Carregando estatísticas...</span>
+    </div>
+  </div>
+
+  <!-- Filtros Avançados -->
+  <!-- Busca Simples -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="input-group">
+        <span class="input-group-text">
+          <i class="bi bi-search"></i>
+        </span>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Pesquisar por nome, código, departamento..."
+          [(ngModel)]="termoBusca">
+      </div>
+    </div>
+  </div>
+
   <div *ngIf="disciplinas.length === 0" class="text-center py-5">
     <div class="display-4 text-muted mb-3">
       <i class="bi bi-journal-bookmark-fill"></i>
     </div>
-    <h4 class="text-muted">Nenhuma disciplina cadastrada</h4>
+    <h4 class="text-muted">Nenhuma disciplina encontrada</h4>
     <p *ngIf="canEditDisciplinas" class="text-muted">Clique em "Nova Disciplina" para começar.</p>
   </div>
 
   <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
-    <div class="col" *ngFor="let disciplina of disciplinas">
+    <div class="col" *ngFor="let disciplina of disciplinas | filter:termoBusca:'nome,codigo,departamento'">
       <div class="disciplina-card">
+        <!-- Status Badge -->
+        <div class="disciplina-status-badge"
+             [ngClass]="{
+               'longa': disciplina.cargaHoraria >= 80,
+               'media': disciplina.cargaHoraria >= 40 && disciplina.cargaHoraria < 80,
+               'curta': disciplina.cargaHoraria < 40
+             }">
+          {{ disciplina.cargaHoraria >= 80 ? 'LON' : (disciplina.cargaHoraria >= 40 ? 'MED' : 'CUR') }}
+        </div>
+
         <div class="disciplina-card-header">
           <h5 class="disciplina-nome">{{ disciplina.nome }}</h5>
           <span class="disciplina-badge">{{ disciplina.codigo }}</span>

@@ -73,7 +73,7 @@ export class Gerenciarusuarios implements OnInit {
   }
 
   carregarUsuarios() {
-    this.usuarioService.listarTodos().subscribe({
+    this.usuarioService.listarTodosComDetalhes().subscribe({
       next: (data) => {
         this.usuarios = data;
         this.filtrarUsuarios();

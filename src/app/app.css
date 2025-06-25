@@ -1,0 +1,123 @@
+/* ===== LAYOUT PRINCIPAL RESPONSIVO ===== */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.main-content {
+  flex: 1;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: all 0.3s ease;
+  margin-left: 280px; /* Largura correta da sidebar */
+}
+
+.main-content.sidebar-collapsed {
+  margin-left: 60px; /* Largura da sidebar colapsada */
+}
+
+/* Overlay para mobile */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 998;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.sidebar-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ===== RESPONSIVIDADE DO LAYOUT ===== */
+
+/* Mobile (até 768px) */
+@media (max-width: 767.98px) {
+  .main-content {
+    margin-left: 0;
+    padding: 0.5rem;
+  }
+
+  .main-content.sidebar-collapsed {
+    margin-left: 0;
+  }
+}
+
+/* Tablet (768px - 991.98px) */
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .main-content {
+    padding: 1rem;
+    margin-left: 280px; /* Manter largura consistente */
+  }
+
+  .main-content.sidebar-collapsed {
+    margin-left: 60px;
+  }
+}
+
+/* Desktop (992px+) */
+@media (min-width: 992px) {
+  .main-content {
+    padding: 2rem;
+    margin-left: 280px; /* Manter largura consistente */
+  }
+
+  .main-content.sidebar-collapsed {
+    margin-left: 60px;
+  }
+}
+
+/* ===== PWA STYLES ===== */
+.app-layout.pwa-mode {
+  /* Ajustes específicos para modo PWA */
+  padding-top: 0;
+}
+
+.pwa-mode .main-content {
+  /* Remove padding extra em modo PWA */
+  padding-top: 20px;
+}
+
+/* Safe area para dispositivos com notch */
+@supports (padding: max(0px)) {
+  .app-layout {
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+  }
+
+  .pwa-mode {
+    padding-top: max(0px, env(safe-area-inset-top));
+    padding-bottom: max(0px, env(safe-area-inset-bottom));
+  }
+}
+
+/* ===== RESPONSIVIDADE MOBILE ===== */
+@media (max-width: 767px) {
+  .admin-layout {
+    padding-left: 0 !important;
+  }
+
+  .main-content {
+    margin-left: 0 !important;
+    padding: 10px;
+  }
+
+  .main-content.sidebar-collapsed {
+    margin-left: 0 !important;
+  }
+
+  /* Ajustes PWA mobile */
+  .pwa-mode .main-content {
+    padding-bottom: 80px; /* Espaço para navegação mobile */
+  }
+}

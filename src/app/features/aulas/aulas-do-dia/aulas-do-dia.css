@@ -1,0 +1,231 @@
+:host {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Header */
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--cor-primaria, #198754);
+  margin-bottom: 0.25rem;
+}
+
+.page-subtitle {
+  color: #6c757d;
+  font-size: 1.1rem;
+  margin-bottom: 0;
+}
+
+/* Estatísticas */
+.stat-card {
+  background: #fff;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: transform 0.2s ease-in-out;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+}
+
+.stat-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: #fff;
+}
+
+.stat-primary .stat-icon { background-color: #0d6efd; }
+.stat-success .stat-icon { background-color: #198754; }
+.stat-warning .stat-icon { background-color: #fd7e14; }
+.stat-info .stat-icon { background-color: #0dcaf0; }
+
+.stat-content h3 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  color: #343a40;
+}
+
+.stat-content p {
+  margin-bottom: 0;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.empty-icon {
+  font-size: 4rem;
+  color: #dee2e6;
+  margin-bottom: 1rem;
+}
+
+.empty-state h4 {
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
+/* Aulas Grid */
+.aulas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.aula-card {
+  background: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  border-left: 4px solid #dee2e6;
+}
+
+.aula-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.aula-card.periodo-matutino {
+  border-left-color: #198754;
+}
+
+.aula-card.periodo-vespertino {
+  border-left-color: #fd7e14;
+}
+
+.aula-card.periodo-noturno {
+  border-left-color: #0dcaf0;
+}
+
+.aula-header {
+  background: #f8f9fa;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.aula-horario {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #343a40;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.aula-periodo {
+  background: #e9ecef;
+  color: #495057;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.periodo-matutino .aula-periodo {
+  background: #d1e7dd;
+  color: #0f5132;
+}
+
+.periodo-vespertino .aula-periodo {
+  background: #f8d7da;
+  color: #842029;
+}
+
+.periodo-noturno .aula-periodo {
+  background: #cff4fc;
+  color: #055160;
+}
+
+.aula-content {
+  padding: 1.5rem;
+}
+
+.aula-disciplina {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #343a40;
+  margin-bottom: 1rem;
+}
+
+.aula-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #6c757d;
+  font-size: 0.95rem;
+}
+
+.info-item i {
+  width: 16px;
+  color: #adb5bd;
+}
+
+/* Info Panels */
+.info-panel {
+  background: #fff;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.info-panel h6 {
+  color: #495057;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.info-panel p {
+  color: #6c757d;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .aulas-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .page-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch !important;
+  }
+  
+  .page-header .d-flex {
+    justify-content: space-between;
+  }
+}

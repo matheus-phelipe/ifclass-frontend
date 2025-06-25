@@ -117,7 +117,6 @@ export class GestaoProfessoresComponent implements OnInit {
       next: (professores) => {
         this.professores = professores;
         this.carregando = false;
-        console.log('Professores carregados:', professores);
       },
       error: (error) => {
         console.error('Erro ao carregar professores:', error);
@@ -128,18 +127,16 @@ export class GestaoProfessoresComponent implements OnInit {
     });
   }
 
-
-
   atualizarDados(): void {
     this.carregarDados();
   }
 
   exportarPDF(): void {
-    console.log('Exportar PDF - Implementar funcionalidade');
+    // Implementar funcionalidade
   }
 
   exportarExcel(): void {
-    console.log('Exportar Excel - Implementar funcionalidade');
+    // Implementar funcionalidade
   }
 
   getStatusClass(status: string): string {

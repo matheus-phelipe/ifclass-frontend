@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../service/auth/auth.service';
 import { CommonModule } from '@angular/common';
@@ -14,15 +14,30 @@ export class SidebarComponent {
   @Input() isProfessor: boolean = false;
   @Input() isCoordenador: boolean = false;
   @Input() isAdmin: boolean = false;
+  @Input() isMobile: boolean = false;
+  @Input() sidebarCollapsed: boolean = false;
 
-  sidebarOpen: boolean = true;
+  @Output() sidebarToggled = new EventEmitter<void>();
+
+  // Estados dos submenus
+  expandedMenus: { [key: string]: boolean } = {
+    geral: true,
+    coordenacao: false,
+    admin: false
+  };
 
   constructor(
     private router: Router,
     private authService: AuthService) {}
 
   toggleSidebar() {
-    this.sidebarOpen = !this.sidebarOpen;
+    this.sidebarToggled.emit();
+  }
+
+  toggleSubmenu(menuKey: string) {
+    if (!this.sidebarCollapsed) {
+      this.expandedMenus[menuKey] = !this.expandedMenus[menuKey];
+    }
   }
 
   logout() {

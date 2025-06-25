@@ -59,6 +59,7 @@ export class MapaAlunoComponent implements OnInit {
   error: string | null = null;
   public activeBlocoId: number | null = null;
   public editingSala: Sala | null = null;
+  public blocoSelecionadoId: number | null = null;
 
   // --- Propriedades para o Drag and Drop ---
   public isDragging = false;
@@ -103,12 +104,15 @@ export class MapaAlunoComponent implements OnInit {
     altura: 100,
     cor: '#FFFFFF'
   };
-  blocoSelecionadoId: number | null = null;
 
   aulasHoje: Aula[] = [];
   salasAulaHoje: number[] = [];
   aulasSemana: Aula[] = [];
   alunoTemTurmaMasSemAulas = false;
+
+  // Propriedades para o novo layout
+  mobileMenuOpen = false;
+  legendExpanded = false;
 
   constructor(
     private blocoService: BlocoService,
@@ -242,13 +246,15 @@ export class MapaAlunoComponent implements OnInit {
     let newX = Math.round(point.x - this.dragOffset.x);
     let newY = Math.round(point.y - this.dragOffset.y);
 
-    const viewBox = { width: 1600, height: 900 };
+    // Corrigido: usar o viewBox real do SVG (3200x1800)
+    const viewBox = { width: 3200, height: 1800 };
     const salaWidth = this.draggingSala.largura ?? 150;
     const salaHeight = this.draggingSala.altura ?? 100;
 
+    // Permite movimento em toda a área do viewBox
     newX = Math.max(0, Math.min(newX, viewBox.width - salaWidth));
     newY = Math.max(0, Math.min(newY, viewBox.height - salaHeight));
-    
+
     this.draggingSala.posX = newX;
     this.draggingSala.posY = newY;
 
@@ -305,6 +311,52 @@ export class MapaAlunoComponent implements OnInit {
 
   // --- Fim da Lógica de Drag and Drop ---
 
+  // --- Métodos para a Imagem Aérea do Campus ---
+
+  onImageError(event: any): void {
+    // Esconde a imagem e mostra o fallback
+    event.target.style.display = 'none';
+    const fallback = document.getElementById('image-fallback');
+    if (fallback) {
+      fallback.style.display = 'flex';
+    }
+  }
+
+  onImageLoad(event: any): void {
+    // Garante que a imagem está visível e o fallback escondido
+    event.target.style.display = 'block';
+    const fallback = document.getElementById('image-fallback');
+    if (fallback) {
+      fallback.style.display = 'none';
+    }
+  }
+
+  selecionarBlocoFisico(nomeBloco: string): void {
+    // Encontra o bloco pelo nome e seleciona
+    const bloco = this.blocos.find(b => b.nome.toUpperCase().includes(nomeBloco.toUpperCase()));
+    if (bloco && bloco.id) {
+      this.activeBlocoId = bloco.id;
+      this.blocoSelecionadoId = bloco.id; // Define também para adicionar salas
+      this.cancelarEdicao();
+    }
+  }
+
+  blocoTemAulasHoje(nomeBloco: string): boolean {
+    // Verifica se alguma sala do bloco tem aulas hoje
+    const bloco = this.blocos.find(b => b.nome.toUpperCase().includes(nomeBloco.toUpperCase()));
+    if (!bloco) return false;
+
+    return bloco.salas.some(sala => this.isSalaAulaHoje(sala.id));
+  }
+
+  getSalasCount(nomeBloco: string): number {
+    // Retorna o número de salas do bloco
+    const bloco = this.blocos.find(b => b.nome.toUpperCase().includes(nomeBloco.toUpperCase()));
+    return bloco?.salas?.length || 0;
+  }
+
+  // --- Fim dos Métodos da Imagem Aérea ---
+
   selectSala(sala: Sala): void {
     // A seleção para edição só é permitida se for admin.
     if (!this.authService.isRoleActiveOrHigher('ROLE_ADMIN')) return;
@@ -327,6 +379,10 @@ export class MapaAlunoComponent implements OnInit {
 
   toggleBloco(blocoId: number): void {
     this.activeBlocoId = this.activeBlocoId === blocoId ? null : blocoId;
+    // Quando um bloco é selecionado, definir como padrão para adicionar novas salas
+    if (this.activeBlocoId !== null) {
+      this.blocoSelecionadoId = this.activeBlocoId;
+    }
     this.cancelarEdicao();
   }
 
@@ -351,7 +407,8 @@ export class MapaAlunoComponent implements OnInit {
         
         // Seleciona o primeiro bloco da lista por padrão
         if (!this.activeBlocoId && this.blocos.length > 0) {
-          this.activeBlocoId = this.blocos[0].id; 
+          this.activeBlocoId = this.blocos[0].id;
+          this.blocoSelecionadoId = this.blocos[0].id; // Define também para adicionar salas
         }
         
         this.isLoading = false;
@@ -395,18 +452,28 @@ export class MapaAlunoComponent implements OnInit {
       posY: this.formSala.posY,
       largura: this.formSala.largura,
       altura: this.formSala.altura,
-      cor: this.formSala.cor 
+      cor: this.formSala.cor
     };
 
     if (this.editingSala) {
       this.blocoService.updateSala(this.blocoSelecionadoId, this.editingSala.id, salaData).subscribe({
-        next: () => { this.cancelarEdicao(); this.carregarBlocos(); },
-        error: () => { this.error = 'Falha ao atualizar a sala.'; }
+        next: () => {
+          this.cancelarEdicao();
+          this.carregarBlocos();
+        },
+        error: (err) => {
+          this.error = 'Falha ao atualizar a sala.';
+        }
       });
     } else {
       this.blocoService.addSala(this.blocoSelecionadoId, salaData).subscribe({
-        next: () => { this.cancelarEdicao(); this.carregarBlocos(); },
-        error: () => { this.error = 'Falha ao criar a sala.'; }
+        next: (response) => {
+          this.cancelarEdicao();
+          this.carregarBlocos();
+        },
+        error: (err) => {
+          this.error = 'Falha ao criar a sala.';
+        }
       });
     }
   }
@@ -470,5 +537,37 @@ export class MapaAlunoComponent implements OnInit {
       this.authService.setActiveRole('ROLE_ADMIN');
       this.router.navigate(['/app/home']);
     }
+  }
+
+  // Métodos para o novo layout
+  toggleMobileMenu(): void {
+    this.mobileMenuOpen = !this.mobileMenuOpen;
+  }
+
+  selectBloco(blocoId: number): void {
+    this.activeBlocoId = blocoId;
+    this.mobileMenuOpen = false; // Fecha o menu mobile após seleção
+    this.cancelarEdicao();
+  }
+
+  toggleLegend(): void {
+    this.legendExpanded = !this.legendExpanded;
+  }
+
+  showCreateBlocoModal(): void {
+    // Implementar modal para criar bloco no mobile
+    // Por enquanto, usar prompt simples
+    const nome = prompt('Nome do novo bloco:');
+    if (nome?.trim()) {
+      this.novoBlocoNome = nome.trim();
+      this.handleCreateBloco();
+    }
+  }
+
+  showCreateSalaModal(): void {
+    // Implementar modal para criar sala no mobile
+    // Por enquanto, redirecionar para o formulário desktop
+    this.mobileMenuOpen = false;
+    // Scroll para o formulário se estiver visível
   }
 }

@@ -60,18 +60,25 @@ body, html {
   justify-content: space-between;
   transition: all 0.3s ease-in-out;
   border: 1px solid transparent;
+  border-left: 4px solid transparent;
   min-height: 150px;
+  position: relative;
+  z-index: 1;
+  overflow: visible;
 }
 .turma-card:hover {
   transform: translateY(-6px);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   border-color: #d1e7dd;
+  border-left-color: #0d6efd;
+  z-index: 1002;
 }
 .turma-card-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 20px;
+  padding-right: 60px; /* Espaço adequado para o badge */
 }
 .turma-curso-nome {
   font-size: 1.25rem;
@@ -305,4 +312,175 @@ body, html {
 /* Garante que os modais do bootstrap tenham um backdrop */
 .modal-backdrop {
   opacity: 0.5;
-} 
+}
+
+/* Cards Mais Informativos - Melhorias para Turmas */
+
+.turma-card.current-year {
+  border-left-color: #198754;
+}
+
+.turma-card.past-year {
+  border-left-color: #6c757d;
+}
+
+.turma-card.future-year {
+  border-left-color: #ffc107;
+}
+
+/* Status Badge para Turmas */
+.turma-status-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 2px 6px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  z-index: 1001;
+  min-width: 35px;
+  text-align: center;
+  line-height: 1.2;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.turma-status-badge.current {
+  background-color: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
+}
+
+.turma-status-badge.past {
+  background-color: #e2e3e5;
+  color: #383d41;
+  border: 1px solid #d6d8db;
+}
+
+.turma-status-badge.future {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+/* Meta informações para Turmas */
+.turma-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.turma-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: #6c757d;
+  background-color: #f8f9fa;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.turma-meta-item i {
+  font-size: 0.75rem;
+}
+
+/* Ações com fade-in no hover */
+.turma-card-actions {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+}
+
+.turma-card:hover .turma-card-actions {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Preview para Turmas */
+.turma-card-preview {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  width: 280px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+  padding: 16px;
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(10px);
+  transition: all 0.3s ease;
+  border: 1px solid #e9ecef;
+  pointer-events: none;
+}
+
+.turma-card:hover .turma-card-preview {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+  z-index: 10000;
+  pointer-events: auto;
+}
+
+.turma-preview-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #146c43;
+  margin-bottom: 8px;
+}
+
+.turma-preview-info {
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin-bottom: 8px;
+}
+
+.turma-preview-stats {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.turma-preview-stat {
+  text-align: center;
+  padding: 6px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  flex: 1;
+}
+
+.turma-preview-stat-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #146c43;
+}
+
+.turma-preview-stat-label {
+  font-size: 0.7rem;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Garantir que containers não interfiram com z-index */
+.row, .col, .col-md-3, .col-md-4, .col-md-6, .col-lg-3, .col-lg-4, .col-xl-3, .col-xl-4 {
+  position: relative;
+  z-index: auto;
+  overflow: visible;
+}
+
+.container, .container-fluid {
+  overflow: visible;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .turma-card-preview {
+    display: none;
+  }
+}

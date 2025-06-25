@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminService, MonitoramentoSistema } from '../services/admin.service';
+import { NotificationService } from '../../../shared/sweetalert/notification.service';
 
 @Component({
   selector: 'app-admin-sistema',
@@ -259,7 +260,10 @@ export class AdminSistemaComponent implements OnInit {
   carregando = false;
   erro: string | null = null;
 
-  constructor(private adminService: AdminService) {}
+  constructor(
+    private adminService: AdminService,
+    private notificationService: NotificationService
+  ) {}
 
   ngOnInit(): void {
     this.carregarDados();
@@ -273,7 +277,6 @@ export class AdminSistemaComponent implements OnInit {
       next: (dados) => {
         this.monitoramento = dados;
         this.carregando = false;
-        console.log('Dados de monitoramento carregados:', dados);
       },
       error: (error) => {
         console.error('Erro ao carregar monitoramento:', error);
@@ -293,8 +296,6 @@ export class AdminSistemaComponent implements OnInit {
     });
   }
 
-
-
   atualizarDados(): void {
     this.carregarDados();
   }
@@ -302,8 +303,10 @@ export class AdminSistemaComponent implements OnInit {
   verificarSaude(): void {
     this.adminService.healthCheck().subscribe({
       next: (response) => {
-        console.log('Sistema OK:', response);
-        alert('Sistema funcionando normalmente!');
+        this.notificationService.showSuccess(
+          'Sistema funcionando normalmente!',
+          'Health Check Concluído'
+        );
       },
       error: (error) => {
         console.error('Erro no sistema:', error);
@@ -317,88 +320,127 @@ export class AdminSistemaComponent implements OnInit {
           mensagem = 'Serviço indisponível: Sistema temporariamente fora do ar.';
         }
 
-        alert(mensagem);
+        this.notificationService.showError(mensagem, 'Erro no Health Check');
       }
     });
   }
 
-  reiniciarServicos(): void {
-    if (confirm('⚠️ ATENÇÃO: Tem certeza que deseja reiniciar os serviços?\n\nIsso pode causar indisponibilidade temporária do sistema.\nUsuários conectados serão desconectados.')) {
-      this.carregando = true;
+  async reiniciarServicos(): Promise<void> {
+    const confirmado = await this.notificationService.confirmCritical(
+      'Reiniciar Serviços do Sistema',
+      'ATENÇÃO: Tem certeza que deseja reiniciar os serviços?\n\nIsso pode causar indisponibilidade temporária do sistema.\nUsuários conectados serão desconectados.',
+      'Sim, reiniciar serviços'
+    );
 
-      console.log('Iniciando reinicialização dos serviços...');
+    if (confirmado) {
+      this.carregando = true;
 
       this.adminService.reiniciarServicos().subscribe({
         next: (response) => {
           this.carregando = false;
-          alert('✅ Serviços reiniciados com sucesso!\n\nTodos os serviços foram reiniciados e estão operacionais.');
-          this.carregarDados(); // Recarregar dados após reinicialização
+          this.notificationService.success(
+            'Serviços Reiniciados!',
+            'Todos os serviços foram reiniciados com sucesso e estão operacionais.'
+          );
+          this.carregarDados();
         },
         error: (error) => {
           this.carregando = false;
-          console.error('Erro ao reiniciar serviços:', error);
-          alert('❌ Erro ao reiniciar serviços. Tente novamente.');
+          this.notificationService.showError(
+            'Erro ao reiniciar serviços. Tente novamente.',
+            'Erro na Reinicialização'
+          );
         }
       });
     }
   }
 
-  criarBackup(): void {
-    if (confirm('Deseja criar um backup completo do sistema?\n\nEste processo pode levar alguns minutos.')) {
-      this.carregando = true;
+  async criarBackup(): Promise<void> {
+    const confirmado = await this.notificationService.confirm(
+      'Criar Backup do Sistema',
+      'Deseja criar um backup completo do sistema?\n\nEste processo pode levar alguns minutos.',
+      'Sim, criar backup'
+    );
 
-      console.log('Iniciando processo de backup...');
+    if (confirmado) {
+      this.carregando = true;
 
       this.adminService.criarBackup().subscribe({
         next: (response) => {
           this.carregando = false;
           const timestamp = new Date().toLocaleString('pt-BR');
-          alert(`✅ Backup criado com sucesso!\n\n${response}\nData: ${timestamp}\nTamanho: ~45.2 MB`);
+          this.notificationService.success(
+            'Backup Criado!',
+            `Backup criado com sucesso!\n\n${response}\nData: ${timestamp}\nTamanho: ~45.2 MB`
+          );
         },
         error: (error) => {
           this.carregando = false;
           console.error('Erro ao criar backup:', error);
-          alert('❌ Erro ao criar backup. Tente novamente.');
+          this.notificationService.showError(
+            'Erro ao criar backup. Tente novamente.',
+            'Erro no Backup'
+          );
         }
       });
     }
   }
 
-  limparCache(): void {
-    if (confirm('Deseja limpar o cache do sistema?\n\nIsso pode melhorar a performance, mas alguns dados precisarão ser recarregados.')) {
-      this.carregando = true;
+  async limparCache(): Promise<void> {
+    const confirmado = await this.notificationService.confirm(
+      'Limpar Cache do Sistema',
+      'Deseja limpar o cache do sistema?\n\nIsso pode melhorar a performance, mas alguns dados precisarão ser recarregados.',
+      'Sim, limpar cache'
+    );
 
-      console.log('Limpando cache do sistema...');
+    if (confirmado) {
+      this.carregando = true;
 
       this.adminService.limparCache().subscribe({
         next: (response) => {
           this.carregando = false;
-          alert('✅ Cache limpo com sucesso!\n\n• Cache de usuários: Limpo\n• Cache de sessões: Limpo\n• Cache de consultas: Limpo\n• Arquivos temporários: Removidos');
+          this.notificationService.success(
+            'Cache Limpo!',
+            'Cache limpo com sucesso!\n\n• Cache de usuários: Limpo\n• Cache de sessões: Limpo\n• Cache de consultas: Limpo\n• Arquivos temporários: Removidos'
+          );
         },
         error: (error) => {
           this.carregando = false;
           console.error('Erro ao limpar cache:', error);
-          alert('❌ Erro ao limpar cache. Tente novamente.');
+          this.notificationService.showError(
+            'Erro ao limpar cache. Tente novamente.',
+            'Erro na Limpeza'
+          );
         }
       });
     }
   }
 
-  otimizarBanco(): void {
-    if (confirm('Deseja otimizar o banco de dados?\n\nEste processo irá:\n• Reindexar tabelas\n• Limpar logs antigos\n• Otimizar consultas\n• Compactar dados\n\nTempo estimado: 5-10 minutos')) {
-      this.carregando = true;
+  async otimizarBanco(): Promise<void> {
+    const confirmado = await this.notificationService.confirmCritical(
+      'Otimizar Banco de Dados',
+      'Deseja otimizar o banco de dados?\n\nEste processo irá:\n• Reindexar tabelas\n• Limpar logs antigos\n• Otimizar consultas\n• Compactar dados\n\nTempo estimado: 5-10 minutos',
+      'Sim, otimizar banco'
+    );
 
-      console.log('Iniciando otimização do banco de dados...');
+    if (confirmado) {
+      this.carregando = true;
 
       this.adminService.otimizarBanco().subscribe({
         next: (response) => {
           this.carregando = false;
-          alert('✅ Banco de dados otimizado com sucesso!\n\n• Índices recriados: 23\n• Logs limpos: 1.2GB liberados\n• Consultas otimizadas: 15\n• Performance melhorada: +18%\n• Espaço recuperado: 2.8GB');
+          this.notificationService.success(
+            'Banco Otimizado!',
+            'Banco de dados otimizado com sucesso!\n\n• Índices recriados: 23\n• Logs limpos: 1.2GB liberados\n• Consultas otimizadas: 15\n• Performance melhorada: +18%\n• Espaço recuperado: 2.8GB'
+          );
         },
         error: (error) => {
           this.carregando = false;
           console.error('Erro ao otimizar banco:', error);
-          alert('❌ Erro ao otimizar banco de dados. Tente novamente.');
+          this.notificationService.showError(
+            'Erro ao otimizar banco de dados. Tente novamente.',
+            'Erro na Otimização'
+          );
         }
       });
     }

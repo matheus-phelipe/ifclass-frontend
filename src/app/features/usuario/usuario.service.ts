@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Usuario } from './usuario.model';
-import { environment } from '../../../environments/environment.development';
+import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -20,6 +20,11 @@ export class UsuarioService {
   // Listar todos os usuários
   listarTodos() {
     return this.http.get<Usuario[]>(this.apiUrl);
+  }
+
+  // Listar usuários com detalhes (turma/curso para alunos, disciplinas para professores)
+  listarTodosComDetalhes() {
+    return this.http.get<Usuario[]>(`${this.apiUrl}/detalhes`);
   }
 
   // Atualizar authorities (papéis)

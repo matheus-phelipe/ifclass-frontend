@@ -7,6 +7,8 @@ import { BlocoService } from '../bloco.service';
 import { AuthService } from '../../../service/auth/auth.service';
 import { NgxPanZoomModule } from 'ngx-panzoom';
 import { ProfileSwitcherComponent } from '../../../shared/profile-switcher/profile-switcher';
+import { DashboardStatsComponent, StatCard } from '../../../shared/dashboard-stats/dashboard-stats.component';
+// StatsService removido temporariamente
 
 // Re-definir a interface PanZoomConfig (COMPLETA)
 export interface PanZoomConfig {
@@ -40,7 +42,7 @@ export interface PanZoomConfig {
 @Component({
   selector: 'app-gerenciador-salas',
   standalone: true,  
-  imports: [CommonModule, FormsModule, NgxPanZoomModule, ProfileSwitcherComponent],
+  imports: [CommonModule, FormsModule, NgxPanZoomModule, ProfileSwitcherComponent, DashboardStatsComponent],
   templateUrl: './gerenciador-salas.html',
   styleUrls: ['./gerenciador-salas.css'],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
@@ -93,14 +95,20 @@ export class GerenciadorSalasComponent implements OnInit {
   };
   blocoSelecionadoId: number | null = null;
 
+  // Dashboard Stats
+  statsCards: StatCard[] = [];
+  isLoadingStats = true;
+
   constructor(
     private blocoService: BlocoService,
     public authService: AuthService,
-    private el: ElementRef // Usado para querySelector
+    private el: ElementRef, // Usado para querySelector
+
   ) {}
 
   ngOnInit(): void {
     this.carregarBlocos();
+    this.carregarEstatisticas();
   }
 
   // --- Lógica de Drag and Drop (Apenas para Admin) ---
@@ -235,12 +243,62 @@ export class GerenciadorSalasComponent implements OnInit {
             this.blocoSelecionadoId = this.blocos[0].id;
         }
         this.isLoading = false;
+        this.carregarEstatisticas();
       },
       error: () => {
         this.error = 'Falha ao carregar os dados do campus.';
         this.isLoading = false;
       }
     });
+  }
+
+  carregarEstatisticas(): void {
+    this.isLoadingStats = true;
+
+    // Calcular estatísticas baseadas nos dados carregados
+    const totalSalas = this.blocos.reduce((total, bloco) => total + (bloco.salas?.length || 0), 0);
+    const totalBlocos = this.blocos.length;
+    const salasComCapacidade = this.blocos.flatMap(b => b.salas || []).filter(s => s.capacidade && s.capacidade > 0);
+    const capacidadeTotal = salasComCapacidade.reduce((total, sala) => total + (sala.capacidade || 0), 0);
+    const capacidadeMedia = salasComCapacidade.length > 0 ? Math.round(capacidadeTotal / salasComCapacidade.length) : 0;
+
+    // Classificar salas por capacidade
+    const salasGrandes = salasComCapacidade.filter(s => (s.capacidade || 0) >= 50).length;
+    const salasMedias = salasComCapacidade.filter(s => (s.capacidade || 0) >= 20 && (s.capacidade || 0) < 50).length;
+    const salasPequenas = salasComCapacidade.filter(s => (s.capacidade || 0) < 20).length;
+
+    this.statsCards = [
+      {
+        title: 'Total de Salas',
+        value: totalSalas,
+        icon: 'bi-door-open',
+        color: 'primary',
+        subtitle: `Distribuídas em ${totalBlocos} blocos`
+      },
+      {
+        title: 'Capacidade Total',
+        value: capacidadeTotal,
+        icon: 'bi-people',
+        color: 'success',
+        subtitle: `Média de ${capacidadeMedia} por sala`
+      },
+      {
+        title: 'Salas Grandes',
+        value: salasGrandes,
+        icon: 'bi-building',
+        color: 'warning',
+        subtitle: '50+ pessoas'
+      },
+      {
+        title: 'Salas Pequenas',
+        value: salasPequenas,
+        icon: 'bi-house',
+        color: 'info',
+        subtitle: 'Até 20 pessoas'
+      }
+    ];
+
+    this.isLoadingStats = false;
   }
 
   handleCreateBloco(): void {

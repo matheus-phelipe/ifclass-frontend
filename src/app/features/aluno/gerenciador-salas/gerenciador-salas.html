@@ -6,6 +6,21 @@
       <div class="mb-4 text-center">
         <app-profile-switcher></app-profile-switcher>
       </div>
+
+      
+          <!-- Dashboard de Estatísticas -->
+      <app-dashboard-stats
+         [stats]="statsCards"
+         *ngIf="!isLoadingStats && statsCards.length > 0">
+      </app-dashboard-stats>
+
+          <!-- Loading das estatísticas -->
+      <div *ngIf="isLoadingStats" class="text-center py-3">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Carregando estatísticas...</span>
+        </div>
+      </div>
+
       <!-- Coluna da Esquerda: Painel de Controle e Formulários -->
       <div class="col-lg-4 col-xl-3">
         <div class="control-panel">

@@ -1,0 +1,252 @@
+/* Estilos customizados para SweetAlert2 - Design System IFClass */
+
+/* ===== VARIÁVEIS CUSTOMIZADAS ===== */
+:root {
+  --swal-border-radius: 16px;
+  --swal-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  --swal-backdrop: rgba(0, 0, 0, 0.4);
+  --swal-spacing: 2rem;
+  --swal-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ===== CONTAINER PRINCIPAL ===== */
+.swal2-container {
+  backdrop-filter: blur(8px);
+  background-color: var(--swal-backdrop) !important;
+}
+
+/* ===== POPUP MODERNO ===== */
+.swal-modern {
+  border-radius: var(--swal-border-radius) !important;
+  box-shadow: var(--swal-shadow) !important;
+  border: none !important;
+  font-family: var(--swal-font-family) !important;
+  padding: var(--swal-spacing) !important;
+  background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%) !important;
+}
+
+/* ===== TÍTULO ===== */
+.swal-title {
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+  color: #212529 !important;
+  margin-bottom: 1rem !important;
+  line-height: 1.3 !important;
+}
+
+/* ===== CONTEÚDO ===== */
+.swal-content,
+.swal2-html-container {
+  font-size: 1rem !important;
+  color: #6c757d !important;
+  line-height: 1.6 !important;
+  margin-bottom: 1.5rem !important;
+}
+
+/* ===== ÍCONES CUSTOMIZADOS ===== */
+.swal2-icon {
+  border: none !important;
+  margin: 0 auto 1.5rem auto !important;
+  width: 80px !important;
+  height: 80px !important;
+}
+
+.swal2-icon.swal2-success {
+  background: linear-gradient(135deg, #198754, #20c997) !important;
+  border-radius: 50% !important;
+}
+
+.swal2-icon.swal2-error {
+  background: linear-gradient(135deg, #dc3545, #fd7e14) !important;
+  border-radius: 50% !important;
+}
+
+.swal2-icon.swal2-warning {
+  background: linear-gradient(135deg, #ffc107, #fd7e14) !important;
+  border-radius: 50% !important;
+}
+
+.swal2-icon.swal2-info {
+  background: linear-gradient(135deg, #0dcaf0, #6f42c1) !important;
+  border-radius: 50% !important;
+}
+
+.swal2-icon.swal2-question {
+  background: linear-gradient(135deg, #6f42c1, #0dcaf0) !important;
+  border-radius: 50% !important;
+}
+
+/* ===== BOTÕES MODERNOS ===== */
+.swal2-actions {
+  gap: 1rem !important;
+  margin-top: 2rem !important;
+}
+
+.swal2-confirm,
+.swal2-cancel {
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+  font-size: 1rem !important;
+  padding: 0.75rem 2rem !important;
+  border: none !important;
+  transition: all 0.3s ease !important;
+  min-width: 120px !important;
+  font-family: var(--swal-font-family) !important;
+}
+
+.swal2-confirm {
+  background: linear-gradient(135deg, #198754, #20c997) !important;
+  box-shadow: 0 4px 15px rgba(25, 135, 84, 0.3) !important;
+}
+
+.swal2-confirm:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(25, 135, 84, 0.4) !important;
+}
+
+.swal2-cancel {
+  background: linear-gradient(135deg, #6c757d, #adb5bd) !important;
+  box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3) !important;
+}
+
+.swal2-cancel:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4) !important;
+}
+
+/* ===== VARIAÇÕES ESPECIAIS ===== */
+
+/* Modal de Perigo */
+.swal-danger .swal2-confirm {
+  background: linear-gradient(135deg, #dc3545, #fd7e14) !important;
+  box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3) !important;
+}
+
+.swal-danger .swal2-confirm:hover {
+  box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4) !important;
+}
+
+/* Modal Crítico */
+.swal-critical {
+  background: linear-gradient(145deg, #fff3cd 0%, #ffeaa7 100%) !important;
+  border-left: 5px solid #ffc107 !important;
+}
+
+.swal-critical .swal2-confirm {
+  background: linear-gradient(135deg, #fd7e14, #ffc107) !important;
+  box-shadow: 0 4px 15px rgba(253, 126, 20, 0.3) !important;
+}
+
+.swal-critical .swal2-confirm:hover {
+  box-shadow: 0 6px 20px rgba(253, 126, 20, 0.4) !important;
+}
+
+/* ===== ANIMAÇÕES ===== */
+.swal2-show {
+  animation: swalSlideInDown 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+}
+
+.swal2-hide {
+  animation: swalSlideOutUp 0.3s cubic-bezier(0.55, 0.055, 0.675, 0.19) !important;
+}
+
+@keyframes swalSlideInDown {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -100%, 0) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes swalSlideOutUp {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(0, -100%, 0) scale(0.9);
+  }
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 768px) {
+  .swal-modern {
+    margin: 1rem !important;
+    padding: 1.5rem !important;
+    border-radius: 12px !important;
+  }
+  
+  .swal-title {
+    font-size: 1.25rem !important;
+  }
+  
+  .swal-content {
+    font-size: 0.9rem !important;
+  }
+  
+  .swal2-icon {
+    width: 60px !important;
+    height: 60px !important;
+  }
+  
+  .swal2-confirm,
+  .swal2-cancel {
+    padding: 0.75rem 1.5rem !important;
+    font-size: 0.9rem !important;
+    min-width: 100px !important;
+  }
+  
+  .swal2-actions {
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+  }
+}
+
+/* ===== TOASTR CUSTOMIZATIONS ===== */
+.toast-container {
+  z-index: 9999 !important;
+}
+
+.toast {
+  border-radius: 12px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
+  border: none !important;
+  font-family: var(--swal-font-family) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+.toast-success {
+  background: linear-gradient(135deg, rgba(25, 135, 84, 0.95), rgba(32, 201, 151, 0.95)) !important;
+}
+
+.toast-error {
+  background: linear-gradient(135deg, rgba(220, 53, 69, 0.95), rgba(253, 126, 20, 0.95)) !important;
+}
+
+.toast-warning {
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.95), rgba(253, 126, 20, 0.95)) !important;
+}
+
+.toast-info {
+  background: linear-gradient(135deg, rgba(13, 202, 240, 0.95), rgba(111, 66, 193, 0.95)) !important;
+}
+
+.toast-title {
+  font-weight: 600 !important;
+  font-size: 1rem !important;
+}
+
+.toast-message {
+  font-size: 0.9rem !important;
+  opacity: 0.95 !important;
+}
+
+/* Progress bar customizada */
+.toast-progress {
+  background: rgba(255, 255, 255, 0.3) !important;
+  height: 3px !important;
+}
