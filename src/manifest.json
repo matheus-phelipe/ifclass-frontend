@@ -1,0 +1,25 @@
+{
+  "name": "IFClass - Sistema de Gestão Acadêmica",
+  "short_name": "IFClass",
+  "description": "Sistema completo para gestão de aulas, usuários e campus do Instituto Federal",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#198754",
+  "background_color": "#ffffff",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "assets/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "prefer_related_applications": false
+}

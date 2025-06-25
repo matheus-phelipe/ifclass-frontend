@@ -1,7 +1,10 @@
 <app-loader [show]="(loaderVisible$ | async) ?? false"></app-loader>
 
+<!-- PWA Install Component -->
+<app-pwa-install></app-pwa-install>
+
 <ng-container *ngIf="showMainLayout">
-  <div class="app-layout admin-layout">
+  <div class="app-layout admin-layout" [class.pwa-mode]="isPwaMode">
     <app-sidebar
       [isProfessor]="isProfessor"
       [isCoordenador]="isCoordenador"

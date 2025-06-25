@@ -7,6 +7,8 @@ import { UsuarioService } from './features/usuario/usuario.service';
 import { LoaderService } from './shared/loader/loader.service';
 import { SidebarComponent } from './shared/sidebar/sidebar';
 import { LoaderComponent } from './shared/loader/loader.component';
+import { PwaInstallComponent } from './shared/pwa-install/pwa-install.component';
+import { PwaService } from './service/pwa/pwa.service';
 
 @Component({
   selector: 'app-root',
@@ -15,7 +17,8 @@ import { LoaderComponent } from './shared/loader/loader.component';
     RouterOutlet,
     CommonModule,
     SidebarComponent,
-    LoaderComponent
+    LoaderComponent,
+    PwaInstallComponent
   ],
   templateUrl: './app.html',
   styleUrls: ['./app.css', './layout-fixes.css']
@@ -34,6 +37,9 @@ export class App implements OnInit, OnDestroy {
   isDesktop = false;
   sidebarCollapsed = false;
 
+  // PWA
+  isPwaMode = false;
+
   // Lista de rotas onde a sidebar NÃO deve aparecer.
   private standaloneRoutes = ['/login', '/cadastro', '/resetar-senha', '/aluno/mapa'];
   private roleSubscription!: Subscription;
@@ -47,7 +53,8 @@ export class App implements OnInit, OnDestroy {
     private router: Router,
     private loaderService: LoaderService,
     private usuarioService: UsuarioService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private pwaService: PwaService
   ) {
     this.updateLayout(this.router.url);
   }
@@ -73,6 +80,9 @@ export class App implements OnInit, OnDestroy {
 
     // Inicializa responsividade após as subscriptions
     this.checkScreenSize();
+
+    // Inicializa PWA
+    this.initializePwa();
   }
 
   ngOnDestroy(): void {
@@ -142,6 +152,17 @@ export class App implements OnInit, OnDestroy {
   closeSidebar(): void {
     if (this.isMobile) {
       this.sidebarCollapsed = true;
+    }
+  }
+
+  // ===== MÉTODOS PWA =====
+
+  private initializePwa(): void {
+    this.isPwaMode = this.pwaService.isPwaMode();
+
+    // Registra service worker se disponível
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js');
     }
   }
 }
