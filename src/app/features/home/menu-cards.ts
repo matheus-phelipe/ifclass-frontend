@@ -67,7 +67,7 @@ export const ALL_MENU_CARDS: MenuCard[] = [
     icon: 'bi bi-gear-fill',
     title: 'Configurações',
     text: 'Ajuste configurações do sistema.',
-    link: '/configuracoes',
+    link: '/app/admin/configuracoes',
     roles: ['ROLE_ADMIN']
   }
 ];
