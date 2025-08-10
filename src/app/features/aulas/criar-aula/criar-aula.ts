@@ -1,5 +1,16 @@
-import { Component, OnInit, ViewChild, AfterViewInit, ElementRef } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  AfterViewInit,
+  ElementRef,
+} from '@angular/core';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -22,9 +33,15 @@ import { ModalConfirmacaoComponent } from '../../../shared/modal-confirmacao/mod
 @Component({
   selector: 'app-criar-aula',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, ProfileSwitcherComponent, ModalConfirmacaoComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    FormsModule,
+    ProfileSwitcherComponent,
+    ModalConfirmacaoComponent,
+  ],
   templateUrl: './criar-aula.html',
-  styleUrls: ['./criar-aula.css']
+  styleUrls: ['./criar-aula.css'],
 })
 export class CriarAulaComponent implements OnInit, AfterViewInit {
   form: FormGroup;
@@ -41,7 +58,11 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
   usuarioId: number | null = null;
   aulaParaRemover: Aula | null = null;
   isModalVisible = false;
-  modalConfig = { title: '', message: '', type: 'primary' as 'primary' | 'danger' | 'success' };
+  modalConfig = {
+    title: '',
+    message: '',
+    type: 'primary' as 'primary' | 'danger' | 'success',
+  };
 
   // Melhorias na tela
   conflitos: string[] = [];
@@ -50,6 +71,15 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
   agendaProfessor: Aula[] = [];
   isValidatingConflicts = false;
   showSuggestions = false;
+
+  // Filtros selecionados
+  filtroSalaId: number | null = null;
+  filtroProfessorId: number | null = null;
+  filtroDisciplinaId: number | null = null;
+
+  // Lista que será exibida após filtro e usada na paginação
+  aulasFiltradas: Aula[] = [];
+  paginatedAulasFiltradas: Aula[] = [];
 
   // Paginação
   currentPage = 1;
@@ -75,20 +105,27 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
       disciplina: [null, Validators.required],
       professor: [null, Validators.required],
       diaSemana: [null, Validators.required],
-      hora: [null, Validators.required]
+      hora: [null, Validators.required],
     });
   }
 
   ngOnInit() {
     this.blocoService.getBlocos().subscribe({
-      next: blocos => {
+      next: (blocos) => {
         this.blocos = blocos;
-        this.salas = blocos.flatMap(b => b.salas);
-      }
+        this.salas = blocos.flatMap((b) => b.salas);
+      },
     });
-    this.turmaService.listar().subscribe({ next: t => this.turmas = t });
-    this.disciplinaService.listar().subscribe({ next: d => this.disciplinas = d });
-    this.usuarioService.listarTodos().subscribe({ next: u => this.professores = u.filter(p => p.authorities.includes('ROLE_PROFESSOR')) });
+    this.turmaService.listar().subscribe({ next: (t) => (this.turmas = t) });
+    this.disciplinaService
+      .listar()
+      .subscribe({ next: (d) => (this.disciplinas = d) });
+    this.usuarioService.listarTodos().subscribe({
+      next: (u) =>
+        (this.professores = u.filter((p) =>
+          p.authorities.includes('ROLE_PROFESSOR')
+        )),
+    });
     this.usuarioId = this.authService.getIdUsuario();
     this.perfil = this.authService.getActiveRole();
     this.carregarAulas();
@@ -102,7 +139,9 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
 
   initializeTooltips(): void {
     setTimeout(() => {
-      const tooltipTriggerList = this.elementRef.nativeElement.querySelectorAll('[data-bs-toggle="tooltip"]');
+      const tooltipTriggerList = this.elementRef.nativeElement.querySelectorAll(
+        '[data-bs-toggle="tooltip"]'
+      );
       if (typeof bootstrap !== 'undefined') {
         tooltipTriggerList.forEach((tooltipTriggerEl: any) => {
           new bootstrap.Tooltip(tooltipTriggerEl);
@@ -118,15 +157,23 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
 
     // Verificar conflitos antes de criar
     if (this.conflitos.length > 0) {
-      this.erro = 'Não é possível criar a aula devido a conflitos: ' + this.conflitos.join(', ');
+      this.erro =
+        'Não é possível criar a aula devido a conflitos: ' +
+        this.conflitos.join(', ');
       return;
     }
 
     this.carregando = true;
-    const sala = this.salas.find(s => s.id === Number(this.form.value.sala));
-    const turma = this.turmas.find(t => t.id === Number(this.form.value.turma));
-    const disciplina = this.disciplinas.find(d => d.id === Number(this.form.value.disciplina));
-    const professor = this.professores.find(p => p.id === Number(this.form.value.professor));
+    const sala = this.salas.find((s) => s.id === Number(this.form.value.sala));
+    const turma = this.turmas.find(
+      (t) => t.id === Number(this.form.value.turma)
+    );
+    const disciplina = this.disciplinas.find(
+      (d) => d.id === Number(this.form.value.disciplina)
+    );
+    const professor = this.professores.find(
+      (p) => p.id === Number(this.form.value.professor)
+    );
     if (!sala || !turma || !disciplina || !professor) {
       this.erro = 'Selecione todos os campos corretamente.';
       this.carregando = false;
@@ -138,7 +185,7 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
       disciplina,
       professor,
       diaSemana: this.form.value.diaSemana,
-      hora: this.form.value.hora
+      hora: this.form.value.hora,
     };
     this.aulaService.criarAula(aula).subscribe({
       next: () => {
@@ -150,8 +197,42 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
       error: () => {
         this.erro = 'Erro ao criar aula.';
         this.carregando = false;
-      }
+      },
     });
+  }
+
+  filtrarAulas(): void {
+    this.aulasFiltradas = this.aulas.filter((aula) => {
+      // Se filtro SalaId, ProfessorId e DisciplinaId é null, aceita tods de seu respectivo filtro
+      const condSala = this.filtroSalaId
+        ? aula.sala.id === this.filtroSalaId
+        : true;
+      const condProfessor = this.filtroProfessorId
+        ? aula.professor.id === this.filtroProfessorId
+        : true;
+      const condDisciplina = this.filtroDisciplinaId
+        ? aula.disciplina.id === this.filtroDisciplinaId
+        : true;
+      return condSala && condProfessor && condDisciplina;
+    });
+
+    this.currentPage = 1; // resetar página ao filtrar
+    this.updatePaginationFiltrada();
+  }
+
+  updatePaginationFiltrada() {
+    this.totalPages = Math.ceil(this.aulasFiltradas.length / this.itemsPerPage);
+    if (this.currentPage > this.totalPages) this.currentPage = 1;
+    this.updatePaginatedAulasFiltradas();
+  }
+
+  updatePaginatedAulasFiltradas() {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    this.paginatedAulasFiltradas = this.aulasFiltradas.slice(
+      startIndex,
+      endIndex
+    );
   }
 
   abrirModalRemocao(aula: Aula) {
@@ -161,25 +242,27 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
     this.modalConfig = {
       title: 'Confirmar Remoção',
       message: `Tem certeza que deseja remover a aula de ${disciplina} de toda ${dia}?`,
-      type: 'danger'
+      type: 'danger',
     };
     this.isModalVisible = true;
   }
 
   confirmarRemocao() {
     if (!this.aulaParaRemover || !this.aulaParaRemover.id) return;
-    
+
     this.aulaService.remover(this.aulaParaRemover.id).subscribe({
       next: () => {
         this.sucesso = 'Aula removida com sucesso!';
-        this.aulas = this.aulas.filter(a => a.id !== this.aulaParaRemover!.id);
+        this.aulas = this.aulas.filter(
+          (a) => a.id !== this.aulaParaRemover!.id
+        );
         this.cancelarRemocao();
         this.carregarAulas();
       },
       error: () => {
         this.erro = 'Erro ao remover a aula.';
         this.cancelarRemocao();
-      }
+      },
     });
   }
 
@@ -191,42 +274,52 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
   formatarDiaSemana(dia: string | undefined): string {
     if (!dia) return '';
     const dias: { [key: string]: string } = {
-      'MONDAY': 'Segunda-feira',
-      'TUESDAY': 'Terça-feira',
-      'WEDNESDAY': 'Quarta-feira',
-      'THURSDAY': 'Quinta-feira',
-      'FRIDAY': 'Sexta-feira',
-      'SATURDAY': 'Sábado',
-      'SUNDAY': 'Domingo'
+      MONDAY: 'Segunda-feira',
+      TUESDAY: 'Terça-feira',
+      WEDNESDAY: 'Quarta-feira',
+      THURSDAY: 'Quinta-feira',
+      FRIDAY: 'Sexta-feira',
+      SATURDAY: 'Sábado',
+      SUNDAY: 'Domingo',
     };
     return dias[dia] || dia;
   }
 
   getBlocoNome(salaId: number): string {
-    const bloco = this.blocos.find(b => b.salas.some(s => s.id === salaId));
+    const bloco = this.blocos.find((b) => b.salas.some((s) => s.id === salaId));
     return bloco ? bloco.nome : '-';
   }
 
   carregarAulas() {
     if (this.perfil === 'ROLE_PROFESSOR' && this.usuarioId) {
       this.aulaService.buscarPorProfessor(this.usuarioId).subscribe({
-        next: aulas => {
+        next: (aulas) => {
           this.aulas = this.ordenarAulas(aulas);
           this.updatePagination();
-        }
+          this.filtrarAulas();
+        },
       });
     } else {
       this.aulaService.buscarTodas().subscribe({
-        next: aulas => {
+        next: (aulas) => {
           this.aulas = this.ordenarAulas(aulas);
           this.updatePagination();
-        }
+          this.filtrarAulas();
+        },
       });
     }
   }
 
   private ordenarAulas(aulas: Aula[]): Aula[] {
-    const ordemDias = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
+    const ordemDias = [
+      'MONDAY',
+      'TUESDAY',
+      'WEDNESDAY',
+      'THURSDAY',
+      'FRIDAY',
+      'SATURDAY',
+      'SUNDAY',
+    ];
     return aulas.sort((a, b) => {
       const diaA = ordemDias.indexOf(a.diaSemana);
       const diaB = ordemDias.indexOf(b.diaSemana);
@@ -250,42 +343,56 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
     this.isValidatingConflicts = true;
 
     const formValue = this.form.value;
-    if (!formValue.diaSemana || !formValue.hora || !formValue.professor || !formValue.sala) {
+    if (
+      !formValue.diaSemana ||
+      !formValue.hora ||
+      !formValue.professor ||
+      !formValue.sala
+    ) {
       this.isValidatingConflicts = false;
       return;
     }
 
     // Verificar conflito de professor
-    const conflitoProfessor = this.aulas.find(aula =>
-      aula.professor.id === formValue.professor &&
-      aula.diaSemana === formValue.diaSemana &&
-      aula.hora === formValue.hora
+    const conflitoProfessor = this.aulas.find(
+      (aula) =>
+        aula.professor.id === formValue.professor &&
+        aula.diaSemana === formValue.diaSemana &&
+        aula.hora === formValue.hora
     );
 
     if (conflitoProfessor) {
-      this.conflitos.push(`Professor já tem aula de ${conflitoProfessor.disciplina.nome} neste horário`);
+      this.conflitos.push(
+        `Professor já tem aula de ${conflitoProfessor.disciplina.nome} neste horário`
+      );
     }
 
     // Verificar conflito de sala
-    const conflitoSala = this.aulas.find(aula =>
-      aula.sala.id === formValue.sala &&
-      aula.diaSemana === formValue.diaSemana &&
-      aula.hora === formValue.hora
+    const conflitoSala = this.aulas.find(
+      (aula) =>
+        aula.sala.id === formValue.sala &&
+        aula.diaSemana === formValue.diaSemana &&
+        aula.hora === formValue.hora
     );
 
     if (conflitoSala) {
-      this.conflitos.push(`Sala já está ocupada com aula de ${conflitoSala.disciplina.nome}`);
+      this.conflitos.push(
+        `Sala já está ocupada com aula de ${conflitoSala.disciplina.nome}`
+      );
     }
 
     // Verificar conflito de turma
-    const conflitoTurma = this.aulas.find(aula =>
-      aula.turma.id === formValue.turma &&
-      aula.diaSemana === formValue.diaSemana &&
-      aula.hora === formValue.hora
+    const conflitoTurma = this.aulas.find(
+      (aula) =>
+        aula.turma.id === formValue.turma &&
+        aula.diaSemana === formValue.diaSemana &&
+        aula.hora === formValue.hora
     );
 
     if (conflitoTurma) {
-      this.conflitos.push(`Turma já tem aula de ${conflitoTurma.disciplina.nome} neste horário`);
+      this.conflitos.push(
+        `Turma já tem aula de ${conflitoTurma.disciplina.nome} neste horário`
+      );
     }
 
     this.isValidatingConflicts = false;
@@ -301,11 +408,12 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
     }
 
     // Salas disponíveis (não ocupadas no horário)
-    this.salasDisponiveis = this.salas.filter(sala => {
-      return !this.aulas.some(aula =>
-        aula.sala.id === sala.id &&
-        aula.diaSemana === formValue.diaSemana &&
-        aula.hora === formValue.hora
+    this.salasDisponiveis = this.salas.filter((sala) => {
+      return !this.aulas.some(
+        (aula) =>
+          aula.sala.id === sala.id &&
+          aula.diaSemana === formValue.diaSemana &&
+          aula.hora === formValue.hora
       );
     });
 
@@ -323,7 +431,9 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    this.agendaProfessor = this.aulas.filter(aula => aula.professor.id === professorId);
+    this.agendaProfessor = this.aulas.filter(
+      (aula) => aula.professor.id === professorId
+    );
   }
 
   selecionarSalaRecomendada(sala: Sala) {
@@ -356,13 +466,13 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
   goToPage(page: number) {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
-      this.updatePaginatedAulas();
+      this.updatePaginatedAulasFiltradas();
     }
   }
 
   onItemsPerPageChange() {
     this.currentPage = 1;
-    this.updatePagination();
+    this.updatePaginationFiltrada();
   }
 
   getStartIndex(): number {
@@ -377,7 +487,10 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
   getVisiblePages(): number[] {
     const pages: number[] = [];
     const maxVisiblePages = 5;
-    let startPage = Math.max(1, this.currentPage - Math.floor(maxVisiblePages / 2));
+    let startPage = Math.max(
+      1,
+      this.currentPage - Math.floor(maxVisiblePages / 2)
+    );
     let endPage = Math.min(this.totalPages, startPage + maxVisiblePages - 1);
 
     if (endPage - startPage + 1 < maxVisiblePages) {

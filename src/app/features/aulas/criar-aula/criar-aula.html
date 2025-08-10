@@ -265,9 +265,28 @@
           </div>
         </div>
 
+        <!-- Filtros -->
+        <div *ngIf="aulas.length > 0" class="filtros-container mb-3 d-flex gap-3">
+          <select [(ngModel)]="filtroSalaId" (change)="filtrarAulas()" class="form-select">
+            <option [ngValue]="null">Todas as Salas</option>
+            <option *ngFor="let sala of salas" [ngValue]="sala.id">{{ getBlocoNome(sala.id) }} - {{ sala.codigo }}</option>
+          </select>
+
+          <select [(ngModel)]="filtroProfessorId" (change)="filtrarAulas()" class="form-select">
+            <option [ngValue]="null">Todos os Professores</option>
+            <option *ngFor="let prof of professores" [ngValue]="prof.id">{{ prof.nome }}</option>
+          </select>
+
+          <select [(ngModel)]="filtroDisciplinaId" (change)="filtrarAulas()" class="form-select">
+            <option [ngValue]="null">Todas as Disciplinas</option>
+            <option *ngFor="let disc of disciplinas" [ngValue]="disc.id">{{ disc.nome }}</option>
+          </select>
+        </div>
+
+
         <div class="aulas-content">
           <div class="aulas-grid" *ngIf="paginatedAulas.length > 0">
-            <div class="aula-card" *ngFor="let aula of paginatedAulas">
+            <div class="aula-card" *ngFor="let aula of paginatedAulasFiltradas">
               <div class="aula-header">
                 <div class="aula-day">
                   <i class="bi bi-calendar3"></i>
