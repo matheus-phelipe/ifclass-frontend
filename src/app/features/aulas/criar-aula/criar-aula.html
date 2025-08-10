@@ -266,8 +266,8 @@
         </div>
 
         <!-- Filtros -->
-        <div *ngIf="aulas.length > 0" class="filtros-container mb-3 d-flex gap-3">
-          <select [(ngModel)]="filtroSalaId" (change)="filtrarAulas()" class="form-select">
+        <div *ngIf="aulas.length > 0" class="filtros-container mb-3 d-flex gap-0">
+          <select [(ngModel)]="filtroSalaId" (change)="filtrarAulas()" class="form-select ">
             <option [ngValue]="null">Todas as Salas</option>
             <option *ngFor="let sala of salas" [ngValue]="sala.id">{{ getBlocoNome(sala.id) }} - {{ sala.codigo }}</option>
           </select>
@@ -282,7 +282,7 @@
             <option *ngFor="let disc of disciplinas" [ngValue]="disc.id">{{ disc.nome }}</option>
           </select>
         </div>
-
+        <!--  -->
 
         <div class="aulas-content">
           <div class="aulas-grid" *ngIf="paginatedAulas.length > 0">

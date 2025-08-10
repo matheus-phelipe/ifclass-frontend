@@ -4,7 +4,7 @@
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   padding: 0;
   margin: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 /* ===== HEADER MODERNO ===== */
@@ -386,8 +386,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* ===== ALERTAS MODERNOS ===== */
@@ -578,7 +582,7 @@
 }
 
 .aula-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -810,7 +814,8 @@
     font-size: 1.25rem;
   }
 
-  .form-card, .aulas-card {
+  .form-card,
+  .aulas-card {
     border-radius: 0.5rem;
   }
 
@@ -846,7 +851,8 @@
     font-size: 1.5rem;
   }
 
-  .form-card, .aulas-card {
+  .form-card,
+  .aulas-card {
     border-radius: 1rem;
   }
 
@@ -897,13 +903,16 @@
   }
 
   /* Botões maiores em mobile */
-  .submit-btn, .action-btn, .pagination-btn {
+  .submit-btn,
+  .action-btn,
+  .pagination-btn {
     min-height: 48px;
     font-size: 1rem;
   }
 
   /* Inputs maiores em mobile */
-  .modern-input, .modern-select {
+  .modern-input,
+  .modern-select {
     padding: 1rem;
     font-size: 1rem;
   }
@@ -1017,7 +1026,8 @@
 
 /* High DPI displays */
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-  .header-icon, .aula-card::before {
+  .header-icon,
+  .aula-card::before {
     image-rendering: -webkit-optimize-contrast;
     image-rendering: crisp-edges;
   }
@@ -1030,4 +1040,28 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+.form-select {
+  border-radius: 0; /* Borda arredondada */
+  border-color: white; /* Cor da borda */
+  background-color: white; /* Fundo claro */
+  color: #2d3748; /* Cor do texto */
+  padding: 8px 12px; /* Espaçamento interno */
+  font-weight: 600; /* Texto mais forte */
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+  text-align: center;
+}
+
+.form-select:hover {
+  background-color: #e9e9e9;
+  border-color: #e9e9e9;
+}
+
+.form-select:focus {
+  border-color: #1c64f2; /* Cor da borda ao focar */
+  box-shadow: 0 0 5px rgba(28, 100, 242, 0.5);
+  outline: none;
+  background-color: #fff; /* Pode reforçar */
+  color: #000; /* Cor texto mais escura ao focar */
 }
