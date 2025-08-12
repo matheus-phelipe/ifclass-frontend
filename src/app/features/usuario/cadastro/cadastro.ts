@@ -5,11 +5,12 @@ import { Component, ViewChild } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgModel } from '@angular/forms';
+import { AlertComponent } from '../../../shared/alert/alert';
 
 @Component({
   selector: 'app-cadastro',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, ModalComponent],
+  imports: [CommonModule, FormsModule, RouterModule, ModalComponent, AlertComponent],
   templateUrl: './cadastro.html',
   styleUrl: './cadastro.css'
 })
@@ -22,6 +23,7 @@ export class CadastroComponent {
   };
 
   @ViewChild('meuModal') modal!: ModalComponent;
+  @ViewChild('meuAlerta') meuAlerta!: AlertComponent;
 
   usuario: Cadastro = {
     nome: '',
@@ -62,7 +64,7 @@ export class CadastroComponent {
         });    
         },
       error: (err) => {
-        this.abrirModal("Erro ao cadastrar usuário!");
+        this.meuAlerta.show("Erro ao cadastrar usuário!", 5000, 'danger');
       }
     });
   }
