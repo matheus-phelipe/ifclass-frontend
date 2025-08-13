@@ -255,10 +255,49 @@
               <i class="bi bi-calendar-check"></i>
               Aulas Agendadas
             </h3>
-            <p class="aulas-subtitle">Visualize e gerencie todas as aulas criadas</p>
+            <p class="aulas-subtitle hide-mobile">Visualize e gerencie todas as aulas criadas</p>
           </div>
           <div class="aulas-stats">
-            <div class="stat-item">
+            <!-- Filtros -->
+            <button #filterBtn class="filter-toggle-btn" (click)="toggleFiltros($event)" [attr.aria-expanded]="mostrarFiltros" aria-controls="filterPanel" title="Abrir filtros">
+              <i class="bi bi-search"></i>
+            </button>
+            <!-- Popover -->
+            <div #filterPanel id="filterPanel" class="filter-popover" [class.open]="mostrarFiltros" role="dialog" [attr.aria-hidden]="!mostrarFiltros">
+               <button class="close-btn" (click)="toggleFiltros($event)" aria-label="Fechar filtros" type="button">
+                  &times;
+                </button>
+              <div class="filter-inner">
+                <div class="filter-row">
+                  <label>Sala</label>
+                  <select [(ngModel)]="filtroSalaId" (change)="filtrarAulas()">
+                    <option [ngValue]="null">Todas</option>
+                    <option *ngFor="let sala of salasFiltradas" [ngValue]="sala.id">
+                      {{ getBlocoNome(sala.id) }} - {{ sala.codigo }}
+                    </option>
+                  </select>
+                </div>
+
+                <div class="filter-row">
+                  <label>Professor</label>
+                  <select [(ngModel)]="filtroProfessorId" (change)="filtrarAulas()">
+                    <option [ngValue]="null">Todos</option>
+                    <option *ngFor="let prof of professoresFiltrados" [ngValue]="prof.id">{{ prof.nome }}</option>
+                  </select>
+                </div>
+
+                <div class="filter-row">
+                  <label>Disciplina</label>
+                  <select [(ngModel)]="filtroDisciplinaId" (change)="filtrarAulas()">
+                    <option [ngValue]="null">Todas</option>
+                    <option *ngFor="let disc of disciplinasFiltradas" [ngValue]="disc.id">{{ disc.nome }}</option>
+                  </select>
+                </div>
+
+              </div>
+            </div>
+            <!--  -->
+            <div class="stat-item hide-mobile">
               <span class="stat-number">{{ aulas.length }}</span>
               <span class="stat-label">Aulas</span>
             </div>
@@ -267,7 +306,7 @@
 
         <div class="aulas-content">
           <div class="aulas-grid" *ngIf="paginatedAulas.length > 0">
-            <div class="aula-card" *ngFor="let aula of paginatedAulas">
+             <div class="aula-card" *ngFor="let aula of paginatedAulasFiltradas">
               <div class="aula-header">
                 <div class="aula-day">
                   <i class="bi bi-calendar3"></i>

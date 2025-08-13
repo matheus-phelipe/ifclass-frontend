@@ -1031,3 +1031,183 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+.aulas-stats {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.filtros-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  background: white;
+  box-shadow: -4px 0 10px rgba(0, 0, 0, 0.1);
+  transform: translateX(100%);
+  opacity: 0;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+  will-change: transform, opacity;
+  z-index: 1100;
+}
+
+.filtros-container.ativo {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.filter-toggle-btn {
+  background: transparent;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 0.35rem;
+  border-radius: 6px;
+  transition: transform 0.18s ease, background 0.18s ease;
+}
+
+.filter-toggle-btn:hover {
+  transform: scale(1.06);
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.filter-toggle-btn.open i {
+  transform: rotate(90deg);
+  transition: transform 0.25s ease;
+}
+
+.filter-popover {
+  position: absolute;
+  top: 90%;
+  right: 90%;
+  transform: translateY(-10px);
+  width: 360px;
+  max-width: 90vw;
+  background: #fff;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  padding: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 1000;
+}
+
+.filter-popover.open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) translateX(0);
+}
+
+.filter-inner {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter-row label {
+  display: block;
+  font-size: 0.8rem;
+  margin-bottom: 4px;
+  color: #333;
+}
+
+.filter-row select,
+.filter-row input {
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #e6e6e6;
+  font-size: 1rem;
+  background: white;
+  transition: border-color 0.3s ease;
+}
+
+.filter-row select:focus,
+.filter-row input:focus {
+  border-color: #667eea;
+  outline: none;
+  box-shadow: 0 0 5px rgba(102, 126, 234, 0.5);
+}
+
+.filter-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+@media (max-width: 768px) {
+  .filter-popover.open {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) scale(1);
+    width: 100vw;
+    height: auto;
+    box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    background: white;
+    z-index: 1000;
+    border-radius: 8px;
+    pointer-events: auto;
+    opacity: 1;
+  }
+
+  .filtros-container {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 90vw;
+    max-width: 320px;
+    height: 100vh;
+    padding: 1.5rem 1rem;
+    box-shadow: -3px 0 12px rgba(0, 0, 0, 0.25);
+    background: white;
+    border-radius: 0 0 0 12px;
+    overflow-y: auto;
+    transform: translateX(0%);
+    transition: transform 0.3s ease-in-out;
+    z-index: 1050;
+  }
+
+  .filter-popover {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.95);
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    width: 90%;
+    max-width: 400px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  }
+}
+
+.close-btn {
+  display: none;
+  position: absolute;
+  top: 0.2rem;
+  right: 1rem;
+  background: transparent;
+  border: none;
+  font-size: 2.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #333;
+  z-index: 1100;
+  padding: 0;
+}
+
+@media (max-width: 768px) {
+  .close-btn {
+    display: block;
+  }
+}
