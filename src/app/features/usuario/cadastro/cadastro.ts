@@ -1,19 +1,19 @@
 import { ModalComponent } from './../../../shared/modal/modal';
 import { Cadastro } from './cadastro.model';
 import { UsuarioService } from '../usuario.service';
-import { Component, ViewChild } from '@angular/core';
+import { Component, viewChild, ViewChild } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgModel } from '@angular/forms';
-import { AlertComponent } from '../../../shared/alert/alert';
 
 @Component({
   selector: 'app-cadastro',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, ModalComponent, AlertComponent],
+  imports: [CommonModule, FormsModule, RouterModule, ModalComponent],
   templateUrl: './cadastro.html',
   styleUrl: './cadastro.css'
 })
+
 export class CadastroComponent {
   mensagemDoModal: string = '';
   
@@ -22,8 +22,8 @@ export class CadastroComponent {
     confirmarSenha: false
   };
 
-  @ViewChild('meuModal') modal!: ModalComponent;
-  @ViewChild('meuAlerta') meuAlerta!: AlertComponent;
+
+    @ViewChild('meuModal') modal!: ModalComponent;
 
   usuario: Cadastro = {
     nome: '',
@@ -42,6 +42,7 @@ export class CadastroComponent {
   ];
 
   constructor(private service: UsuarioService, private router: Router) {}
+
 
   cadastrar() {
     if (this.usuario.senha !== this.usuario.confirmarSenha) {
@@ -63,9 +64,6 @@ export class CadastroComponent {
           this.router.navigate(['/login']);
         });    
         },
-      error: (err) => {
-        this.meuAlerta.show("Erro ao cadastrar usuário!", 5000, 'danger');
-      }
     });
   }
 
