@@ -1,7 +1,7 @@
 import { ModalComponent } from './../../../shared/modal/modal';
 import { Cadastro } from './cadastro.model';
 import { UsuarioService } from '../usuario.service';
-import { Component, viewChild, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgModel } from '@angular/forms';
@@ -21,7 +21,6 @@ export class CadastroComponent {
     senha: false,
     confirmarSenha: false
   };
-
 
     @ViewChild('meuModal') modal!: ModalComponent;
 
@@ -43,7 +42,6 @@ export class CadastroComponent {
 
   constructor(private service: UsuarioService, private router: Router) {}
 
-
   cadastrar() {
     if (this.usuario.senha !== this.usuario.confirmarSenha) {
       this.abrirModal("Senhas não coincidem!");
@@ -63,7 +61,7 @@ export class CadastroComponent {
         this.modal.closed.subscribe(() => {
           this.router.navigate(['/login']);
         });    
-        },
+        }
     });
   }
 
