@@ -272,7 +272,7 @@
                   <label>Sala</label>
                   <select [(ngModel)]="filtroSalaId" (change)="filtrarAulas()">
                     <option [ngValue]="null">Todas</option>
-                    <option *ngFor="let sala of salasFiltradas" [ngValue]="sala.id">
+                    <option *ngFor="let sala of salasFiltradas()" [ngValue]="sala.id">
                       {{ getBlocoNome(sala.id) }} - {{ sala.codigo }}
                     </option>
                   </select>
@@ -282,7 +282,7 @@
                   <label>Professor</label>
                   <select [(ngModel)]="filtroProfessorId" (change)="filtrarAulas()">
                     <option [ngValue]="null">Todos</option>
-                    <option *ngFor="let prof of professoresFiltrados" [ngValue]="prof.id">{{ prof.nome }}</option>
+                    <option *ngFor="let prof of professoresFiltrados()" [ngValue]="prof.id">{{ prof.nome }}</option>
                   </select>
                 </div>
 
@@ -290,7 +290,7 @@
                   <label>Disciplina</label>
                   <select [(ngModel)]="filtroDisciplinaId" (change)="filtrarAulas()">
                     <option [ngValue]="null">Todas</option>
-                    <option *ngFor="let disc of disciplinasFiltradas" [ngValue]="disc.id">{{ disc.nome }}</option>
+                    <option *ngFor="let disc of disciplinasFiltradas()" [ngValue]="disc.id">{{ disc.nome }}</option>
                   </select>
                 </div>
 

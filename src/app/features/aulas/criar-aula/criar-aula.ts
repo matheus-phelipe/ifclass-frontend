@@ -167,35 +167,37 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
   }
 
   // Filtra as salas que possuam aulas e verifica se qual professor ou disciplina possuem aula atrelada a sala selecionada
-  get salasFiltradas(): Sala[] {
-    return this.salas.filter(sala =>
-      this.aulas.some(aula =>
-        aula.sala.id === sala.id &&
-        (this.filtroProfessorId ? aula.professor.id === this.filtroProfessorId : true) &&
-        (this.filtroDisciplinaId ? aula.disciplina.id === this.filtroDisciplinaId : true)
-      )
+  salasFiltradas(): Sala[] {
+    const aulasFiltradas = this.aulas.filter(aula =>
+      (!this.filtroProfessorId || aula.professor.id === this.filtroProfessorId) &&
+      (!this.filtroDisciplinaId || aula.disciplina.id === this.filtroDisciplinaId)
     );
+    const idsSalas = new Set(aulasFiltradas.map(aula => aula.sala.id));
+    return this.salas.filter(sala => idsSalas.has(sala.id));
   }
 
-  get professoresFiltrados(): Usuario[] {
-    return this.professores.filter(professor =>
-      this.aulas.some(aula =>
-        aula.professor.id === professor.id &&
-        (this.filtroSalaId ? aula.sala.id === this.filtroSalaId : true) &&
-        (this.filtroDisciplinaId ? aula.disciplina.id === this.filtroDisciplinaId : true)
-      )
+  professoresFiltrados(): Usuario[] {
+    const aulasFiltradas = this.aulas.filter(aula =>
+      (!this.filtroSalaId || aula.sala.id === this.filtroSalaId) &&
+      (!this.filtroDisciplinaId || aula.disciplina.id === this.filtroDisciplinaId)
     );
+    const idsProfessores = new Set(aulasFiltradas.map(aula => aula.professor.id));
+    return this.professores.filter(prof => idsProfessores.has(prof.id));
   }
+  disciplinasFiltradas(): Disciplina[] {
+  // Pega apenas as aulas válidas com os filtros aplicados
+  const aulasFiltradas = this.aulas.filter(aula =>
+    (!this.filtroSalaId || aula.sala.id === this.filtroSalaId) &&
+    (!this.filtroProfessorId || aula.professor.id === this.filtroProfessorId)
+  );
 
-  get disciplinasFiltradas(): Disciplina[] {
-    return this.disciplinas.filter(disciplina =>
-      this.aulas.some(aula =>
-        aula.disciplina.id === disciplina.id &&
-        (this.filtroSalaId ? aula.sala.id === this.filtroSalaId : true) &&
-        (this.filtroProfessorId ? aula.professor.id === this.filtroProfessorId : true)
-      )
-    );
-  }
+  // Cria um conjunto com IDs de disciplinas dessas aulas
+  const idsDisciplinas = new Set(aulasFiltradas.map(aula => aula.disciplina.id));
+
+  // Filtra apenas disciplinas que estão nesse conjunto
+  return this.disciplinas.filter(d => idsDisciplinas.has(d.id));
+}
+
 
   // evita que o clique suba para DOM e feche imediatamente
   toggleFiltros(event?: MouseEvent) {
@@ -242,11 +244,15 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
   // Atualiza o número total de páginas baseado na quantidade de aulas filtradas e itens por página.
   // Também ajusta a página atual para 1 se ela estiver fora do intervalo válido.
   // Depois, chama a função para atualizar a lista paginada de aulas filtradas.
-  updatePaginationFiltrada() {
-    this.totalPages = Math.ceil(this.aulasFiltradas.length / this.itemsPerPage);
-    if (this.currentPage > this.totalPages) this.currentPage = 1;
-    this.updatePaginatedAulasFiltradas();
-  }
+updatePaginationFiltrada() {
+  this.totalPages = this.aulasFiltradas.length;
+  this.totalPages = Math.ceil(this.totalPages / this.itemsPerPage);
+
+  if (this.currentPage > this.totalPages) this.currentPage = 1;
+
+  this.updatePaginatedAulasFiltradas();
+}
+
 
   // Atualiza a lista de aulas filtradas que serão exibidas na página atual,
   // calculando os índices de início e fim conforme a página atual e itens por página,
