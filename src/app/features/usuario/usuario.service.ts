@@ -22,6 +22,11 @@ export class UsuarioService {
     return this.http.get<Usuario[]>(this.apiUrl);
   }
 
+  // Listar todos os professores, mesmo com acesso ADMIN na criação de aula
+  listarProfessores() {
+    return this.http.get<Usuario[]>(`${this.apiUrl}/listar/professores`);
+  }
+
   // Listar usuários com detalhes (turma/curso para alunos, disciplinas para professores)
   listarTodosComDetalhes() {
     return this.http.get<Usuario[]>(`${this.apiUrl}/detalhes`);
@@ -54,3 +59,4 @@ export class UsuarioService {
     return this.http.get<import('../disciplinas/disciplina.model').Disciplina[]>(`${this.apiUrl}/${professorId}/disciplinas`);
   }
 }
+ 

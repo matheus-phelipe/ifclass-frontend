@@ -88,9 +88,21 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
     });
     this.turmaService.listar().subscribe({ next: t => this.turmas = t });
     this.disciplinaService.listar().subscribe({ next: d => this.disciplinas = d });
-    this.usuarioService.listarTodos().subscribe({ next: u => this.professores = u.filter(p => p.authorities.includes('ROLE_PROFESSOR')) });
     this.usuarioId = this.authService.getIdUsuario();
     this.perfil = this.authService.getActiveRole();
+      if (this.perfil === 'ROLE_PROFESSOR' && this.usuarioId) {
+        // Se for professor, lista apenas ele mesmo
+        this.usuarioService.listarProfessores().subscribe({
+          next: u => {
+            const prof = u.find(p => p.id === this.usuarioId);
+            this.professores = prof ? [prof] : [];
+          }});
+      } else {
+        // Se for admin, lista todos os professores
+        this.usuarioService.listarProfessores().subscribe({
+          next: u => this.professores = u
+        });
+      }
     this.carregarAulas();
     this.setupFormValidation();
   }
@@ -391,3 +403,4 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
     return pages;
   }
 }
+ 
