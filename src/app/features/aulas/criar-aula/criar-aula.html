@@ -249,27 +249,32 @@
     <!-- Listagem de Aulas Moderna -->
     <div class="aulas-section">
       <div class="aulas-card">
-        <div class="aulas-header">
+        <div class="aulas-header d-flex justify-content-between align-items-center flex-wrap">
           <div class="header-info">
-            <h3 class="aulas-title">
+            <h3 class="aulas-title mb-0">
               <i class="bi bi-calendar-check"></i>
               Aulas Agendadas
             </h3>
             <p class="aulas-subtitle hide-mobile">Visualize e gerencie todas as aulas criadas</p>
+
+            <button #filterBtnMobile class="filter-toggle-btn d-md-none p-1 text-white rounded-1" (click)="toggleFiltros($event)" [attr.aria-expanded]="mostrarFiltros" aria-controls="filterPanel" title="Abrir filtros">
+              <i class="bi bi-search"></i>
+            </button>
+
           </div>
-          <div class="aulas-stats">
+          <div class="aulas-stats position-relative d-flex align-items-center gap-3 mt-2 mt-md-0">
             <!-- Filtros -->
-            <button #filterBtn class="filter-toggle-btn" (click)="toggleFiltros($event)" [attr.aria-expanded]="mostrarFiltros" aria-controls="filterPanel" title="Abrir filtros">
+            <button #filterBtn class="filter-toggle-btn  hide-mobile p-1 text-white rounded-1" (click)="toggleFiltros($event)" [attr.aria-expanded]="mostrarFiltros" aria-controls="filterPanel" title="Abrir filtros">
               <i class="bi bi-search"></i>
             </button>
             <!-- Popover -->
-            <div #filterPanel id="filterPanel" class="filter-popover" [class.open]="mostrarFiltros" role="dialog" [attr.aria-hidden]="!mostrarFiltros">
-               <button class="close-btn" (click)="toggleFiltros($event)" aria-label="Fechar filtros" type="button">
+            <div #filterPanel id="filterPanel" class="filter-popover shadow bg-white rounded-3 p-2" [class.open]="mostrarFiltros" role="dialog" [attr.aria-hidden]="!mostrarFiltros">
+               <button class="close-btn hide-desktop" (click)="toggleFiltros($event)" aria-label="Fechar filtros" type="button">
                   &times;
                 </button>
-              <div class="filter-inner">
+              <div class="filter-inner p-2 d-flex flex-column gap-2">
                 <div class="filter-row">
-                  <label>Sala</label>
+                  <label class="form-label small text-dark mb-1">Sala</label>
                   <select [(ngModel)]="filtroSalaId" (change)="filtrarAulas()">
                     <option [ngValue]="null">Todas</option>
                     <option *ngFor="let sala of salasFiltradas()" [ngValue]="sala.id">
@@ -279,7 +284,7 @@
                 </div>
 
                 <div class="filter-row">
-                  <label>Professor</label>
+                  <label class="form-label small text-dark mb-1">Professor</label>
                   <select [(ngModel)]="filtroProfessorId" (change)="filtrarAulas()">
                     <option [ngValue]="null">Todos</option>
                     <option *ngFor="let prof of professoresFiltrados()" [ngValue]="prof.id">{{ prof.nome }}</option>
@@ -287,7 +292,7 @@
                 </div>
 
                 <div class="filter-row">
-                  <label>Disciplina</label>
+                  <label class="form-label small text-dark mb-1">Disciplina</label>
                   <select [(ngModel)]="filtroDisciplinaId" (change)="filtrarAulas()">
                     <option [ngValue]="null">Todas</option>
                     <option *ngFor="let disc of disciplinasFiltradas()" [ngValue]="disc.id">{{ disc.nome }}</option>

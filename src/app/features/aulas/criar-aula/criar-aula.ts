@@ -184,17 +184,14 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
     const idsProfessores = new Set(aulasFiltradas.map(aula => aula.professor.id));
     return this.professores.filter(prof => idsProfessores.has(prof.id));
   }
+
+  //Retorna apenas as disciplinas que estão presentes nas aulas filtradas pelos filtros de sala e professor.
   disciplinasFiltradas(): Disciplina[] {
-  // Pega apenas as aulas válidas com os filtros aplicados
   const aulasFiltradas = this.aulas.filter(aula =>
     (!this.filtroSalaId || aula.sala.id === this.filtroSalaId) &&
     (!this.filtroProfessorId || aula.professor.id === this.filtroProfessorId)
   );
-
-  // Cria um conjunto com IDs de disciplinas dessas aulas
   const idsDisciplinas = new Set(aulasFiltradas.map(aula => aula.disciplina.id));
-
-  // Filtra apenas disciplinas que estão nesse conjunto
   return this.disciplinas.filter(d => idsDisciplinas.has(d.id));
 }
 
@@ -221,8 +218,7 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // Retorna uma lista de salas que possuem pelo menos uma aula relacionada
-  // que atende aos filtros opcionais de professor e disciplina aplicados.
+  //Retorna as salas que têm pelo menos uma aula compatível com os filtros de professor e disciplina.
   filtrarAulas(): void {
     this.aulasFiltradas = this.aulas.filter((aula) => {
       const condSala = this.filtroSalaId
@@ -241,22 +237,17 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
     this.updatePaginationFiltrada();
   }
 
-  // Atualiza o número total de páginas baseado na quantidade de aulas filtradas e itens por página.
-  // Também ajusta a página atual para 1 se ela estiver fora do intervalo válido.
-  // Depois, chama a função para atualizar a lista paginada de aulas filtradas.
-updatePaginationFiltrada() {
-  this.totalPages = this.aulasFiltradas.length;
-  this.totalPages = Math.ceil(this.totalPages / this.itemsPerPage);
+  // Atualiza o total de páginas e a página atual conforme aulas filtradas, depois atualiza a lista paginada.
+  updatePaginationFiltrada() {
+    this.totalPages = this.aulasFiltradas.length;
+    this.totalPages = Math.ceil(this.totalPages / this.itemsPerPage);
 
-  if (this.currentPage > this.totalPages) this.currentPage = 1;
+    if (this.currentPage > this.totalPages) this.currentPage = 1;
 
-  this.updatePaginatedAulasFiltradas();
-}
+    this.updatePaginatedAulasFiltradas();
+  }
 
-
-  // Atualiza a lista de aulas filtradas que serão exibidas na página atual,
-  // calculando os índices de início e fim conforme a página atual e itens por página,
-  // e seleciona esse pedaço do array para exibir.
+  // Atualiza a lista de aulas exibidas na página atual com base nos índices calculados.
   updatePaginatedAulasFiltradas() {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
