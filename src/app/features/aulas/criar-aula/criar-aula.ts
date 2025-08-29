@@ -91,21 +91,46 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
     this.usuarioId = this.authService.getIdUsuario();
     this.perfil = this.authService.getActiveRole();
       if (this.perfil === 'ROLE_PROFESSOR' && this.usuarioId) {
-        // Se for professor, lista apenas ele mesmo
-        this.usuarioService.listarProfessores().subscribe({
-          next: u => {
-            const prof = u.find(p => p.id === this.usuarioId);
-            this.professores = prof ? [prof] : [];
-          }});
-      } else {
-        // Se for admin, lista todos os professores
-        this.usuarioService.listarProfessores().subscribe({
-          next: u => this.professores = u
-        });
+    // Se for professor, lista apenas ele mesmo
+    this.usuarioService.listarProfessores().subscribe({
+      next: u => {
+        const prof = u.find(p => p.id === this.usuarioId);
+        this.professores = prof ? [prof] : [];
+        // já pré-seleciona ele no form
+        if (prof) {
+          this.form.patchValue({ professor: prof.id });
+        }
       }
+    });
+  } else if (this.perfil === 'ROLE_ADMIN') {
+    // Se for admin, lista todos os professores
+    this.usuarioService.listarProfessores().subscribe({
+      next: u => this.professores = u
+    });
+  }
     this.carregarAulas();
     this.setupFormValidation();
   }
+
+/* if (this.perfil === 'ROLE_PROFESSOR' && this.usuarioId) {
+        // Se for professor, lista apenas ele mesmo
+        this.usuarioService.listarTodos().subscribe({
+          next: u => {
+            const usuario = u.find(p => p.id === this.usuarioId);
+            if (usuario) {
+              this.professores = [usuario]; // só ele na lista
+              this.form.patchValue({ professor: usuario.id }); // já pré-seleciona
+            }
+          }
+        });
+      }
+      // Se for ADMIN, lista todos os professores
+      if (this.perfil === 'ROLE_ADMIN') {
+        this.usuarioService.listarProfessores().subscribe({
+          next: u => this.professores = u.filter(p => p.authorities.includes('ROLE_PROFESSOR'))
+        });
+      }
+  } */
 
   ngAfterViewInit(): void {
     // Inicializar tooltips do Bootstrap
