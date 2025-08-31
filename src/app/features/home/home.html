@@ -1,3 +1,4 @@
+<app-alert></app-alert>
 <div class="container-fluid">
 
   <!-- Cabeçalho de Boas-Vindas -->
@@ -12,7 +13,7 @@
   <div class="row g-4">
     <!-- Coluna Principal (70%) -->
     <div class="col-lg-8">
-      
+
       <!-- Widget de Próxima Aula -->
       <div *ngIf="proximaAula" class="card-destaque h-100">
         <div class="card-destaque-header">
@@ -41,9 +42,11 @@
         <div class="card-destaque-body">
           <h2 class="disciplina-titulo">{{ proximaAulaFutura.disciplina }}</h2>
           <div class="detalhes-aula">
-            <span class="d-block mb-2"><i class="bi bi-calendar-week"></i> {{ formatarDiaSemana(proximaAulaFutura.diaSemana) }}</span>
+            <span class="d-block mb-2"><i class="bi bi-calendar-week"></i> {{
+              formatarDiaSemana(proximaAulaFutura.diaSemana) }}</span>
             <span><i class="bi bi-person-video"></i> {{ proximaAulaFutura.professor }}</span>
-            <span><i class="bi bi-geo-alt-fill"></i> Sala {{ proximaAulaFutura.sala }} ({{ proximaAulaFutura.bloco }})</span>
+            <span><i class="bi bi-geo-alt-fill"></i> Sala {{ proximaAulaFutura.sala }} ({{ proximaAulaFutura.bloco
+              }})</span>
             <span><i class="bi bi-hourglass-split"></i> {{ proximaAulaFutura.horario }}</span>
           </div>
         </div>
@@ -56,14 +59,15 @@
       <ng-container *ngIf="!proximaAula && !proximaAulaFutura">
 
         <!-- Mensagem para Admin/Coordenador -->
-        <div *ngIf="authService.getActiveRole() === 'ROLE_ADMIN' || authService.getActiveRole() === 'ROLE_COORDENADOR'" class="card-destaque h-100">
-            <div class="card-destaque-body text-center">
-              <i class="bi bi-graph-up-arrow display-1 text-white mb-3"></i>
-              <h2 class="disciplina-titulo">Visão Geral do Campus</h2>
-              <p class="text-white-50">Utilize os menus de acesso rápido para gerenciar o sistema.</p>
-            </div>
+        <div *ngIf="authService.getActiveRole() === 'ROLE_ADMIN' || authService.getActiveRole() === 'ROLE_COORDENADOR'"
+          class="card-destaque h-100">
+          <div class="card-destaque-body text-center">
+            <i class="bi bi-graph-up-arrow display-1 text-white mb-3"></i>
+            <h2 class="disciplina-titulo">Visão Geral do Campus</h2>
+            <p class="text-white-50">Utilize os menus de acesso rápido para gerenciar o sistema.</p>
+          </div>
         </div>
-        
+
         <!-- Mensagem para Professor sem aula -->
         <div *ngIf="authService.getActiveRole() === 'ROLE_PROFESSOR' && !professorSemAulas" class="card-destaque h-100">
           <div class="card-destaque-body text-center">
@@ -72,7 +76,7 @@
             <p class="text-white-50">Aproveite para planejar suas próximas atividades ou criar novas aulas.</p>
           </div>
         </div>
-        
+
         <!-- Mensagem para Professor sem nenhuma aula cadastrada -->
         <div *ngIf="professorSemAulas" class="card-destaque h-100">
           <div class="card-destaque-body text-center">
@@ -88,7 +92,7 @@
 
     <!-- Coluna Lateral (30%) -->
     <div class="col-lg-4">
-      
+
       <!-- Widget de Avisos -->
       <div class="card-lateral h-100">
         <h5 class="card-lateral-titulo">
@@ -96,31 +100,126 @@
           Avisos da Coordenação
         </h5>
         <ul class="lista-avisos">
-          <li *ngFor="let aviso of avisos">
-            <p class="aviso-titulo">{{ aviso.titulo }}</p>
-            <small class="aviso-data">{{ aviso.data }}</small>
+          <li *ngFor="let aviso of avisos | slice:0:3">
+            <p class="aviso-titulo text-wrap text-break">{{ aviso.titulo }}</p>
+            <p class="text-muted small mb-0">
+              {{ aviso.dataInsercao | date:'dd/MM/yyyy HH:mm' }} </p>
           </li>
         </ul>
-        <a href="" class="ver-todos-link">Ver todos os avisos</a>
+        <a class="ver-todos-link" (click)="abrirModalTodosAvisos()">Ver todos os avisos</a>
+        <button class="btn btn-primary mt-2" (click)="abrirModal()">+ Novo Aviso</button>
       </div>
+      <!-- MODAL ADICIONAR AVISO -->
+      <div class="modal fade" tabindex="-1" [ngClass]="{ 'show d-block': exibirModalAviso }">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">{{ modoEdicao ? 'Editar Aviso' : 'Novo Aviso' }}</h5>
+              <button type="button" class="btn-close" (click)="fecharModalAviso()"></button>
+            </div>
+            <div class="modal-body">
+              <form #formAviso="ngForm">
+                <!-- Título -->
+                <div class="mb-3">
+                  <label class="form-label">Título</label>
+                  <input type="text" class="form-control" [(ngModel)]="novoAviso.titulo" name="titulo" #titulo="ngModel"
+                    placeholder="Título do Aviso" required maxlength="100">
+                  <small class="text-muted small mt-1 d-block text-end">
+                    {{ novoAviso.titulo.length || 0 }}/100
+                  </small>
 
-    </div>
-  </div>
+                  <!-- Mensagens de erro -->
+                  <div *ngIf="titulo.invalid && titulo.touched" class="text-danger mt-1 small">
+                    <div *ngIf="titulo.errors?.['required']">O título é obrigatório.</div>
+                    <div *ngIf="titulo.errors?.['maxlength']">Máximo de 100 caracteres permitidos.</div>
+                  </div>
+                </div>
 
-  <!-- Seção de Ações Rápidas (Menu Antigo) -->
-  <div class="mt-5">
-    <h3 class="fw-bold text-muted mb-4">Acesso Rápido</h3>
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 text-center">
-      <div class="col" *ngFor="let item of menuCards">
-        <a [routerLink]="item.link" class="card-acao">
-          <div class="card-acao-icon">
-            <i class="{{ item.icon }}"></i>
+                <!-- Informações -->
+                <div class="mb-3">
+                  <label class="form-label">Informações</label>
+                  <textarea class="form-control" rows="4" [(ngModel)]="novoAviso.informacoes" name="informacoes"
+                    #informacoes="ngModel" placeholder="Digite as informações do aviso" required
+                    maxlength="500"></textarea>
+
+                  <small class="text-muted small mt-1 d-block text-end">
+                    {{ novoAviso.informacoes.length || 0 }}/500
+                  </small>
+
+                  <!-- Mensagens de erro -->
+                  <div *ngIf="informacoes.invalid && informacoes.touched" class="text-danger mt-1 small">
+                    <div *ngIf="informacoes.errors?.['required']">As informações são obrigatórias.</div>
+                    <div *ngIf="informacoes.errors?.['maxlength']">Máximo de 500 caracteres permitidos.</div>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-secondary" (click)="fecharModalAviso()">Cancelar</button>
+              <button class="btn btn-success" [disabled]="formAviso.invalid" (click)="salvarAviso()">
+                {{ modoEdicao ? 'Salvar Alterações' : 'Salvar' }}
+              </button>
+            </div>
           </div>
-          <h6 class="mt-3 fw-semibold">{{ item.title }}</h6>
-          <p class="card-acao-texto">{{ item.text }}</p>
-        </a>
+        </div>
       </div>
+
+
     </div>
   </div>
 
+  <!-- MODAL VER TODOS OS AVISOS -->
+  <div class="modal" tabindex="-1" [ngClass]="{ 'show d-block': exibirModalTodosAvisos }">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Todos os Avisos</h5>
+          <button type="button" class="btn-close" (click)="fecharModalTodosAvisos()"></button>
+        </div>
+        <div class="modal-body">
+          <div *ngIf="avisos.length > 0; else nenhumAviso">
+            <div *ngFor="let aviso of avisos" class="mb-3 border rounded p-2">
+              <h6 class="fw-bold text-wrap text-break">{{ aviso.titulo }}</h6>
+              <p class="mb-1 text-wrap text-break">{{ aviso.informacoes }}</p>
+              <p class="text-muted small mb-2">
+                Publicado em {{ aviso.dataInsercao | date:'dd/MM/yyyy HH:mm' }}</p>
+
+
+              <div class="actions-container mt-2 d-flex justify-content-end" (click)="$event.stopPropagation()">
+                <button class="btn action-btn btn-edit" title="Editar Aviso" (click)="abrirModalEditar(aviso)">
+                  <i class="bi bi-pencil-fill"></i>
+                </button>
+                <button class="btn action-btn btn-delete" title="Excluir Aviso" (click)="removerAviso(aviso)">
+                  <i class="bi bi-trash3-fill"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ng-template #nenhumAviso>
+          <p class="text-center text-muted">Nenhum aviso disponível.</p>
+        </ng-template>
+      </div>
+    </div>
+  </div>
 </div>
+
+
+<!-- Seção de Ações Rápidas (Menu Antigo) -->
+<div class="mt-5">
+  <h3 class="fw-bold text-muted mb-4">Acesso Rápido</h3>
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 text-center">
+    <div class="col" *ngFor="let item of menuCards">
+      <a [routerLink]="item.link" class="card-acao">
+        <div class="card-acao-icon">
+          <i class="{{ item.icon }}"></i>
+        </div>
+        <h6 class="mt-3 fw-semibold">{{ item.title }}</h6>
+        <p class="card-acao-texto">{{ item.text }}</p>
+      </a>
+    </div>
+  </div>
+</div>
+
+<app-alert #alerta></app-alert>
+<app-modal-confirmacao #modalConfirm (canceled)="cancelarRemocao()"></app-modal-confirmacao>
