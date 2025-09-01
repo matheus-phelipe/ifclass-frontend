@@ -185,8 +185,10 @@ export class Home implements OnInit, OnDestroy {
   }
 
   abrirModal(): void {
-    this.novoAviso = { id: 0, titulo: '', informacoes: '' };
-    this.exibirModalAviso = true;
+    if (this.authService.isRoleActiveOrHigher('ROLE_ADMIN') || this.authService.isRoleActiveOrHigher('ROLE_COORDENADOR')) {
+      this.novoAviso = { id: 0, titulo: '', informacoes: '' };
+      this.exibirModalAviso = true;
+    }
   }
 
   fecharModalAviso(): void {
@@ -205,11 +207,13 @@ export class Home implements OnInit, OnDestroy {
   }
 
   abrirModalEditar(aviso: any) {
-    this.avisoSelecionado = aviso;
-    this.novoAviso = { ...aviso };
-    this.exibirModalAviso = true;
-    this.modoEdicao = true;
-    this.exibirModalTodosAvisos = false;
+    if (this.authService.isRoleActiveOrHigher('ROLE_ADMIN') || this.authService.isRoleActiveOrHigher('ROLE_COORDENADOR')) {
+      this.avisoSelecionado = aviso;
+      this.novoAviso = { ...aviso };
+      this.exibirModalAviso = true;
+      this.modoEdicao = true;
+      this.exibirModalTodosAvisos = false;
+    }
   }
 
   removerAviso(aviso: Aviso) {

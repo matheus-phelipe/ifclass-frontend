@@ -107,7 +107,7 @@
           </li>
         </ul>
         <a class="ver-todos-link" (click)="abrirModalTodosAvisos()">Ver todos os avisos</a>
-        <button class="btn btn-primary mt-2" (click)="abrirModal()">+ Novo Aviso</button>
+        <button *ngIf="authService.hasActiveRole(['ROLE_ADMIN', 'ROLE_COORDENADOR'])" class="btn btn-primary mt-2" (click)="abrirModal()">+ Novo Aviso</button>
       </div>
       <!-- MODAL ADICIONAR AVISO -->
       <div class="modal fade" tabindex="-1" [ngClass]="{ 'show d-block': exibirModalAviso }">
@@ -186,10 +186,12 @@
 
 
               <div class="actions-container mt-2 d-flex justify-content-end" (click)="$event.stopPropagation()">
-                <button class="btn action-btn btn-edit" title="Editar Aviso" (click)="abrirModalEditar(aviso)">
+                <button *ngIf="authService.hasActiveRole(['ROLE_ADMIN', 'ROLE_COORDENADOR'])"
+                class="btn action-btn btn-edit" title="Editar Aviso" (click)="abrirModalEditar(aviso)">
                   <i class="bi bi-pencil-fill"></i>
                 </button>
-                <button class="btn action-btn btn-delete" title="Excluir Aviso" (click)="removerAviso(aviso)">
+                <button *ngIf="authService.hasActiveRole(['ROLE_ADMIN', 'ROLE_COORDENADOR'])"
+                class="btn action-btn btn-delete" title="Excluir Aviso" (click)="removerAviso(aviso)">
                   <i class="bi bi-trash3-fill"></i>
                 </button>
               </div>
