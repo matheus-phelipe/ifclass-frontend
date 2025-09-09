@@ -167,9 +167,17 @@
 }
 
 .modal-header {
-  background-color: var(--cor-primaria);
+  background-color: #0f5132; /* verde principal */
+  color: white;
+  border-top-left-radius: .5rem;
+  border-top-right-radius: .5rem;
 }
 
-.modal-title {
-  color: white;
+.modal-content {
+  border: 2px solid #0f5132;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  border-radius: 12px;
+  border-left: 6px solid #0f5132;
+  border-right: 6px solid #0f5132;
+  border-bottom: 6px solid #0f5132;
 }
