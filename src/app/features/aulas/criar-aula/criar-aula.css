@@ -1031,3 +1031,116 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+.filter-toggle-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.18s ease, background 0.18s ease;
+}
+
+.filter-toggle-btn:hover {
+  transform: scale(1.06);
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.filter-toggle-btn.open i {
+  transform: rotate(90deg);
+  transition: transform 0.25s ease;
+}
+
+.filter-popover {
+  position: absolute;
+  top: 90%;
+  right: 90%;
+  transform: translateY(-10px);
+  width: 23rem;
+  max-width: 90vw;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 1000;
+}
+
+.filter-popover.open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) translateX(0);
+}
+
+.filter-row select,
+.filter-row input {
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #e6e6e6;
+  font-size: 1rem;
+  background: white;
+  transition: border-color 0.3s ease;
+}
+
+.filter-row select:focus,
+.filter-row input:focus {
+  border-color: #667eea;
+  outline: none;
+  box-shadow: 0 0 5px rgba(102, 126, 234, 0.5);
+}
+
+@media (max-width: 768px) {
+  .filter-popover.open {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) scale(1);
+    width: 100vw;
+    height: auto;
+    box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    background: white;
+    z-index: 1000;
+    border-radius: 8px;
+    pointer-events: auto;
+    opacity: 1;
+  }
+
+  .filter-popover {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.95);
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    width: 90%;
+    max-width: 400px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  }
+
+  .aulas-title {
+    font-size: 1.5rem;
+  }
+
+  .filter-toggle-btn {
+    padding: 0.25rem 0.5rem; /* botão menor */
+    font-size: 1rem;
+  }
+}
+
+.close-btn {
+  display: block;
+  position: absolute;
+  top: 0.2rem;
+  right: 1rem;
+  background: transparent;
+  border: none;
+  font-size: 2.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #333;
+  z-index: 1100;
+  padding: 0;
+}
+
+

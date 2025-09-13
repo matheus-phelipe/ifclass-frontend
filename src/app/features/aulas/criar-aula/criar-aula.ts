@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewInit, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, ElementRef, HostListener } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -51,6 +51,16 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
   isValidatingConflicts = false;
   showSuggestions = false;
 
+   // Filtros selecionados
+  filtroSalaId: number | null = null;
+  filtroProfessorId: number | null = null;
+  filtroDisciplinaId: number | null = null;
+
+  // Lista que será exibida após filtro e usada na paginação
+  aulasFiltradas: Aula[] = [];
+  paginatedAulasFiltradas: Aula[] = [];
+  mostrarFiltros = false;
+
   // Paginação
   currentPage = 1;
   itemsPerPage = 10;
@@ -58,6 +68,8 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
   paginatedAulas: Aula[] = [];
 
   @ViewChild('modalConfirm') modalConfirm!: ModalConfirmacaoComponent;
+  @ViewChild('filterPanel') filterPanelRef!: ElementRef;
+  @ViewChild('filterBtn') filterBtnRef!: ElementRef;
 
   constructor(
     private fb: FormBuilder,
@@ -154,6 +166,97 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
     });
   }
 
+  // Filtra as salas que possuam aulas e verifica se qual professor ou disciplina possuem aula atrelada a sala selecionada
+  salasFiltradas(): Sala[] {
+    const aulasFiltradas = this.aulas.filter(aula =>
+      (!this.filtroProfessorId || aula.professor.id === this.filtroProfessorId) &&
+      (!this.filtroDisciplinaId || aula.disciplina.id === this.filtroDisciplinaId)
+    );
+    const idsSalas = new Set(aulasFiltradas.map(aula => aula.sala.id));
+    return this.salas.filter(sala => idsSalas.has(sala.id));
+  }
+
+  professoresFiltrados(): Usuario[] {
+    const aulasFiltradas = this.aulas.filter(aula =>
+      (!this.filtroSalaId || aula.sala.id === this.filtroSalaId) &&
+      (!this.filtroDisciplinaId || aula.disciplina.id === this.filtroDisciplinaId)
+    );
+    const idsProfessores = new Set(aulasFiltradas.map(aula => aula.professor.id));
+    return this.professores.filter(prof => idsProfessores.has(prof.id));
+  }
+
+  //Retorna apenas as disciplinas que estão presentes nas aulas filtradas pelos filtros de sala e professor.
+  disciplinasFiltradas(): Disciplina[] {
+  const aulasFiltradas = this.aulas.filter(aula =>
+    (!this.filtroSalaId || aula.sala.id === this.filtroSalaId) &&
+    (!this.filtroProfessorId || aula.professor.id === this.filtroProfessorId)
+  );
+  const idsDisciplinas = new Set(aulasFiltradas.map(aula => aula.disciplina.id));
+  return this.disciplinas.filter(d => idsDisciplinas.has(d.id));
+}
+
+
+  // evita que o clique suba para DOM e feche imediatamente
+  toggleFiltros(event?: MouseEvent) {
+    event?.stopPropagation();
+    this.mostrarFiltros = !this.mostrarFiltros;
+  }
+
+  aplicarFiltros() {
+    this.filtrarAulas();
+    this.mostrarFiltros = false;
+  }
+
+  // fecha ao clicar fora do popover
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event) {
+    if (!this.mostrarFiltros) return;
+    const clickedInsidePanel = this.filterPanelRef?.nativeElement.contains(event.target);
+    const clickedOnBtn = this.filterBtnRef?.nativeElement.contains(event.target);
+    if (!clickedInsidePanel && !clickedOnBtn) {
+      this.mostrarFiltros = false;
+    }
+  }
+
+  //Retorna as salas que têm pelo menos uma aula compatível com os filtros de professor e disciplina.
+  filtrarAulas(): void {
+    this.aulasFiltradas = this.aulas.filter((aula) => {
+      const condSala = this.filtroSalaId
+        ? aula.sala.id === this.filtroSalaId
+        : true;
+      const condProfessor = this.filtroProfessorId
+        ? aula.professor.id === this.filtroProfessorId
+        : true;
+      const condDisciplina = this.filtroDisciplinaId
+        ? aula.disciplina.id === this.filtroDisciplinaId
+        : true;
+      return condSala && condProfessor && condDisciplina;
+    });
+
+    this.currentPage = 1;
+    this.updatePaginationFiltrada();
+  }
+
+  // Atualiza o total de páginas e a página atual conforme aulas filtradas, depois atualiza a lista paginada.
+  updatePaginationFiltrada() {
+    this.totalPages = this.aulasFiltradas.length;
+    this.totalPages = Math.ceil(this.totalPages / this.itemsPerPage);
+
+    if (this.currentPage > this.totalPages) this.currentPage = 1;
+
+    this.updatePaginatedAulasFiltradas();
+  }
+
+  // Atualiza a lista de aulas exibidas na página atual com base nos índices calculados.
+  updatePaginatedAulasFiltradas() {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    this.paginatedAulasFiltradas = this.aulasFiltradas.slice(
+      startIndex,
+      endIndex
+    );
+  }
+
   abrirModalRemocao(aula: Aula) {
     this.aulaParaRemover = aula;
     const disciplina = aula.disciplina.nome;
@@ -168,7 +271,7 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
 
   confirmarRemocao() {
     if (!this.aulaParaRemover || !this.aulaParaRemover.id) return;
-    
+
     this.aulaService.remover(this.aulaParaRemover.id).subscribe({
       next: () => {
         this.sucesso = 'Aula removida com sucesso!';
@@ -213,6 +316,7 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
         next: aulas => {
           this.aulas = this.ordenarAulas(aulas);
           this.updatePagination();
+          this.filtrarAulas();
         }
       });
     } else {
@@ -220,6 +324,7 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
         next: aulas => {
           this.aulas = this.ordenarAulas(aulas);
           this.updatePagination();
+          this.filtrarAulas();
         }
       });
     }
@@ -356,13 +461,13 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
   goToPage(page: number) {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
-      this.updatePaginatedAulas();
+      this.updatePaginatedAulasFiltradas();
     }
   }
 
   onItemsPerPageChange() {
     this.currentPage = 1;
-    this.updatePagination();
+    this.updatePaginationFiltrada();
   }
 
   getStartIndex(): number {
