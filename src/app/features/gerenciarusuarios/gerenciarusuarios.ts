@@ -8,13 +8,14 @@ import { FormsModule } from '@angular/forms';
 import { AlertComponent } from '../../shared/alert/alert';
 import { ModalConfirmacaoComponent } from '../../shared/modal-confirmacao/modal-confirmacao';
 import { ProfileSwitcherComponent } from '../../shared/profile-switcher/profile-switcher';
+import { CriarUsuario } from '../gerenciarusuarios/criar-usuario/criar-usuario';
 
 declare var bootstrap: any;
 
 @Component({
   selector: 'app-gerenciarusuarios',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, AlertComponent, ModalConfirmacaoComponent, ProfileSwitcherComponent],
+  imports: [CommonModule, RouterModule, FormsModule, AlertComponent, ModalConfirmacaoComponent, ProfileSwitcherComponent, CriarUsuario],
   templateUrl: './gerenciarusuarios.html',
   styleUrls: ['./gerenciarusuarios.css']
 })
@@ -47,7 +48,13 @@ export class Gerenciarusuarios implements OnInit {
     };
   
   usuarioParaRemover!: Usuario;
-  
+
+  // Controle do modal de criar usuário
+  mostrarCriarUsuario = false;
+  abrirCriarUsuario() {
+    this.mostrarCriarUsuario = true;
+  }
+
   // Variáveis para alteração de permissão
   usuarioParaAlterarPermissao!: Usuario;
   permissoesParaAtualizar: string[] = [];

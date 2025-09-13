@@ -231,6 +231,28 @@
   z-index: 3;
 }
 
+.btn-adicionar {
+  background-color: #24845c;   
+  color: white;
+  border: none;
+  border-radius: 8px;          
+  padding: 10px 18px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-adicionar:hover {
+  background-color: #176645;   
+  transform: scale(1.05);      
+}
+
+.btn-adicionar:active {
+  background-color:#176645;   
+  transform: scale(0.98);      
+}
+
 /* Responsividade para paginação */
 @media (max-width: 768px) {
   .pagination-controls-top {

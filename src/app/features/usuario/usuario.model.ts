@@ -4,10 +4,19 @@ export interface Usuario {
   id: number;
   nome: string;
   email: string;
+  senha?: string;
   prontuario: string;
   authorities: string[];
   disciplinas?: Disciplina[];
   turma?: TurmaResumo;
+}
+
+export interface UsuarioCreate {
+  nome: string;
+  email: string;
+  senha: string;
+  prontuario: string;
+  authorities: string[];
 }
 
 export interface TurmaResumo {

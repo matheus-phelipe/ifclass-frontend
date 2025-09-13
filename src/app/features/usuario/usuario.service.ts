@@ -12,11 +12,11 @@ export class UsuarioService {
 
   constructor(private http: HttpClient) {}
 
-   // Cadastrar novo usuário
-  cadastrar(usuario: any) {
-    return this.http.post(this.apiUrl, usuario);
+  // Cadastrar novo usuário
+  cadastrar(usuario: any): Observable<Usuario> {
+    return this.http.post<Usuario>(this.apiUrl, usuario);
   }
-
+fear
   // Listar todos os usuários
   listarTodos() {
     return this.http.get<Usuario[]>(this.apiUrl);
