@@ -249,16 +249,60 @@
     <!-- Listagem de Aulas Moderna -->
     <div class="aulas-section">
       <div class="aulas-card">
-        <div class="aulas-header">
+        <div class="aulas-header d-flex justify-content-between align-items-center flex-wrap">
           <div class="header-info">
-            <h3 class="aulas-title">
+            <h3 class="aulas-title mb-0">
               <i class="bi bi-calendar-check"></i>
               Aulas Agendadas
             </h3>
-            <p class="aulas-subtitle">Visualize e gerencie todas as aulas criadas</p>
+            <p class="aulas-subtitle hide-mobile">Visualize e gerencie todas as aulas criadas</p>
+
+            <button #filterBtnMobile class="filter-toggle-btn d-md-none p-1 text-white rounded-1" (click)="toggleFiltros($event)" [attr.aria-expanded]="mostrarFiltros" aria-controls="filterPanel" title="Abrir filtros">
+              <i class="bi bi-search"></i>
+            </button>
+
           </div>
-          <div class="aulas-stats">
-            <div class="stat-item">
+          <div class="aulas-stats position-relative d-flex align-items-center gap-3 mt-2 mt-md-0">
+            <!-- Filtros -->
+            <button #filterBtn class="filter-toggle-btn  hide-mobile p-1 text-white rounded-1" (click)="toggleFiltros($event)" [attr.aria-expanded]="mostrarFiltros" aria-controls="filterPanel" title="Abrir filtros">
+              <i class="bi bi-search"></i>
+            </button>
+            <!-- Popover -->
+            <div #filterPanel id="filterPanel" class="filter-popover shadow bg-white rounded-3 p-2" [class.open]="mostrarFiltros" role="dialog" [attr.aria-hidden]="!mostrarFiltros">
+               <button class="close-btn hide-desktop" (click)="toggleFiltros($event)" aria-label="Fechar filtros" type="button">
+                  &times;
+                </button>
+              <div class="filter-inner p-2 d-flex flex-column gap-2">
+                <div class="filter-row">
+                  <label class="form-label small text-dark mb-1">Sala</label>
+                  <select [(ngModel)]="filtroSalaId" (change)="filtrarAulas()">
+                    <option [ngValue]="null">Todas</option>
+                    <option *ngFor="let sala of salasFiltradas()" [ngValue]="sala.id">
+                      {{ getBlocoNome(sala.id) }} - {{ sala.codigo }}
+                    </option>
+                  </select>
+                </div>
+
+                <div class="filter-row">
+                  <label class="form-label small text-dark mb-1">Professor</label>
+                  <select [(ngModel)]="filtroProfessorId" (change)="filtrarAulas()">
+                    <option [ngValue]="null">Todos</option>
+                    <option *ngFor="let prof of professoresFiltrados()" [ngValue]="prof.id">{{ prof.nome }}</option>
+                  </select>
+                </div>
+
+                <div class="filter-row">
+                  <label class="form-label small text-dark mb-1">Disciplina</label>
+                  <select [(ngModel)]="filtroDisciplinaId" (change)="filtrarAulas()">
+                    <option [ngValue]="null">Todas</option>
+                    <option *ngFor="let disc of disciplinasFiltradas()" [ngValue]="disc.id">{{ disc.nome }}</option>
+                  </select>
+                </div>
+
+              </div>
+            </div>
+            <!--  -->
+            <div class="stat-item hide-mobile">
               <span class="stat-number">{{ aulas.length }}</span>
               <span class="stat-label">Aulas</span>
             </div>
@@ -267,7 +311,7 @@
 
         <div class="aulas-content">
           <div class="aulas-grid" *ngIf="paginatedAulas.length > 0">
-            <div class="aula-card" *ngFor="let aula of paginatedAulas">
+             <div class="aula-card" *ngFor="let aula of paginatedAulasFiltradas">
               <div class="aula-header">
                 <div class="aula-day">
                   <i class="bi bi-calendar3"></i>
