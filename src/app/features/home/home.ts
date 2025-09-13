@@ -12,12 +12,12 @@ import { UsuarioService } from '../usuario/usuario.service';
 import { Aula } from '../aulas/aula.model';
 import { BlocoService } from '../aluno/bloco.service';
 import { Bloco } from '../aluno/bloco.model';
-import { AvisosService } from '../../model/aviso/aviso.service';
 import { FormsModule } from '@angular/forms';
 import { ViewChild } from '@angular/core';
 import { AlertComponent } from '../../shared/alert/alert';
 import { ModalConfirmacaoComponent } from '../../shared/modal-confirmacao/modal-confirmacao';
 import { Action } from 'rxjs/internal/scheduler/Action';
+import { AvisosService } from './aviso.service';
 
 @Component({
   selector: 'app-home',
