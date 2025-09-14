@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
 import { AlertComponent } from '../../shared/alert/alert';
 import { ModalConfirmacaoComponent } from '../../shared/modal-confirmacao/modal-confirmacao';
 import { ProfileSwitcherComponent } from '../../shared/profile-switcher/profile-switcher';
+import { ChangeDetectorRef } from '@angular/core';
 
 declare var bootstrap: any;
 
@@ -60,17 +61,20 @@ export class Gerenciarusuarios implements OnInit {
 
   constructor(
     public authService: AuthService,
-    private usuarioService: UsuarioService
+    private usuarioService: UsuarioService,
+    private cdr: ChangeDetectorRef
   ) {}
 
    ngOnInit(): void {
     this.carregarUsuarios();
-
-    const modalElement = document.getElementById('editarUsuarioModal');
-    if (modalElement) {
-      this.editarUsuarioModal = new bootstrap.Modal(modalElement);
-    }
   }
+
+  ngAfterViewInit(): void {
+  const modalElement = document.getElementById('editarUsuarioModal');
+  if (modalElement) {
+    this.editarUsuarioModal = new bootstrap.Modal(modalElement);
+  }
+}
 
   carregarUsuarios() {
     this.usuarioService.listarTodosComDetalhes().subscribe({
@@ -235,11 +239,18 @@ export class Gerenciarusuarios implements OnInit {
     });
   }
 
-  abrirModalEditar(usuario: Usuario) {
-    if (!this.authService.isRoleActiveOrHigher('ROLE_ADMIN')) return;
-    this.usuarioParaEditar = JSON.parse(JSON.stringify(usuario));
-    this.editarUsuarioModal.show();
-  }
+
+
+abrirModalEditar(usuario: Usuario) {
+  if (!this.authService.isRoleActiveOrHigher('ROLE_ADMIN')) return;
+
+  this.usuarioParaEditar = { ...usuario };
+
+  // Força o Angular a renderizar os campos antes de mostrar o modal
+  this.cdr.detectChanges();
+
+  this.editarUsuarioModal.show();
+}
 
   salvarEdicao() {
     this.usuarioService.atualizarUsuario(this.usuarioParaEditar).subscribe({
