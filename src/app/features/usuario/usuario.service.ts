@@ -16,7 +16,7 @@ export class UsuarioService {
   cadastrar(usuario: any): Observable<Usuario> {
     return this.http.post<Usuario>(this.apiUrl, usuario);
   }
-fear
+
   // Listar todos os usuários
   listarTodos() {
     return this.http.get<Usuario[]>(this.apiUrl);
