@@ -1,0 +1,50 @@
+<div class="overlay">
+  <div class="modal-custom">
+    <button class="btn-cancelar" (click)="fechar.emit()">×</button>
+    <h2>Criar Usuário</h2>
+
+    <label>Nome de Usuário</label>
+    <input [(ngModel)]="nome" type="text" placeholder="Digite o nome" />
+
+    <label>Email</label>
+    <input [(ngModel)]="email" type="email" placeholder="Digite o email" />
+
+    <label>Senha</label>
+    <input [(ngModel)]="senha" type="password" placeholder="Digite a senha" />
+
+    <label>Prontuário</label>
+    <input [(ngModel)]="prontuario" type="text" placeholder="Digite a prontuário"/>
+
+    <label>Permissões</label>
+    <div class="permissoes">
+      <label>
+        <input type="checkbox" name="ROLE_ALUNO"
+          [(ngModel)]="permissoesSelecionadas['ROLE_ALUNO']"
+          [ngModelOptions]="{standalone: true}" />
+        <span>Aluno</span>
+      </label>
+      <label>
+        <input type="checkbox" name="ROLE_PROFESSOR"
+          [(ngModel)]="permissoesSelecionadas['ROLE_PROFESSOR']"
+          [ngModelOptions]="{standalone: true}" />
+        <span>Professor</span>
+      </label>
+      <label>
+        <input type="checkbox" name="ROLE_COORDENADOR"
+          [(ngModel)]="permissoesSelecionadas['ROLE_COORDENADOR']"
+          [ngModelOptions]="{standalone: true}" />
+        <span>Coordenador</span>
+      </label>
+      <label>
+        <input type="checkbox" name="ROLE_ADMIN"
+          [(ngModel)]="permissoesSelecionadas['ROLE_ADMIN']"
+          [ngModelOptions]="{standalone: true}" />
+        <span>Admin</span>
+      </label>
+    </div>
+ 
+    <div class="acoes">
+      <button class="btn-criar" (click)="criarConta()">Criar Conta</button>
+    </div>
+  </div>
+</div>
