@@ -13,6 +13,7 @@ import { FormsModule, NgModel } from '@angular/forms';
   templateUrl: './cadastro.html',
   styleUrl: './cadastro.css'
 })
+
 export class CadastroComponent {
   mensagemDoModal: string = '';
   
@@ -21,7 +22,7 @@ export class CadastroComponent {
     confirmarSenha: false
   };
 
-  @ViewChild('meuModal') modal!: ModalComponent;
+    @ViewChild('meuModal') modal!: ModalComponent;
 
   usuario: Cadastro = {
     nome: '',
@@ -60,10 +61,7 @@ export class CadastroComponent {
         this.modal.closed.subscribe(() => {
           this.router.navigate(['/login']);
         });    
-        },
-      error: (err) => {
-        this.abrirModal("Erro ao cadastrar usuário!");
-      }
+        }
     });
   }
 
