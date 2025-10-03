@@ -31,3 +31,13 @@ export interface CursoResumo {
   nome: string;
   codigo: string;
 }
+
+export interface RowError {
+  row: number;
+  message: string;
+}
+
+export interface BatchExcelResult {
+  createdCount: number;
+  errors: RowError[];
+}

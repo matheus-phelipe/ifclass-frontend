@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Usuario } from './usuario.model';
+import { Usuario, BatchExcelResult  } from './usuario.model';
 import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
 
@@ -57,6 +57,12 @@ export class UsuarioService {
 
   listarDisciplinas(professorId: number) {
     return this.http.get<import('../disciplinas/disciplina.model').Disciplina[]>(`${this.apiUrl}/${professorId}/disciplinas`);
+  }
+
+  excel(file: File): Observable<BatchExcelResult> { 
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<BatchExcelResult>(`${this.apiUrl}/excel`, formData); 
   }
 }
  

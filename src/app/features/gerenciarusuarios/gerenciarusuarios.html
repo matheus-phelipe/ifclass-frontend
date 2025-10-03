@@ -34,14 +34,22 @@
       </div>
     </div>
       
-    <div class="page-header d-flex justify-content-between align-items-start">
+    <div class="page-header d-flex justify-content-start align-items-center">
       <div class="align-items-center">
-        <!-- Botão para adicionar usuário -->
         <button class="btn-adicionar" (click)="abrirCriarUsuario()">+ Adicionar Usuário</button>
         <app-criar-usuario 
           *ngIf="mostrarCriarUsuario" 
           (fechar)="mostrarCriarUsuario = false">
         </app-criar-usuario>
+      </div>
+      
+      <div class="align-items-center">
+        <button class="btn-excel" (click)="abrirExcelUsuario()">+ Usuário via Excel</button>
+        <app-excel-usuario
+          *ngIf="mostrarExcelUsuario"
+          (fechar)="mostrarExcelUsuario = false"
+          (importacaoConcluida)="carregarUsuarios()">
+        </app-excel-usuario>
       </div>
     </div>
 

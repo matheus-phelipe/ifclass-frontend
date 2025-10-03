@@ -1,0 +1,41 @@
+<div class="overlay">
+  <div class="modal-custom">
+    <button class="btn-cancelar" (click)="fechar.emit()">×</button>
+    <h2>Importar Usuários (Excel)</h2>
+
+    <p>Selecione um arquivo Excel (.xlsx ou .xls). A primeira linha deve ser cabeçalho com as colunas:</p>
+    <ul>
+      <li>
+        <strong>nome</strong>, 
+        <strong>email</strong>, 
+        <strong>senha</strong>, 
+        <strong>prontuario</strong>,
+        <strong>permissao</strong>
+    </li>
+    </ul>
+
+    <div class="file-upload">
+      <input type="file" id="fileInput"
+         (change)="onFileSelected($event)"
+         accept=".xlsx, .xls, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
+      <label for="fileInput" class="custom-file-btn">📁 Escolher arquivo</label>
+      <span *ngIf="fileName">{{ fileName }}</span>
+    </div>
+
+    <div class="acoes">
+      <button class="btn-criar" (click)="upload()" [disabled]="!file">Enviar e importar</button>
+    </div>
+
+    <div *ngIf="resultado">
+      <h3>Resultado</h3>
+      <p><strong>Criados:</strong> {{resultado.createdCount}}</p>
+      <div *ngIf="resultado.errors?.length">
+        <p><strong>Erros:</strong></p>
+        <ul>
+          <li *ngFor="let e of resultado.errors">Linha {{e.row}} — {{e.message}}</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>

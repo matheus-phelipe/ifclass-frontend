@@ -33,13 +33,24 @@
 .permission-filter-container .btn-group .btn {
   border-radius: 0.375rem !important;
   font-weight: 500;
-  padding: 0.4rem 0.8rem;
   transition: all 0.2s ease-in-out;
+  font-size: 15px;
+  padding: 0.20rem 0.5rem; 
+}
+
+.permission-filter-container .btn-group .btn.btn-outline-secondary {
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  color: #495057;
 }
 
 .permission-filter-container .btn-group .btn.btn-primary {
+  background-color: #198754; 
+  border-color: #198754;
+  color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
 
 .table-container { background-color: #fff; border-radius: var(--raio-borda, 0.75rem); box-shadow: var(--sombra-suave, 0 4px 12px rgba(0, 0, 0, 0.08)); overflow: hidden; }
 .table { margin-bottom: 0; }
@@ -249,6 +260,29 @@
 }
 
 .btn-adicionar:active {
+  background-color:#176645;   
+  transform: scale(0.98);      
+}
+
+.btn-excel {
+  margin-left: 15px;
+  background-color: #24845c;   
+  color: white;
+  border: none;
+  border-radius: 8px;          
+  padding: 10px 18px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-excel:hover {
+  background-color: #176645;   
+  transform: scale(1.05);      
+}
+
+.btn-excel:active {
   background-color:#176645;   
   transform: scale(0.98);      
 }

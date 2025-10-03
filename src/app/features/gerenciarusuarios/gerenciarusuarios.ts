@@ -9,13 +9,14 @@ import { AlertComponent } from '../../shared/alert/alert';
 import { ModalConfirmacaoComponent } from '../../shared/modal-confirmacao/modal-confirmacao';
 import { ProfileSwitcherComponent } from '../../shared/profile-switcher/profile-switcher';
 import { CriarUsuario } from '../gerenciarusuarios/criar-usuario/criar-usuario';
+import {ExcelUsuarios} from '../gerenciarusuarios/excel-usuario/excel-usuario';
 
 declare var bootstrap: any;
 
 @Component({
   selector: 'app-gerenciarusuarios',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, AlertComponent, ModalConfirmacaoComponent, ProfileSwitcherComponent, CriarUsuario],
+  imports: [CommonModule, RouterModule, FormsModule, AlertComponent, ModalConfirmacaoComponent, ProfileSwitcherComponent, CriarUsuario, ExcelUsuarios],
   templateUrl: './gerenciarusuarios.html',
   styleUrls: ['./gerenciarusuarios.css']
 })
@@ -55,6 +56,12 @@ export class Gerenciarusuarios implements OnInit {
     this.mostrarCriarUsuario = true;
   }
 
+  // Controle do modal de criar usuário via Excel
+  mostrarExcelUsuario = false;
+  abrirExcelUsuario() {
+    this.mostrarExcelUsuario = true;
+  }
+
   // Variáveis para alteração de permissão
   usuarioParaAlterarPermissao!: Usuario;
   permissoesParaAtualizar: string[] = [];
@@ -84,6 +91,7 @@ export class Gerenciarusuarios implements OnInit {
       next: (data) => {
         this.usuarios = data;
         this.filtrarUsuarios();
+        this.mostrarExcelUsuario = false;
       },
       error: () => this.mostrarAlerta("Erro ao carregar usuários.", 'danger')
     });
