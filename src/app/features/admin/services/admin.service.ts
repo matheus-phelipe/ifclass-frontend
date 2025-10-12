@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 
@@ -76,6 +76,22 @@ export class AdminService {
 
   getLogsSistema(): Observable<LogSistema[]> {
     return this.http.get<LogSistema[]>(`${this.apiUrl}/sistema/logs`);
+  }
+
+  exportarLogs(filtros: any): Observable<Blob> {
+    let params = new HttpParams();
+
+    // Adiciona cada filtro aos parâmetros da URL, se ele tiver um valor
+    if (filtros.dataInicio) params = params.append('dataInicio', filtros.dataInicio);
+    if (filtros.dataFim) params = params.append('dataFim', filtros.dataFim);
+    if (filtros.nivelSelecionado) params = params.append('nivel', filtros.nivelSelecionado);
+    if (filtros.fonteSelecionada) params = params.append('fonte', filtros.fonteSelecionada);
+    if (filtros.termoBusca) params = params.append('termoBusca', filtros.termoBusca);
+
+    return this.http.get(`${this.apiUrl}/sistema/logs/export`, {
+      params: params,
+      responseType: 'blob'
+    });
   }
 
   healthCheck(): Observable<string> {

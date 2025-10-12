@@ -4,8 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { AdminService, LogSistema } from '../services/admin.service';
 import { OnDestroy } from '@angular/core';
 import { LogWebsocketService } from '../services/log-websocket.service';
-import { Subscription } from 'rxjs';
+import { finalize, Subscription } from 'rxjs';
 import { ScrollingModule } from '@angular/cdk/scrolling';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-admin-logs',
@@ -318,6 +319,7 @@ export class AdminLogsComponent implements OnInit, OnDestroy {
   filteredLogs: LogSistema[] = [];
   expandedLogId: number | null = null;
   logCopiadoId: number | null = null;
+  isExporting = false;
 
   nivelSelecionado = '';
   fonteSelecionada = '';
@@ -327,7 +329,7 @@ export class AdminLogsComponent implements OnInit, OnDestroy {
 
   private logSubscription!: Subscription;
 
-  constructor(private adminService: AdminService, private logWebsocketService: LogWebsocketService,  private cdr: ChangeDetectorRef) {
+  constructor(private adminService: AdminService, private logWebsocketService: LogWebsocketService,  private cdr: ChangeDetectorRef, private toastr: ToastrService) {
     // Obter a data atual
     const today = new Date();
     const year = today.getFullYear();
@@ -454,41 +456,40 @@ export class AdminLogsComponent implements OnInit, OnDestroy {
   }
 
   exportarLogs(): void {
-    const logsFiltrados = this.getLogsFiltrados();
+      // Monta um objeto com todos os valores atuais dos filtros
+      const filtros = {
+        dataInicio: this.dataInicio,
+        dataFim: this.dataFim,
+        nivelSelecionado: this.nivelSelecionado,
+        fonteSelecionada: this.fonteSelecionada,
+        termoBusca: this.termoBusca
+      };
 
-    if (logsFiltrados.length === 0) {
-      alert('Nenhum log para exportar com os filtros aplicados.');
-      return;
+        this.isExporting = true;
+        this.toastr.info('Iniciando a exportação dos logs...', 'Aguarde');
+
+
+      this.adminService.exportarLogs(filtros).pipe(
+        finalize(() => this.isExporting = false)
+    ).subscribe({
+        next: (data: Blob) => {
+          const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', `logs_filtrados_${new Date().toISOString().split('T')[0]}.xlsx`);
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(url);
+          this.toastr.success('Logs exportados com sucesso!', 'Download Iniciado');
+        },
+        error: (err) => {
+          console.error("Erro ao exportar logs:", err);
+          this.toastr.error('Ocorreu um erro ao exportar os logs.', 'Falha na Exportação');
+        }
+      });
     }
-
-    // Criar CSV
-    const headers = ['Timestamp', 'Nível', 'Categoria', 'Mensagem', 'Usuário', 'IP', 'Detalhes'];
-    const csvContent = [
-      headers.join(','),
-      ...logsFiltrados.map(log => [
-        log.timestamp,
-        log.nivel,
-        log.categoria,
-        `"${log.mensagem.replace(/"/g, '""')}"`,
-        log.usuario,
-        log.ip,
-        `"${log.detalhes.replace(/"/g, '""')}"`
-      ].join(','))
-    ].join('\n');
-
-    // Download do arquivo
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', `logs_sistema_${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    alert(`${logsFiltrados.length} logs exportados com sucesso!`);
-  }
 
   getLogsFiltrados(): LogSistema[] {
     return this.logs.filter(log => {
