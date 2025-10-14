@@ -500,11 +500,11 @@ export class AdminLogsComponent implements OnInit, OnDestroy {
         (log.usuario && log.usuario.toLowerCase().includes(this.termoBusca.toLowerCase()));
 
       const logDate = new Date(log.timestamp);
-      const matchInicio = !this.dataInicio || logDate >= new Date(this.dataInicio);
+      const matchInicio = !this.dataInicio || logDate >= new Date(`${this.dataInicio}T00:00:00`);
 
       let matchFim = true;
       if (this.dataFim) {
-        const dataFimAjustada = new Date(this.dataFim);
+        const dataFimAjustada = new Date(`${this.dataFim}T00:00:00`);
         dataFimAjustada.setDate(dataFimAjustada.getDate() + 1);
         matchFim = logDate < dataFimAjustada;
       }
