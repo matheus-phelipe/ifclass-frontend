@@ -32,7 +32,9 @@
       <div *ngIf="resultado.errors?.length">
         <p><strong>Erros:</strong></p>
         <ul>
-          <li *ngFor="let e of resultado.errors">Linha {{e.row}} — {{e.message}}</li>
+          <li *ngFor="let e of resultado.errors; let i = index">
+            <strong>Usuario #{{i + 1}} </strong>( Na Linha {{e.row}} ) — {{e.message}}
+          </li>
         </ul>
       </div>
     </div>

@@ -60,14 +60,12 @@ export class ExcelUsuarios {
       next: (res: BatchExcelResult) => {
         this.resultado = res;
         this.carregando = false;
-        // Se pelo menos um usuário foi criado, notifica o componente pai
-        if (res.createdCount > 0) {
-          this.importacaoConcluida.emit();
-        }
+        
+        this.importacaoConcluida.emit();
       },
       error: (err: any) => {
         this.carregando = false;
-        this.resultado = err.error; // Exibe o erro retornado pela API no modal
+        this.resultado = err.error;
         alert('Erro ao importar: ' + (err.error?.errors?.[0]?.message || err.message || 'erro desconhecido'));
       }
     });

@@ -91,7 +91,6 @@ export class Gerenciarusuarios implements OnInit {
       next: (data) => {
         this.usuarios = data;
         this.filtrarUsuarios();
-        this.mostrarExcelUsuario = false;
       },
       error: () => this.mostrarAlerta("Erro ao carregar usuários.", 'danger')
     });
