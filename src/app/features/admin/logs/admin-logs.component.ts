@@ -7,11 +7,12 @@ import { LogWebsocketService } from '../services/log-websocket.service';
 import { finalize, Subscription } from 'rxjs';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { ToastrService } from 'ngx-toastr';
+import { RelativeTimePipe } from '../../../shared/pipes/relative-time';
 
 @Component({
   selector: 'app-admin-logs',
   standalone: true,
-  imports: [CommonModule, FormsModule, ScrollingModule],
+  imports: [CommonModule, FormsModule, ScrollingModule, RelativeTimePipe],
   template: `
     <div class="container-fluid">
       <div class="d-flex justify-content-between align-items-center mb-4">
@@ -145,10 +146,13 @@ import { ToastrService } from 'ngx-toastr';
 
             <div class="row p-2 mx-0 border-top log-row align-items-center"
               (click)="toggleExpand(log.id)"
-              [class.active-log]="expandedLogId === log.id">
+              [class.active-log]="expandedLogId === log.id"
+              [ngClass]="getLogRowClass(log.timestamp)">
 
               <div class="col-3 text-truncate">
-                  <small>{{log.timestamp | date:'dd/MM/yyyy HH:mm:ss'}}</small>
+                <small [title]="log.timestamp | date:'dd/MM/yyyy HH:mm:ss'">
+                  {{log.timestamp | relativeTime}}
+                </small>
               </div>
               <div class="col-2">
                   <span class="badge" [class]="getNivelClass(log.nivel)">{{log.nivel}}</span>
@@ -231,6 +235,26 @@ import { ToastrService } from 'ngx-toastr';
     .card {
       cursor: pointer;
       transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+
+    small {
+      transition: color 0.3s ease-in-out;
+    }
+
+    .log-row {
+      transition: background-color 0.5s ease-in-out;
+    }
+
+    .log-row-fresh {
+      background-color: #E0F2E0;
+    }
+
+    .log-row-recent {
+      background-color: #F5F6FA;
+    }
+
+    .log-row:hover, .log-row.active-log {
+       background-color: #f1f3f5;
     }
 
     .card:hover {
@@ -569,5 +593,25 @@ export class AdminLogsComponent implements OnInit, OnDestroy {
     }).catch(err => {
       console.error('Erro ao copiar o log para a área de transferência: ', err);
     });
+  }
+
+  // ... dentro da classe AdminLogsComponent
+
+  getLogRowClass(timestamp: string): string {
+    const logDate = new Date(timestamp);
+    const now = new Date();
+
+    // Calcula a diferença em segundos
+    const diffInSeconds = (now.getTime() - logDate.getTime()) / 1000;
+
+    if (diffInSeconds < 60) { // Menos de 1 minuto
+        return 'log-row-fresh';
+    }
+
+    if (diffInSeconds < 3600) { // Menos de 1 hora
+        return 'log-row-recent';
+    }
+
+    return '';
   }
 }
