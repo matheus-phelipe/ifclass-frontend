@@ -54,51 +54,67 @@ import { NotificationService } from '../../../shared/sweetalert/notification.ser
         </div>
       </div>
 
-      <!-- Configurações Gerais -->
-      <div class="card mb-4">
-        <div class="card-header">
-          <h5 class="mb-0">
-            <i class="bi bi-gear-fill me-2"></i>Configurações Gerais
-            <span class="badge bg-secondary ms-2">4</span>
-          </h5>
+      <div *ngIf="carregando" class="text-center p-5">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Carregando...</span>
         </div>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <div class="card border-primary">
-                <div class="card-body">
-                  <div class="d-flex justify-content-between align-items-start mb-2">
-                    <h6 class="card-title mb-0">app.name</h6>
-                    <span class="badge bg-primary">STRING</span>
-                  </div>
-                  <p class="card-text small text-muted mb-3">Nome da aplicação</p>
-                  <input type="text" class="form-control form-control-sm" [(ngModel)]="configs.appName" value="IFClass">
-                </div>
-              </div>
-            </div>
-            
-            <div class="col-md-6 mb-3">
-              <div class="card border-secondary">
-                <div class="card-body">
-                  <div class="d-flex justify-content-between align-items-start mb-2">
-                    <h6 class="card-title mb-0">app.version</h6>
-                    <div class="d-flex gap-1">
-                      <span class="badge bg-primary">STRING</span>
-                      <span class="badge bg-secondary" title="Somente leitura">
-                        <i class="bi bi-lock"></i>
-                      </span>
-                    </div>
-                  </div>
-                  <p class="card-text small text-muted mb-3">Versão da aplicação</p>
-                  <input type="text" class="form-control form-control-sm" value="1.0.3" disabled>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <p class="mt-2">Carregando configurações...</p>
       </div>
 
-      <!-- Configurações de Segurança -->
+      <div *ngIf="!carregando && erro" class="alert alert-danger">
+        <h5 class="alert-heading">Erro ao Carregar</h5>
+        <p>{{ erro }}</p>
+        <button class="btn btn-danger" (click)="carregarConfiguracoes()">
+          <i class="bi bi-arrow-clockwise me-1"></i>Tentar Novamente
+        </button>
+      </div>
+            <ng-container *ngIf="!carregando && !erro">
+
+            <!-- Configurações Gerais -->
+            <div class="card mb-4">
+              <div class="card-header">
+                <h5 class="mb-0">
+                  <i class="bi bi-gear-fill me-2"></i>Configurações Gerais
+                  <span class="badge bg-secondary ms-2">4</span>
+                </h5>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <div class="card border-primary">
+                      <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                          <h6 class="card-title mb-0">app.name</h6>
+                          <span class="badge bg-primary">STRING</span>
+                        </div>
+                        <p class="card-text small text-muted mb-3">Nome da aplicação</p>
+                        <input type="text" class="form-control form-control-sm" [(ngModel)]="configs.appName">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6 mb-3">
+                    <div class="card border-secondary">
+                      <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                          <h6 class="card-title mb-0">app.version</h6>
+                          <div class="d-flex gap-1">
+                            <span class="badge bg-primary">STRING</span>
+                            <span class="badge bg-secondary" title="Somente leitura">
+                              <i class="bi bi-lock"></i>
+                            </span>
+                          </div>
+                        </div>
+                        <p class="card-text small text-muted mb-3">Versão da aplicação</p>
+                        <input type="text" class="form-control form-control-sm" disabled>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Configurações de Segurança -->
       <div class="card mb-4">
         <div class="card-header">
           <h5 class="mb-0">
@@ -116,11 +132,11 @@ import { NotificationService } from '../../../shared/sweetalert/notification.ser
                     <span class="badge bg-success">NUMBER</span>
                   </div>
                   <p class="card-text small text-muted mb-3">Timeout da sessão em segundos</p>
-                  <input type="number" class="form-control form-control-sm" [(ngModel)]="configs.sessionTimeout" value="3600">
+                  <input type="number" class="form-control form-control-sm" [(ngModel)]="configs.sessionTimeout">
                 </div>
               </div>
             </div>
-            
+
             <div class="col-md-6 mb-3">
               <div class="card border-primary">
                 <div class="card-body">
@@ -129,7 +145,7 @@ import { NotificationService } from '../../../shared/sweetalert/notification.ser
                     <span class="badge bg-success">NUMBER</span>
                   </div>
                   <p class="card-text small text-muted mb-3">Máximo de tentativas de login</p>
-                  <input type="number" class="form-control form-control-sm" [(ngModel)]="configs.maxLoginAttempts" value="5">
+                  <input type="number" class="form-control form-control-sm" [(ngModel)]="configs.maxLoginAttempts">
                 </div>
               </div>
             </div>
@@ -137,7 +153,7 @@ import { NotificationService } from '../../../shared/sweetalert/notification.ser
         </div>
       </div>
 
-      <!-- Configurações de Backup -->
+            <!-- Configurações de Backup -->
       <div class="card mb-4">
         <div class="card-header">
           <h5 class="mb-0">
@@ -164,7 +180,7 @@ import { NotificationService } from '../../../shared/sweetalert/notification.ser
                 </div>
               </div>
             </div>
-            
+
             <div class="col-md-6 mb-3">
               <div class="card border-primary">
                 <div class="card-body">
@@ -173,7 +189,7 @@ import { NotificationService } from '../../../shared/sweetalert/notification.ser
                     <span class="badge bg-primary">STRING</span>
                   </div>
                   <p class="card-text small text-muted mb-3">Horário do backup automático</p>
-                  <input type="time" class="form-control form-control-sm" [(ngModel)]="configs.backupTime" value="03:00">
+                  <input type="time" class="form-control form-control-sm" [(ngModel)]="configs.backupTime">
                 </div>
               </div>
             </div>
@@ -181,21 +197,20 @@ import { NotificationService } from '../../../shared/sweetalert/notification.ser
         </div>
       </div>
 
-      <!-- Resumo de Alterações -->
-      <div *ngIf="temAlteracoesPendentes()" class="card border-warning">
+      <div *ngIf="getAlteracoes().length > 0" class="card border-warning">
         <div class="card-header bg-warning text-dark">
           <h6 class="mb-0">
             <i class="bi bi-exclamation-triangle me-2"></i>
-            Alterações Pendentes (3)
+            Alterações Pendentes ({{ getAlteracoes().length }})
           </h6>
         </div>
         <div class="card-body">
           <div class="row">
             <div class="col-md-8">
               <ul class="list-unstyled mb-0">
-                <li class="mb-1"><strong>app.name</strong>: {{configs.appName}}</li>
-                <li class="mb-1"><strong>security.session.timeout</strong>: {{configs.sessionTimeout}}</li>
-                <li class="mb-1"><strong>backup.automatic.enabled</strong>: {{configs.backupEnabled}}</li>
+                <li *ngFor="let alt of getAlteracoes()" class="mb-1">
+                  <strong>{{ alt.key }}</strong>: {{ alt.valorNovo }}
+                </li>
               </ul>
             </div>
             <div class="col-md-4 text-end">
@@ -209,6 +224,8 @@ import { NotificationService } from '../../../shared/sweetalert/notification.ser
           </div>
         </div>
       </div>
+
+      </ng-container>
 
       <!-- Informações Importantes -->
       <div class="alert alert-info mt-4">
@@ -228,12 +245,12 @@ import { NotificationService } from '../../../shared/sweetalert/notification.ser
     .card {
       transition: transform 0.2s;
     }
-    
+
     .card:hover {
       transform: translateY(-1px);
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    
+
     .form-control-sm {
       font-size: 0.875rem;
     }
@@ -244,17 +261,16 @@ export class AdminConfiguracoesComponent implements OnInit {
   buscaFiltro = '';
   carregando = false;
   erro: string | null = null;
-  alteracoesPendentes = false;
 
-  configs = {
-    appName: 'IFClass',
-    sessionTimeout: 3600,
-    maxLoginAttempts: 5,
-    backupEnabled: true,
-    backupTime: '03:00'
+  configs: any = {
+    appName: null,
+    sessionTimeout: null,
+    maxLoginAttempts: null,
+    backupEnabled: null,
+    backupTime: null
   };
 
-  configsOriginais = { ...this.configs };
+  configsOriginais: any = {  };
 
   constructor(
     private http: HttpClient,
@@ -263,6 +279,32 @@ export class AdminConfiguracoesComponent implements OnInit {
 
   ngOnInit(): void {
     this.carregarConfiguracoes();
+  }
+
+  getAlteracoes(): { key: string, valorNovo: any }[] {
+    if (!this.configs || !this.configsOriginais) {
+      return [];
+    }
+
+    const alteracoes: { key: string, valorNovo: any }[] = [];
+
+    // Compara os valores atuais com os originais
+    if (this.configs.appName !== this.configsOriginais.appName) {
+      alteracoes.push({ key: 'app.name', valorNovo: this.configs.appName });
+    }
+    if (this.configs.sessionTimeout !== this.configsOriginais.sessionTimeout) {
+      alteracoes.push({ key: 'security.session.timeout', valorNovo: this.configs.sessionTimeout });
+    }
+    if (this.configs.maxLoginAttempts !== this.configsOriginais.maxLoginAttempts) {
+      alteracoes.push({ key: 'security.max.login.attempts', valorNovo: this.configs.maxLoginAttempts });
+    }
+    if (this.configs.backupEnabled !== this.configsOriginais.backupEnabled) {
+      alteracoes.push({ key: 'backup.automatic.enabled', valorNovo: this.configs.backupEnabled });
+    }
+    if (this.configs.backupTime !== this.configsOriginais.backupTime) {
+      alteracoes.push({ key: 'backup.schedule.time', valorNovo: this.configs.backupTime });
+    }
+    return alteracoes;
   }
 
   carregarConfiguracoes(): void {
@@ -305,20 +347,16 @@ export class AdminConfiguracoesComponent implements OnInit {
         } else if (error.status === 403) {
           this.erro = 'Acesso negado: Você não tem permissão para acessar as configurações.';
         } else if (error.status === 404) {
-          this.erro = 'Configurações não encontradas: Usando valores padrão.';
+          this.erro = 'Configurações não encontradas: O servidor não retornou valores.';
         } else if (error.status === 500) {
           this.erro = 'Erro interno: Falha ao carregar configurações do servidor.';
         } else {
-          this.erro = `Erro ao carregar configurações: ${error.message || 'Usando valores padrão'}`;
+          this.erro = `Erro ao carregar configurações: ${error.message || 'Erro desconhecido'}`;
         }
 
         this.carregando = false;
       }
     });
-  }
-
-  temAlteracoesPendentes(): boolean {
-    return JSON.stringify(this.configs) !== JSON.stringify(this.configsOriginais);
   }
 
   salvarConfiguracoes(): void {
@@ -395,17 +433,24 @@ export class AdminConfiguracoesComponent implements OnInit {
     );
 
     if (confirmado) {
-      this.configs = {
-        appName: 'IFClass',
-        sessionTimeout: 3600,
-        maxLoginAttempts: 5,
-        backupEnabled: true,
-        backupTime: '03:00'
-      };
-      this.notificationService.showWarning(
-        'Configurações resetadas para valores padrão.',
-        'Configurações Resetadas'
-      );
+    this.carregando = true;
+      // Chama o backend para fazer o reset
+      this.http.post(`${environment.SERVIDOR}/api/configuracoes/settings/reset`, {}).subscribe({
+        next: () => {
+        this.carregando = false;
+        this.notificationService.showWarning(
+          'Configurações resetadas. Carregando novos valores...',
+          'Configurações Resetadas'
+        );
+        // Recarrega os valores padrão que vieram do backend
+        this.carregarConfiguracoes();
+        },
+        error: (error) => {
+        this.carregando = false;
+        console.error('Erro ao resetar configurações:', error);
+        this.notificationService.showError('Não foi possível resetar as configurações no servidor.', 'Erro');
+        }
+      });
     }
   }
 
@@ -413,7 +458,4 @@ export class AdminConfiguracoesComponent implements OnInit {
     this.carregarConfiguracoes();
   }
 
-  onConfigChange(): void {
-    this.alteracoesPendentes = this.temAlteracoesPendentes();
-  }
 }
