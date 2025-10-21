@@ -142,7 +142,7 @@ import { RelativeTimePipe } from '../../../shared/pipes/relative-time';
                 <div *ngIf="erro && !carregando" class="text-center p-4 text-warning">{{erro}}</div>
                 <div *ngIf="getLogsFiltrados().length === 0 && !carregando && !erro" class="text-center p-4 text-muted">Nenhum log encontrado...</div>
 
-          <ng-container *cdkVirtualFor="let log of getLogsFiltrados(); ">
+          <ng-container *cdkVirtualFor="let log of getLogsFiltrados(); trackBy: trackByLogId">
 
             <div class="row p-2 mx-0 border-top log-row align-items-center"
               (click)="toggleExpand(log.id)"
@@ -351,6 +351,7 @@ export class AdminLogsComponent implements OnInit, OnDestroy {
   dataFim: string = '';
   termoBusca = '';
 
+  private wsLogContador = 0;
   private logSubscription!: Subscription;
 
   constructor(private adminService: AdminService, private logWebsocketService: LogWebsocketService,  private cdr: ChangeDetectorRef, private toastr: ToastrService) {
@@ -382,6 +383,11 @@ export class AdminLogsComponent implements OnInit, OnDestroy {
       this.logWebsocketService.connect();
       this.logSubscription = this.logWebsocketService.log$.subscribe({
         next: (novoLog: LogSistema) => {
+          if (novoLog.id === null || novoLog.id === undefined) {
+            this.wsLogContador--;
+            novoLog.id = this.wsLogContador;
+          }
+
           if (this.isPaused) {
             this.pausedLogs.push(novoLog);
           } else {
