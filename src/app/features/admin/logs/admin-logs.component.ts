@@ -28,7 +28,6 @@ import { RelativeTimePipe } from '../../../shared/pipes/relative-time';
       </div>
 
       <div class="alert alert-secondary">
-        <h4>📋 Logs do Sistema</h4>
         <p>Aqui você pode visualizar, filtrar e exportar os logs do sistema para análise e troubleshooting.</p>
       </div>
 
