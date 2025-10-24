@@ -8,6 +8,7 @@ import { CursoService } from '../../cursos/pagina/curso.service';
 import { TurmaService } from '../../turmas/turma.service';
 import { Curso } from '../../cursos/pagina/curso.model';
 import { Turma } from '../../turmas/turma.model';
+import { NotificationService } from '../../../shared/sweetalert/notification.service';
 
 @Component({
   selector: 'app-gestao-horarios',
@@ -305,7 +306,8 @@ export class GestaoHorariosComponent implements OnInit {
     private coordenacaoService: CoordenacaoService,
     private aulaService: AulaService,
     private cursoService: CursoService,
-    private turmaService: TurmaService
+    private turmaService: TurmaService,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -472,7 +474,10 @@ export class GestaoHorariosComponent implements OnInit {
 
   detectarConflitos(): void {
     this.detectarConflitosAutomatico();
-    alert(`Análise concluída! ${this.conflitosDetectados} conflito(s) detectado(s).`);
+    this.notificationService.success(
+      'Análise Concluída!', 
+      `${this.conflitosDetectados} conflito(s) detectado(s).`
+    );
   }
 
   detectarConflitosAutomatico(): void {
@@ -603,7 +608,10 @@ export class GestaoHorariosComponent implements OnInit {
   }
 
   otimizarSalas(): void {
-    alert('Otimização de salas iniciada! (simulado)');
+    this.notificationService.success(
+      'Otimização Iniciada!', 
+      'Otimização de salas iniciada com sucesso!'
+    );
   }
 
   atualizarGrade(): void {
@@ -611,7 +619,10 @@ export class GestaoHorariosComponent implements OnInit {
     this.carregarAulas();
     this.carregarCursos();
     this.carregarTurmas();
-    alert('Grade atualizada com sucesso!');
+    this.notificationService.success(
+      'Grade Atualizada!', 
+      'Grade horária atualizada com sucesso!'
+    );
   }
 
   formatarDiaSemana(dia: string): string {
