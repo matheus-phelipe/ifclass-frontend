@@ -356,7 +356,7 @@ export class GerenciadorSalasComponent implements OnInit {
     const confirmado = await this.notificationService.confirm(
       'Excluir Bloco',
       `Tem certeza que deseja apagar ${blocoNome} e todas as suas salas?`,
-      'Esta ação não pode ser desfeita!'
+      'Sim, excluir'
     );
     
     if (confirmado) {
@@ -388,7 +388,7 @@ export class GerenciadorSalasComponent implements OnInit {
     const confirmado = await this.notificationService.confirm(
       'Excluir Sala',
       `Tem certeza que deseja apagar ${salaCodigo}?`,
-      'Esta ação não pode ser desfeita!'
+      'Sim, excluir'
     );
     
     if (confirmado) {

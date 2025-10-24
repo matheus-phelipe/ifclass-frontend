@@ -151,7 +151,7 @@ export class DisciplinasComponent implements OnInit {
     this.notificationService.confirm(
       'Excluir Disciplina',
       'Tem certeza que deseja excluir esta disciplina?',
-      'warning'
+      'Sim, excluir'
     ).then((confirmed) => {
       if (confirmed) {
         this.disciplinaService.excluir(id).subscribe({
