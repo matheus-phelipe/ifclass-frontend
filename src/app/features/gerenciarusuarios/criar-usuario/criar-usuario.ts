@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { UsuarioService } from '../../usuario/usuario.service';
 import { UsuarioCreate } from '../../usuario/usuario.model';
+import { NotificationService } from '../../../shared/sweetalert/notification.service';
 
 @Component({
   selector: 'app-criar-usuario',
@@ -27,7 +28,10 @@ export class CriarUsuario {
     ROLE_ADMIN: false
   };
 
-  constructor(private usuarioService: UsuarioService) {}
+  constructor(
+    private usuarioService: UsuarioService,
+    private notificationService: NotificationService
+  ) {}
 
   criarConta() {
     // Cria o array de authorities apenas com as chaves marcadas como true
@@ -48,11 +52,11 @@ export class CriarUsuario {
 
     this.usuarioService.cadastrar(novoUsuario).subscribe({
       next: (res) => {
-        alert(`Usuário ${res.nome} criado com sucesso!`);
+        this.notificationService.success('Sucesso!', `Usuário ${res.nome} criado com sucesso!`);
         this.fechar.emit();
       },
       error: (err) => {
-        alert('Erro ao criar usuário: ' + (err.error?.message || 'desconhecido'));
+        this.notificationService.error('Erro!', 'Erro ao criar usuário: ' + (err.error?.message || 'desconhecido'));
       }
     });
   }

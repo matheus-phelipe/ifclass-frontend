@@ -18,10 +18,14 @@
   border-radius: 12px;
   width: 400px;
   max-width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
   box-shadow: 0 5px 25px rgba(0,0,0,0.3);
   animation: fadeIn 0.3s ease-in-out;
   z-index: 1001;
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .modal-custom h2 {
@@ -92,6 +96,9 @@
 .acoes {
   margin-top: 1.5rem;
   text-align: center;
+  flex-shrink: 0;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
 }
 
 .btn-criar {
