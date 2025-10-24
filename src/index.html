@@ -17,6 +17,12 @@
   <!-- Icons -->
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="apple-touch-icon" href="assets/icons/icon-192x192.png">
+  <script>
+    // Polyfill para a variável 'global' que o sockjs-client precisa
+    if (typeof window.global === 'undefined') {
+      window.global = window;
+    }
+  </script>
 </head>
 <body>
   <app-root></app-root>
