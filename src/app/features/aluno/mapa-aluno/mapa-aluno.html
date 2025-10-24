@@ -257,11 +257,23 @@
       <div class="campus-overview">
         <!-- Título da Seção -->
         <div class="campus-header">
-          <h1 class="campus-title">
-            <i class="bi bi-geo-alt-fill"></i>
-            Mapa do Campus
-          </h1>
-          <p class="campus-subtitle">Clique em um bloco para explorar suas salas e horários</p>
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <h1 class="campus-title">
+                <i class="bi bi-geo-alt-fill"></i>
+                Mapa do Campus
+              </h1>
+              <p class="campus-subtitle">Clique em um bloco para explorar suas salas e horários</p>
+            </div>
+            
+            <!-- Botão de Admin para tela de boas-vindas -->
+            <div *ngIf="authService.isAdmin$ | async" class="admin-actions-welcome">
+              <button class="btn btn-outline-success" (click)="voltarAoPainelAdmin()">
+                <i class="bi bi-house-door-fill me-2"></i>
+                Voltar ao Painel
+              </button>
+            </div>
+          </div>
         </div>
 
         <div class="campus-image-container">

@@ -1284,6 +1284,23 @@
   position: relative;
 }
 
+/* Botão de Admin na tela de boas-vindas */
+.admin-actions-welcome {
+  margin-top: 1rem;
+}
+
+.admin-actions-welcome .btn {
+  border-radius: var(--border-radius-sm);
+  font-weight: 500;
+  transition: var(--transition);
+  box-shadow: var(--shadow-sm);
+}
+
+.admin-actions-welcome .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
 .campus-title {
   font-size: 2.5rem;
   font-weight: 800;
@@ -1529,6 +1546,15 @@
 
   .campus-header {
     margin-bottom: 1.5rem;
+  }
+
+  .admin-actions-welcome {
+    margin-top: 0.5rem;
+  }
+
+  .admin-actions-welcome .btn {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
   }
 
   .campus-title {

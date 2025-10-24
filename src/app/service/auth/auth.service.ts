@@ -57,11 +57,29 @@ export class AuthService {
   }
 
     logout(): void {
+      // Limpa TODOS os dados de autenticação
       localStorage.removeItem('token'); 
-      sessionStorage.removeItem('activeRole'); 
+      localStorage.removeItem('rememberedEmail');
+      localStorage.removeItem('rememberMeFlag');
+      sessionStorage.clear(); // Limpa TUDO do sessionStorage
+      
+      // Reseta o estado do BehaviorSubject
       this.activeRoleSubject.next(null); 
+      
+      // Força navegação para login
+      this.router.navigate(['/login']).then(() => {
+        // Força reload da página para garantir limpeza completa
+        window.location.reload();
+      });
+    }
 
-      this.router.navigate(['/login']);
+    /**
+     * Limpa apenas o estado de autenticação sem navegar (útil para login)
+     */
+    clearAuthState(): void {
+      localStorage.removeItem('token'); 
+      sessionStorage.removeItem('activeRole');
+      this.activeRoleSubject.next(null);
     }
 
   private getDecodedToken(): any | null {
