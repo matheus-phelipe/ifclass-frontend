@@ -47,10 +47,16 @@ import { RelativeTimePipe } from '../../../shared/pipes/relative-time';
             </div>
             <div class="col-md-4">
               <label class="form-label">Período:</label>
-              <div class="input-group">
-                <input type="date" class="form-control" [(ngModel)]="dataInicio">
-                <span class="input-group-text">até</span>
-                <input type="date" class="form-control" [(ngModel)]="dataFim">
+              <div class="row g-2">
+                <div class="col-12">
+                  <input type="date" class="form-control" [(ngModel)]="dataInicio" placeholder="Data início">
+                </div>
+                <div class="col-12 text-center">
+                  <span class="text-muted small">até</span>
+                </div>
+                <div class="col-12">
+                  <input type="date" class="form-control" [(ngModel)]="dataFim" placeholder="Data fim">
+                </div>
               </div>
             </div>
             <div class="col-md-4">
@@ -330,6 +336,17 @@ import { RelativeTimePipe } from '../../../shared/pipes/relative-time';
       background-color: #e9ecef;
       padding: 0.5rem;
       border-radius: 0.25rem;
+    }
+
+    /* Estilos para campos de data */
+    input[type="date"] {
+      width: 100%;
+      font-size: 0.9rem;
+    }
+
+    .form-label {
+      margin-bottom: 0.5rem;
+      font-weight: 500;
     }
   `]
 })
