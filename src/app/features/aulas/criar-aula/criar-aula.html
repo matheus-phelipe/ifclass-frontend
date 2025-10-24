@@ -204,28 +204,6 @@
             </div>
           </form>
 
-          <!-- Alertas Modernos -->
-          <div class="alert-section" *ngIf="sucesso || erro">
-            <div class="modern-alert success" *ngIf="sucesso">
-              <div class="alert-icon">
-                <i class="bi bi-check-circle-fill"></i>
-              </div>
-              <div class="alert-content">
-                <h4>Sucesso!</h4>
-                <p>{{ sucesso }}</p>
-              </div>
-            </div>
-
-            <div class="modern-alert error" *ngIf="erro">
-              <div class="alert-icon">
-                <i class="bi bi-exclamation-circle-fill"></i>
-              </div>
-              <div class="alert-content">
-                <h4>Erro</h4>
-                <p>{{ erro }}</p>
-              </div>
-            </div>
-          </div>
 
           <!-- Agenda do Professor -->
           <div class="professor-agenda" *ngIf="agendaProfessor.length > 0">

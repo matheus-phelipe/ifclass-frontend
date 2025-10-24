@@ -502,47 +502,6 @@
   100% { transform: rotate(360deg); }
 }
 
-/* ===== ALERTAS MODERNOS ===== */
-.alert-section {
-  margin-top: 24px;
-}
-
-.modern-alert {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 20px;
-  border-radius: 16px;
-  border: 2px solid;
-  animation: slideIn 0.3s ease;
-}
-
-.modern-alert.success {
-  background: #f0fff4;
-  border-color: #68d391;
-  color: #2f855a;
-}
-
-.modern-alert.error {
-  background: #fed7d7;
-  border-color: #fc8181;
-  color: #c53030;
-}
-
-.alert-icon {
-  font-size: 1.5rem;
-  flex-shrink: 0;
-}
-
-.alert-content h4 {
-  margin: 0 0 4px 0;
-  font-weight: 600;
-}
-
-.alert-content p {
-  margin: 0;
-  opacity: 0.9;
-}
 
 /* ===== AGENDA DO PROFESSOR ===== */
 .professor-agenda {

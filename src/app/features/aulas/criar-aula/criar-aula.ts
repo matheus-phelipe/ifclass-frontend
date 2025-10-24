@@ -18,6 +18,7 @@ import { AuthService } from '../../../service/auth/auth.service';
 import { Aula } from '../aula.model';
 import { ProfileSwitcherComponent } from '../../../shared/profile-switcher/profile-switcher';
 import { ModalConfirmacaoComponent } from '../../../shared/modal-confirmacao/modal-confirmacao';
+import { NotificationService } from '../../../shared/sweetalert/notification.service';
 
 @Component({
   selector: 'app-criar-aula',
@@ -33,8 +34,6 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
   disciplinas: Disciplina[] = [];
   professores: Usuario[] = [];
   carregando = false;
-  sucesso = '';
-  erro = '';
   blocos: Bloco[] = [];
   aulas: Aula[] = [];
   perfil: string | null = null;
@@ -79,7 +78,8 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
     private usuarioService: UsuarioService,
     private blocoService: BlocoService,
     private authService: AuthService,
-    private elementRef: ElementRef
+    private elementRef: ElementRef,
+    private notificationService: NotificationService
   ) {
     this.form = this.fb.group({
       sala: [null, Validators.required],
@@ -145,13 +145,11 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
   }
 
   criarAula() {
-    this.sucesso = '';
-    this.erro = '';
     if (this.form.invalid) return;
 
     // Verificar conflitos antes de criar
     if (this.conflitos.length > 0) {
-      this.erro = 'Não é possível criar a aula devido a conflitos: ' + this.conflitos.join(', ');
+      this.notificationService.error('Conflito Detectado', 'Não é possível criar a aula devido a conflitos: ' + this.conflitos.join(', '));
       return;
     }
 
@@ -161,7 +159,7 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
     const disciplina = this.disciplinas.find(d => d.id === Number(this.form.value.disciplina));
     const professor = this.professores.find(p => p.id === Number(this.form.value.professor));
     if (!sala || !turma || !disciplina || !professor) {
-      this.erro = 'Selecione todos os campos corretamente.';
+      this.notificationService.error('Campos Obrigatórios', 'Selecione todos os campos corretamente.');
       this.carregando = false;
       return;
     }
@@ -175,13 +173,13 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
     };
     this.aulaService.criarAula(aula).subscribe({
       next: () => {
-        this.sucesso = 'Aula criada com sucesso!';
+        this.notificationService.success('Sucesso!', 'Aula criada com sucesso!');
         this.form.reset();
         this.carregarAulas();
         this.carregando = false;
       },
       error: () => {
-        this.erro = 'Erro ao criar aula.';
+        this.notificationService.error('Erro!', 'Erro ao criar aula. Tente novamente.');
         this.carregando = false;
       }
     });
@@ -295,13 +293,13 @@ export class CriarAulaComponent implements OnInit, AfterViewInit {
 
     this.aulaService.remover(this.aulaParaRemover.id).subscribe({
       next: () => {
-        this.sucesso = 'Aula removida com sucesso!';
+        this.notificationService.success('Sucesso!', 'Aula removida com sucesso!');
         this.aulas = this.aulas.filter(a => a.id !== this.aulaParaRemover!.id);
         this.cancelarRemocao();
         this.carregarAulas();
       },
       error: () => {
-        this.erro = 'Erro ao remover a aula.';
+        this.notificationService.error('Erro!', 'Erro ao remover a aula. Tente novamente.');
         this.cancelarRemocao();
       }
     });
