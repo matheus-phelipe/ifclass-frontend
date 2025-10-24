@@ -56,7 +56,21 @@ export class CriarUsuario {
         this.fechar.emit();
       },
       error: (err) => {
-        this.notificationService.error('Erro!', 'Erro ao criar usuário: ' + (err.error?.message || 'desconhecido'));
+        let errorMessage = 'Erro ao criar usuário';
+        
+        if (err.error?.error) {
+          if (err.error.error.includes('Email já cadastrado')) {
+            errorMessage = 'Este email já está sendo usado por outro usuário.';
+          } else if (err.error.error.includes('Prontuário já cadastrado')) {
+            errorMessage = 'Este prontuário já está sendo usado por outro usuário.';
+          } else {
+            errorMessage = err.error.error;
+          }
+        } else if (err.error?.message) {
+          errorMessage = err.error.message;
+        }
+        
+        this.notificationService.error('Erro!', errorMessage);
       }
     });
   }

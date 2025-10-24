@@ -287,7 +287,23 @@ abrirModalEditar(usuario: Usuario) {
           this.editarUsuarioModal.hide();
           this.mostrarAlerta('Usuário atualizado com sucesso!');
         },
-        error: () => this.mostrarAlerta('Erro ao atualizar usuário.', 'danger')
+        error: (err) => {
+          let errorMessage = 'Erro ao atualizar usuário';
+          
+          if (err.error?.error) {
+            if (err.error.error.includes('Email já está em uso')) {
+              errorMessage = 'Este email já está sendo usado por outro usuário.';
+            } else if (err.error.error.includes('Prontuário já está em uso')) {
+              errorMessage = 'Este prontuário já está sendo usado por outro usuário.';
+            } else {
+              errorMessage = err.error.error;
+            }
+          } else if (err.error?.message) {
+            errorMessage = err.error.message;
+          }
+          
+          this.mostrarAlerta(errorMessage, 'danger');
+        }
     });
   }
 
