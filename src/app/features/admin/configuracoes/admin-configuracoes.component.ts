@@ -28,18 +28,15 @@ interface ConfiguracaoSistema {
           <button class="btn btn-outline-warning" (click)="resetarTodasConfiguracoes()">
             <i class="bi bi-arrow-clockwise me-1"></i>Resetar Todas
           </button>
-          <button class="btn btn-success" (click)="salvarConfiguracoes()">
-            <i class="bi bi-check-lg me-1"></i>Salvar Alterações
-          </button>
           <button class="btn btn-primary" (click)="atualizarConfiguracoes()">
             <i class="bi bi-arrow-clockwise me-1"></i>Atualizar
           </button>
         </div>
       </div>
 
-      <div class="alert alert-warning">
+      <div class="alert alert-info">
         <h4>⚙️ Configurações do Sistema</h4>
-        <p>Aqui você pode gerenciar as configurações globais do sistema. Tenha cuidado ao alterar valores críticos.</p>
+        <p>Aqui você pode gerenciar as configurações globais do sistema. <strong>As alterações são salvas automaticamente</strong> quando você modifica os valores. Tenha cuidado ao alterar valores críticos.</p>
       </div>
 
       <!-- Filtros por Categoria -->
@@ -145,34 +142,6 @@ interface ConfiguracaoSistema {
       </div>
 
 
-      <!-- Resumo de Alterações -->
-      <div *ngIf="temAlteracoesPendentes()" class="card border-warning">
-        <div class="card-header bg-warning text-dark">
-          <h6 class="mb-0">
-            <i class="bi bi-exclamation-triangle me-2"></i>
-            Alterações Pendentes (3)
-          </h6>
-        </div>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-8">
-              <ul class="list-unstyled mb-0">
-                <li class="mb-1"><strong>app.name</strong>: {{configs.appName}}</li>
-                <li class="mb-1"><strong>security.session.timeout</strong>: {{configs.sessionTimeout}}</li>
-                <li class="mb-1"><strong>backup.automatic.enabled</strong>: {{configs.backupEnabled}}</li>
-              </ul>
-            </div>
-            <div class="col-md-4 text-end">
-              <button class="btn btn-outline-secondary me-2" (click)="descartarAlteracoes()">
-                <i class="bi bi-x-lg me-1"></i>Descartar
-              </button>
-              <button class="btn btn-warning" (click)="salvarConfiguracoes()">
-                <i class="bi bi-check-lg me-1"></i>Salvar Todas
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
 
       <!-- Informações Importantes -->
       <div class="alert alert-info mt-4">
@@ -265,19 +234,12 @@ export class AdminConfiguracoesComponent implements OnInit {
   }
 
   temAlteracoesPendentes(): boolean {
-    // Com o novo sistema dinâmico, não precisamos mais verificar alterações pendentes
-    // pois as mudanças são salvas automaticamente
+    // Por enquanto, sempre retorna false para não mostrar o card
+    // quando implementarmos o controle de alterações, podemos comparar
+    // com os valores originais carregados do backend
     return false;
   }
 
-  salvarConfiguracoes(): void {
-    // Com o novo sistema dinâmico, as configurações são salvas automaticamente
-    // quando o usuário faz alterações. Este método agora apenas mostra uma mensagem.
-    this.notificationService.success(
-      'Configurações Salvas',
-      'Todas as configurações foram salvas automaticamente!'
-    );
-  }
 
   async descartarAlteracoes(): Promise<void> {
     const confirmado = await this.notificationService.confirm(
@@ -287,7 +249,8 @@ export class AdminConfiguracoesComponent implements OnInit {
     );
 
     if (confirmado) {
-      this.configs = { ...this.configsOriginais };
+      // Recarregar as configurações do backend para descartar alterações locais
+      this.carregarConfiguracoes();
       this.notificationService.showInfo(
         'Alterações descartadas com sucesso.',
         'Alterações Descartadas'
@@ -362,8 +325,20 @@ export class AdminConfiguracoesComponent implements OnInit {
       novoValor = event.target.value;
     }
 
-    // Atualizar configuração no backend
-    this.atualizarConfiguracao(chave, novoValor);
+    // Atualizar localmente
+    const config = this.configuracoes.find((c: ConfiguracaoSistema) => c.chave === chave);
+    if (config) {
+      config.valor = novoValor;
+    }
+
+    // Salvar automaticamente no backend sem mostrar modal
+    this.atualizarConfiguracaoSilenciosa(chave, novoValor)
+      .then(() => {
+        console.log(`Configuração ${chave} salva com sucesso`);
+      })
+      .catch((error) => {
+        console.error(`Erro ao salvar configuração ${chave}:`, error);
+      });
   }
 
   atualizarConfiguracao(chave: string, valor: string): void {
@@ -385,6 +360,25 @@ export class AdminConfiguracoesComponent implements OnInit {
           this.notificationService.error('Erro ao Atualizar', 'Erro ao atualizar configuração');
         }
       });
+  }
+
+  atualizarConfiguracaoSilenciosa(chave: string, valor: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.http.put(`${environment.SERVIDOR}/api/admin/configuracoes/${chave}`, { valor })
+        .subscribe({
+          next: (response: any) => {
+            if (response.sucesso) {
+              resolve(response);
+            } else {
+              reject(new Error(response.mensagem || 'Erro desconhecido'));
+            }
+          },
+          error: (error) => {
+            console.error('Erro ao atualizar configuração:', error);
+            reject(error);
+          }
+        });
+    });
   }
 
   async salvarConfiguracoesNovo(): Promise<void> {
