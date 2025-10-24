@@ -56,6 +56,12 @@ export class Gerenciarusuarios implements OnInit {
     this.mostrarCriarUsuario = true;
   }
 
+  fecharCriarUsuario() {
+    this.mostrarCriarUsuario = false;
+    // Recarrega a lista de usuários quando o modal é fechado
+    this.carregarUsuarios();
+  }
+
   // Variáveis para alteração de permissão
   usuarioParaAlterarPermissao!: Usuario;
   permissoesParaAtualizar: string[] = [];
@@ -201,8 +207,16 @@ export class Gerenciarusuarios implements OnInit {
   
   formatarNomePermissao(permissao: string): string {
     if (permissao === 'TODOS') return 'Todos';
-    const nome = permissao.replace('ROLE_', '').charAt(0).toUpperCase() + permissao.replace('ROLE_', '').slice(1).toLowerCase();
-    return nome + 's';
+    
+    // Mapeamento específico para português
+    const mapeamento: { [key: string]: string } = {
+      'ROLE_ALUNO': 'Alunos',
+      'ROLE_PROFESSOR': 'Professores', 
+      'ROLE_COORDENADOR': 'Coordenadores',
+      'ROLE_ADMIN': 'Administradores'
+    };
+    
+    return mapeamento[permissao] || permissao.replace('ROLE_', '') + 's';
   }
 
   /**

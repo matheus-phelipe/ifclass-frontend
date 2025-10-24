@@ -40,7 +40,7 @@
         <button class="btn-adicionar" (click)="abrirCriarUsuario()">+ Adicionar Usuário</button>
         <app-criar-usuario 
           *ngIf="mostrarCriarUsuario" 
-          (fechar)="mostrarCriarUsuario = false">
+          (fechar)="fecharCriarUsuario()">
         </app-criar-usuario>
       </div>
     </div>
