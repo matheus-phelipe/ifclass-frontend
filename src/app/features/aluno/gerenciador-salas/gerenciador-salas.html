@@ -63,23 +63,39 @@
                   </select>
                 </div>
 
-                <div class="row g-2 mb-3">
-                  <div class="col-sm-8">
-                    <label for="roomCode" class="form-label small">Código da Sala</label>
-                    <input type="text" id="roomCode" class="form-control" [(ngModel)]="formSala.codigo" name="salaCodigo" required>
-                  </div>
-                  <div class="col-sm-4">
-                    <label for="roomCapacity" class="form-label small">Capacidade</label>
-                    <input type="number" id="roomCapacity" class="form-control" [(ngModel)]="formSala.capacidade" name="salaCapacidade" required>
-                  </div>
+                <!-- Código da Sala - Sempre em linha completa -->
+                <div class="mb-3">
+                  <label for="roomCode" class="form-label small">Código da Sala</label>
+                  <input type="text" id="roomCode" class="form-control" [(ngModel)]="formSala.codigo" name="salaCodigo" required>
                 </div>
 
-                <p class="small text-muted mb-2">Posicionamento e Dimensões</p>
-                <div class="row g-2">
-                  <div class="col-3"><input type="number" placeholder="X" title="Pos. X" class="form-control" [(ngModel)]="formSala.posX" name="salaPosX" required></div>
-                  <div class="col-3"><input type="number" placeholder="Y" title="Pos. Y" class="form-control" [(ngModel)]="formSala.posY" name="salaPosY" required></div>
-                  <div class="col-3"><input type="number" placeholder="Larg." title="Largura" class="form-control" [(ngModel)]="formSala.largura" name="salaLargura" required></div>
-                  <div class="col-3"><input type="number" placeholder="Alt." title="Altura" class="form-control" [(ngModel)]="formSala.altura" name="salaAltura" required></div>
+                <!-- Capacidade - Sempre em linha completa -->
+                <div class="mb-3">
+                  <label for="roomCapacity" class="form-label small">Capacidade</label>
+                  <input type="number" id="roomCapacity" class="form-control" [(ngModel)]="formSala.capacidade" name="salaCapacidade" required>
+                </div>
+
+                <!-- Posicionamento e Dimensões - Layout melhorado -->
+                <div class="mb-3">
+                  <p class="small text-muted mb-2">Posicionamento e Dimensões</p>
+                  <div class="position-dimensions-grid">
+                    <div class="position-field">
+                      <label class="form-label small">Posição X</label>
+                      <input type="number" placeholder="Ex: 50" title="Posição X no mapa" class="form-control" [(ngModel)]="formSala.posX" name="salaPosX" required>
+                    </div>
+                    <div class="position-field">
+                      <label class="form-label small">Posição Y</label>
+                      <input type="number" placeholder="Ex: 50" title="Posição Y no mapa" class="form-control" [(ngModel)]="formSala.posY" name="salaPosY" required>
+                    </div>
+                    <div class="position-field">
+                      <label class="form-label small">Largura</label>
+                      <input type="number" placeholder="Ex: 150" title="Largura da sala" class="form-control" [(ngModel)]="formSala.largura" name="salaLargura" required>
+                    </div>
+                    <div class="position-field">
+                      <label class="form-label small">Altura</label>
+                      <input type="number" placeholder="Ex: 100" title="Altura da sala" class="form-control" [(ngModel)]="formSala.altura" name="salaAltura" required>
+                    </div>
+                  </div>
                 </div>
 
                 <div class="d-flex flex-wrap gap-2 mt-4">

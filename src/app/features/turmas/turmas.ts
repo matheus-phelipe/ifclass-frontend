@@ -15,6 +15,7 @@ import { Usuario } from '../usuario/usuario.model';
 import { Router } from '@angular/router';
 import { DashboardStatsComponent, StatCard } from '../../shared/dashboard-stats/dashboard-stats.component';
 import { FilterPipe } from '../../shared/pipes/filter.pipe';
+import { NotificationService } from '../../shared/sweetalert/notification.service';
 
 @Component({
   selector: 'app-turmas',
@@ -61,7 +62,8 @@ export class TurmasComponent implements OnInit, AfterViewInit {
     private authService: AuthService,
     private usuarioService: UsuarioService,
     private router: Router,
-    private elementRef: ElementRef
+    private elementRef: ElementRef,
+    private notificationService: NotificationService
   ) {
     this.turmaForm = this.fb.group({
       id: [null],
@@ -90,6 +92,8 @@ export class TurmasComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     // Inicializar tooltips do Bootstrap
     this.initializeTooltips();
+    // Configurar posicionamento dos preview cards
+    this.setupPreviewPositioning();
   }
 
   initializeTooltips(): void {
@@ -103,11 +107,65 @@ export class TurmasComponent implements OnInit, AfterViewInit {
     }, 100);
   }
 
+  setupPreviewPositioning(): void {
+    setTimeout(() => {
+      const cards = this.elementRef.nativeElement.querySelectorAll('.turma-card');
+      cards.forEach((card: HTMLElement) => {
+        this.adjustPreviewPosition(card);
+      });
+    }, 200);
+    
+    // Listener para redimensionamento da janela
+    window.addEventListener('resize', () => {
+      this.setupPreviewPositioning();
+    });
+  }
+
+  adjustPreviewPosition(card: HTMLElement): void {
+    const rect = card.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const previewWidth = 280;
+    const previewHeight = 200;
+    
+    // Remove classes anteriores
+    card.classList.remove('preview-left', 'preview-top', 'preview-bottom');
+    
+    // Verifica se está no canto direito da tela
+    const isNearRightEdge = rect.right > viewportWidth - (previewWidth + 20);
+    
+    // Verifica se está no canto inferior da tela
+    const isNearBottomEdge = rect.bottom > viewportHeight - (previewHeight + 20);
+    
+    // Verifica se está no canto esquerdo da tela
+    const isNearLeftEdge = rect.left < 20;
+    
+    // Verifica se está no canto superior da tela
+    const isNearTopEdge = rect.top < 20;
+    
+    // Lógica mais específica para evitar sobreposição
+    if (isNearRightEdge && !isNearLeftEdge) {
+      // Se está no canto direito, mostra à esquerda
+      card.classList.add('preview-left');
+    } else if (isNearBottomEdge && !isNearTopEdge) {
+      // Se está no canto inferior, mostra acima
+      card.classList.add('preview-top');
+    } else if (isNearTopEdge && !isNearBottomEdge) {
+      // Se está no canto superior, mostra abaixo
+      card.classList.add('preview-bottom');
+    }
+    // Se não está em nenhum canto, usa o comportamento padrão (direita)
+  }
+
   carregarTurmas(): void {
     this.turmaService.listar().subscribe({
       next: (turmas: Turma[]) => {
         this.turmas = turmas;
         this.carregarEstatisticas();
+        // Reposicionar previews após carregar dados
+        setTimeout(() => {
+          this.setupPreviewPositioning();
+        }, 300);
       },
       error: (error: any) => {
         console.error('Erro ao carregar turmas:', error);
@@ -217,16 +275,31 @@ export class TurmasComponent implements OnInit, AfterViewInit {
     }
   }
 
-  excluirTurma(id: number): void {
-    if (confirm('Tem certeza que deseja excluir esta turma?')) {
+  async excluirTurma(id: number): Promise<void> {
+    const turma = this.turmas.find(t => t.id === id);
+    const turmaNome = turma ? `${turma.curso?.nome} - ${turma.ano}/${turma.semestre}º semestre` : 'esta turma';
+    
+    const confirmado = await this.notificationService.confirm(
+      'Excluir Turma',
+      `Tem certeza que deseja excluir ${turmaNome}?`,
+      'Sim, excluir'
+    );
+    
+    if (confirmado) {
       this.turmaService.excluir(id).subscribe({
         next: () => {
           this.carregarTurmas();
-          this.toastr.success('Turma excluída com sucesso!');
+          this.notificationService.success(
+            'Turma Excluída',
+            `${turmaNome} foi excluída com sucesso!`
+          );
         },
         error: (error: any) => {
           console.error('Erro ao excluir turma:', error);
-          this.toastr.error('Erro ao excluir turma. Tente novamente.');
+          this.notificationService.error(
+            'Erro ao Excluir',
+            error.error?.message || 'Não foi possível excluir a turma. Tente novamente.'
+          );
         }
       });
     }

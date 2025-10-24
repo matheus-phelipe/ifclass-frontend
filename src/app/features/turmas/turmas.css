@@ -410,7 +410,7 @@ body, html {
   border-radius: 12px;
   box-shadow: 0 10px 40px rgba(0,0,0,0.15);
   padding: 16px;
-  z-index: 9999;
+  z-index: 10;
   opacity: 0;
   visibility: hidden;
   transform: translateX(10px);
@@ -423,8 +423,48 @@ body, html {
   opacity: 1;
   visibility: visible;
   transform: translateX(0);
-  z-index: 10000;
+  z-index: 20;
   pointer-events: auto;
+}
+
+/* Preview para cards no canto direito - aparece à esquerda */
+.turma-card.preview-left .turma-card-preview {
+  left: auto;
+  right: 100%;
+  transform: translateX(-10px);
+  top: -10px;
+}
+
+.turma-card.preview-left:hover .turma-card-preview {
+  transform: translateX(0);
+}
+
+/* Preview para cards no canto inferior - aparece acima */
+.turma-card.preview-top .turma-card-preview {
+  top: auto;
+  bottom: 100%;
+  left: 0;
+  right: auto;
+  transform: translateY(10px);
+  width: 320px;
+}
+
+.turma-card.preview-top:hover .turma-card-preview {
+  transform: translateY(0);
+}
+
+/* Preview para cards no canto superior - aparece abaixo */
+.turma-card.preview-bottom .turma-card-preview {
+  top: 100%;
+  bottom: auto;
+  left: 0;
+  right: auto;
+  transform: translateY(-10px);
+  width: 320px;
+}
+
+.turma-card.preview-bottom:hover .turma-card-preview {
+  transform: translateY(0);
 }
 
 .turma-preview-title {
@@ -476,6 +516,17 @@ body, html {
 
 .container, .container-fluid {
   overflow: visible;
+}
+
+/* Garantir que botões tenham z-index maior que popups */
+.turma-card .btn {
+  position: relative;
+  z-index: 30;
+}
+
+.turma-card-actions {
+  position: relative;
+  z-index: 30;
 }
 
 /* Responsividade */

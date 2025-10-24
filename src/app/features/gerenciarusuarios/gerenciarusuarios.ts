@@ -8,14 +8,16 @@ import { FormsModule } from '@angular/forms';
 import { AlertComponent } from '../../shared/alert/alert';
 import { ModalConfirmacaoComponent } from '../../shared/modal-confirmacao/modal-confirmacao';
 import { ProfileSwitcherComponent } from '../../shared/profile-switcher/profile-switcher';
+import { CriarUsuario } from '../gerenciarusuarios/criar-usuario/criar-usuario';
 import { ChangeDetectorRef } from '@angular/core';
+import { NotificationService } from '../../shared/sweetalert/notification.service';
 
 declare var bootstrap: any;
 
 @Component({
   selector: 'app-gerenciarusuarios',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, AlertComponent, ModalConfirmacaoComponent, ProfileSwitcherComponent],
+  imports: [CommonModule, RouterModule, FormsModule, AlertComponent, ModalConfirmacaoComponent, ProfileSwitcherComponent, CriarUsuario],
   templateUrl: './gerenciarusuarios.html',
   styleUrls: ['./gerenciarusuarios.css']
 })
@@ -48,7 +50,19 @@ export class Gerenciarusuarios implements OnInit {
     };
   
   usuarioParaRemover!: Usuario;
-  
+
+  // Controle do modal de criar usuário
+  mostrarCriarUsuario = false;
+  abrirCriarUsuario() {
+    this.mostrarCriarUsuario = true;
+  }
+
+  fecharCriarUsuario() {
+    this.mostrarCriarUsuario = false;
+    // Recarrega a lista de usuários quando o modal é fechado
+    this.carregarUsuarios();
+  }
+
   // Variáveis para alteração de permissão
   usuarioParaAlterarPermissao!: Usuario;
   permissoesParaAtualizar: string[] = [];
@@ -62,7 +76,8 @@ export class Gerenciarusuarios implements OnInit {
   constructor(
     public authService: AuthService,
     private usuarioService: UsuarioService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private notificationService: NotificationService
   ) {}
 
    ngOnInit(): void {
@@ -194,8 +209,16 @@ export class Gerenciarusuarios implements OnInit {
   
   formatarNomePermissao(permissao: string): string {
     if (permissao === 'TODOS') return 'Todos';
-    const nome = permissao.replace('ROLE_', '').charAt(0).toUpperCase() + permissao.replace('ROLE_', '').slice(1).toLowerCase();
-    return nome + 's';
+    
+    // Mapeamento específico para português
+    const mapeamento: { [key: string]: string } = {
+      'ROLE_ALUNO': 'Alunos',
+      'ROLE_PROFESSOR': 'Professores', 
+      'ROLE_COORDENADOR': 'Coordenadores',
+      'ROLE_ADMIN': 'Administradores'
+    };
+    
+    return mapeamento[permissao] || permissao.replace('ROLE_', '') + 's';
   }
 
   /**
@@ -264,9 +287,25 @@ abrirModalEditar(usuario: Usuario) {
           }
           this.filtrarUsuarios();
           this.editarUsuarioModal.hide();
-          this.mostrarAlerta('Usuário atualizado com sucesso!');
+          this.notificationService.success('Sucesso!', 'Usuário atualizado com sucesso!');
         },
-        error: () => this.mostrarAlerta('Erro ao atualizar usuário.', 'danger')
+        error: (err) => {
+          let errorMessage = 'Erro ao atualizar usuário';
+          
+          if (err.error?.error) {
+            if (err.error.error.includes('Email já está em uso')) {
+              errorMessage = 'Este email já está sendo usado por outro usuário.';
+            } else if (err.error.error.includes('Prontuário já está em uso')) {
+              errorMessage = 'Este prontuário já está sendo usado por outro usuário.';
+            } else {
+              errorMessage = err.error.error;
+            }
+          } else if (err.error?.message) {
+            errorMessage = err.error.message;
+          }
+          
+          this.notificationService.error('Erro!', errorMessage);
+        }
     });
   }
 

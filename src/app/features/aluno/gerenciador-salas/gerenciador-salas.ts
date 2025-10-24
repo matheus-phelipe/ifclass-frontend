@@ -8,6 +8,7 @@ import { AuthService } from '../../../service/auth/auth.service';
 import { NgxPanZoomModule } from 'ngx-panzoom';
 import { ProfileSwitcherComponent } from '../../../shared/profile-switcher/profile-switcher';
 import { DashboardStatsComponent, StatCard } from '../../../shared/dashboard-stats/dashboard-stats.component';
+import { NotificationService } from '../../../shared/sweetalert/notification.service';
 // StatsService removido temporariamente
 
 // Re-definir a interface PanZoomConfig (COMPLETA)
@@ -103,7 +104,7 @@ export class GerenciadorSalasComponent implements OnInit {
     private blocoService: BlocoService,
     public authService: AuthService,
     private el: ElementRef, // Usado para querySelector
-
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -348,27 +349,65 @@ export class GerenciadorSalasComponent implements OnInit {
     }
   }
 
-  handleDeleteBloco(id: number): void {
-    if (confirm('Tem certeza que deseja apagar este bloco e todas as suas salas?')) {
+  async handleDeleteBloco(id: number): Promise<void> {
+    const bloco = this.blocos.find(b => b.id === id);
+    const blocoNome = bloco?.nome || 'este bloco';
+    
+    const confirmado = await this.notificationService.confirm(
+      'Excluir Bloco',
+      `Tem certeza que deseja apagar ${blocoNome} e todas as suas salas?`,
+      'Sim, excluir'
+    );
+    
+    if (confirmado) {
       this.blocoService.deleteBloco(id).subscribe({
         next: () => {
-            if(this.blocoSelecionadoId === id) this.blocoSelecionadoId = null;
-            if(this.activeBlocoId === id) this.activeBlocoId = null;
-            this.carregarBlocos();
+          if(this.blocoSelecionadoId === id) this.blocoSelecionadoId = null;
+          if(this.activeBlocoId === id) this.activeBlocoId = null;
+          this.carregarBlocos();
+          this.notificationService.success(
+            'Bloco Excluído',
+            `${blocoNome} foi excluído com sucesso!`
+          );
         },
-        error: () => { this.error = 'Falha ao deletar bloco.';}
+        error: () => { 
+          this.error = 'Falha ao deletar bloco.';
+          this.notificationService.error(
+            'Erro ao Excluir',
+            'Não foi possível excluir o bloco. Tente novamente.'
+          );
+        }
       });
     }
   }
 
-  handleDeleteSala(blocoId: number, salaId: number): void {
-    if (confirm('Tem certeza que deseja apagar esta sala?')) {
+  async handleDeleteSala(blocoId: number, salaId: number): Promise<void> {
+    const sala = this.blocos.find(b => b.id === blocoId)?.salas.find(s => s.id === salaId);
+    const salaCodigo = sala?.codigo || 'esta sala';
+    
+    const confirmado = await this.notificationService.confirm(
+      'Excluir Sala',
+      `Tem certeza que deseja apagar ${salaCodigo}?`,
+      'Sim, excluir'
+    );
+    
+    if (confirmado) {
       this.blocoService.deleteSala(blocoId, salaId).subscribe({
         next: () => {
           this.cancelarEdicao();
           this.carregarBlocos();
+          this.notificationService.success(
+            'Sala Excluída',
+            `${salaCodigo} foi excluída com sucesso!`
+          );
         },
-        error: () => { this.error = 'Falha ao deletar a sala.' }
+        error: () => { 
+          this.error = 'Falha ao deletar a sala.';
+          this.notificationService.error(
+            'Erro ao Excluir',
+            'Não foi possível excluir a sala. Tente novamente.'
+          );
+        }
       });
     }
   }

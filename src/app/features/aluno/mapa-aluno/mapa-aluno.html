@@ -1,210 +1,210 @@
-<!-- Container Principal do Totem -->
-<div class="totem-container">
+<!-- Container Principal do Campus Map -->
+<div class="campus-map-container">
 
-  <!-- Header Mobile/Tablet -->
-  <header class="mobile-header">
+  <!-- Header Principal -->
+  <header class="campus-header">
     <div class="header-content">
       <div class="logo-section">
-        <img src="assets/ifclass.png" alt="Logo IFClass" class="header-logo">
-        <div class="header-title">
-          <h1>IFClass</h1>
-          <span>Mapa do Campus</span>
-        </div>
-      </div>
-
-      <div class="header-actions">
-        <button class="menu-toggle" (click)="toggleMobileMenu()" [class.active]="mobileMenuOpen">
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
-      </div>
-    </div>
-
-    <!-- Navigation Mobile -->
-    <nav class="mobile-nav" [class.open]="mobileMenuOpen">
-      <div class="nav-section">
-        <h3>Blocos do Campus</h3>
-        <div class="mobile-bloco-grid">
-          <button
-            *ngFor="let bloco of blocos"
-            class="mobile-bloco-card"
-            [class.active]="bloco.id === activeBlocoId"
-            (click)="selectBloco(bloco.id!)"
-          >
-            <i class="bi bi-building-fill"></i>
-            <span>{{ bloco.nome }}</span>
-            <div class="sala-count">{{ bloco.salas.length || 0 }} salas</div>
-          </button>
-
-          <div *ngIf="blocos.length === 0" class="empty-state">
-            <i class="bi bi-info-circle"></i>
-            <span>Nenhum bloco encontrado</span>
+        <div class="logo-container">
+          <img src="assets/ifclass.png" alt="IFClass Logo" class="logo">
+          <div class="logo-text">
+            <h1>IFClass</h1>
+            <span>Mapa Interativo do Campus</span>
           </div>
         </div>
       </div>
-
-      <!-- Admin Panel Mobile -->
-      <div *ngIf="authService.isAdmin$ | async" class="mobile-admin-panel">
-        <h3>Painel Administrativo</h3>
-
-        <div class="admin-actions">
-          <button class="admin-action-btn" (click)="showCreateBlocoModal()">
-            <i class="bi bi-plus-circle"></i>
-            <span>Novo Bloco</span>
-          </button>
-
-          <button class="admin-action-btn" (click)="showCreateSalaModal()">
-            <i class="bi bi-door-open"></i>
-            <span>Nova Sala</span>
-          </button>
-
-          <button *ngIf="activeBlocoId" class="admin-action-btn danger" (click)="handleDeleteBloco(activeBlocoId)">
-            <i class="bi bi-trash"></i>
-            <span>Excluir Bloco</span>
-          </button>
+      
+      <div class="header-info">
+        <div class="time-info">
+          <div class="current-time">
+            <i class="bi bi-clock-fill"></i>
+            <span>{{ currentTime | date:'HH:mm' }}</span>
+          </div>
+          <div class="current-date">
+            <i class="bi bi-calendar3"></i>
+            <span>{{ currentTime | date:'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+        
+        <div class="user-info">
+          <!-- Opção de Login para visitantes -->
+          <div class="login-section" *ngIf="!isLoggedIn">
+            <button class="login-btn" (click)="showLoginModal()">
+              <i class="bi bi-person-circle"></i>
+              <span>Fazer Login</span>
+            </button>
+          </div>
+          
+          <!-- Usuário Logado -->
+          <div class="logged-user-section" *ngIf="isLoggedIn">
+            <app-profile-switcher></app-profile-switcher>
+            <button class="logout-btn" (click)="logout()">
+              <i class="bi bi-box-arrow-right"></i>
+              <span>Sair</span>
+            </button>
+          </div>
         </div>
       </div>
-
-      <!-- User Actions -->
-      <div class="mobile-user-section">
-        <app-profile-switcher></app-profile-switcher>
-        <button class="logout-btn" (click)="logout()">
-          <i class="bi bi-box-arrow-right"></i>
-          <span>Sair</span>
-        </button>
-      </div>
-    </nav>
+    </div>
   </header>
 
-  <!-- Sidebar Desktop -->
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <img src="assets/ifclass.png" alt="Logo IFClass" />
-      <h1 class="h2">Mapa do Campus</h1>
-    </div>
-
-    <ng-container *ngIf="authService.isAdmin$ | async as canManage">
-      <section *ngIf="canManage" class="admin-panel">
-        <h2 class="admin-panel-title">
-          <i class="bi bi-sliders"></i> Painel de Controle
-        </h2>
-
-        <form #blocoForm="ngForm" (ngSubmit)="handleCreateBloco()" class="mb-4">
-          <label for="blockName" class="form-label fw-bold">Criar Novo Bloco</label>
-          <div class="input-group">
-            <input type="text" id="blockName" class="form-control" [(ngModel)]="novoBlocoNome" name="novoBlocoNome" placeholder="Ex: Bloco C" required />
-            <button type="submit" class="btn btn-success" [disabled]="blocoForm.invalid" title="Adicionar Bloco">
-              <i class="bi bi-plus-lg"></i>
-            </button>
-          </div>
-        </form>
-
-        <form #salaForm="ngForm" (ngSubmit)="handleSubmitSala()">
-          <h3 class="form-label fw-bold">{{ editingSala ? 'Editar Sala' : 'Adicionar Nova Sala' }}</h3>
-
-          <div *ngIf="editingSala" class="alert alert-success p-2 d-flex justify-content-between align-items-center mb-3">
-            <span class="small">Editando: <strong>{{ editingSala.codigo }}</strong></span>
-            <button class="btn btn-sm btn-outline-danger" type="button" (click)="handleDeleteSala(activeBlocoId!, editingSala.id!)" title="Excluir Sala">
-                <i class="bi bi-trash"></i>
-            </button>
-          </div>
-
-          <div class="mb-2">
-            <label for="blockSelect" class="form-label small">Bloco</label>
-            <select id="blockSelect" class="form-select" [(ngModel)]="blocoSelecionadoId" name="blocoSelecionadoId" [disabled]="blocos.length === 0 || !!editingSala" required>
-              <option *ngIf="blocos.length === 0" [ngValue]="null">Crie um bloco primeiro</option>
-              <option *ngFor="let bloco of blocos" [value]="bloco.id">{{ bloco.nome }}</option>
-            </select>
-          </div>
-          <div class="row g-2 mb-2">
-            <div class="col-sm-5">
-              <label for="roomCode" class="form-label small">Código</label>
-              <input type="text" id="roomCode" class="form-control form-control-sm" [(ngModel)]="formSala.codigo" name="salaCodigo" required />
-            </div>
-            <div class="col-sm-4">
-              <label for="roomCapacity" class="form-label small">Capac.</label>
-              <input type="number" id="roomCapacity" class="form-control form-control-sm" [(ngModel)]="formSala.capacidade" name="salaCapacidade" required />
-            </div>
-            <div class="col-sm-3">
-              <label for="roomColor" class="form-label small">Cor</label>
-              <input type="color" id="roomColor" class="form-control form-control-color form-control-sm" [(ngModel)]="formSala.cor" name="salaCor" title="Escolha a cor da sala" />
-            </div>
-          </div>
-          <div class="d-flex flex-wrap gap-2 mt-3">
-            <button type="submit" class="btn btn-primary flex-grow-1" [disabled]="salaForm.invalid">
-              {{ editingSala ? 'Atualizar' : 'Adicionar' }}
-            </button>
-            <button *ngIf="editingSala" type="button" class="btn btn-secondary" (click)="cancelarEdicao()">Cancelar</button>
-          </div>
-        </form>
-      </section>
-    </ng-container>
-
-    <nav class="bloco-list">
-      <h2 class="h5 text-muted">Blocos</h2>
-      <ul>
-        <li *ngFor="let bloco of blocos"
-            class="bloco-item"
-            [class.active]="bloco.id === activeBlocoId"
-            (click)="toggleBloco(bloco.id!)">
-          <i class="bi bi-building"></i>
-          <span>{{ bloco.nome }}</span>
-          <i class="bi bi-chevron-right"></i>
-        </li>
-        <li *ngIf="blocos.length === 0" class="bloco-item-empty">
-          Nenhum bloco encontrado.
-        </li>
-      </ul>
-    </nav>
-
-    <footer class="sidebar-footer">
-      <app-profile-switcher></app-profile-switcher>
-
-      <button class="btn btn-outline-danger logout-button" (click)="logout()" title="Sair do sistema">
-        <i class="bi bi-box-arrow-right"></i>
-        <span>Sair</span>
-      </button>
-    </footer>
-  </aside>
-
-  <main class="main-content">
-    <ng-container *ngIf="activeBlocoId; else welcomeScreen">
-      <div class="floorplan-view">
-        <header class="main-content-header">
-          <div>
-            <h3>Bloco: <strong>{{ getActiveBlocoName() }}</strong></h3>
-            <p *ngIf="!(authService.isAdmin$ | async)" class="text-muted">Use dois dedos para ampliar. Arraste para mover o mapa.</p>
-            <p *ngIf="authService.isAdmin$ | async" class="text-muted">Clique e arraste uma sala para movê-la. Clique para editar.</p>
-          </div>
-          <div class="d-flex gap-2">
-               <button *ngIf="authService.hasRole('ROLE_ADMIN')" class="btn btn-outline-success" (click)="voltarAoPainelAdmin()">
-                  <i class="bi bi-house-door-fill me-2"></i>
-                  Voltar ao Painel
-               </button>
-                <button *ngIf="(authService.isAdmin$ | async) && activeBlocoId" (click)="handleDeleteBloco(activeBlocoId)" class="btn btn-outline-danger">
-                  <i class="bi bi-trash-fill me-2"></i>
-                  Excluir Bloco
-                </button>
-          </div>
-        </header>
-
-        <div class="alert alert-danger" *ngIf="error">
-          {{ error }}
-          <button type="button" class="btn-close" (click)="error = null" aria-label="Close"></button>
+  <!-- Cards de Informação Rápida -->
+  <section class="quick-info-section">
+    <div class="info-cards">
+      <!-- Próxima Aula -->
+      <div class="info-card next-class" *ngIf="proximaAula">
+        <div class="card-icon">
+          <i class="bi bi-book-fill"></i>
         </div>
+        <div class="card-content">
+          <h3>Próxima Aula</h3>
+          <p class="subject">{{ proximaAula.disciplina.nome }}</p>
+          <p class="time">{{ proximaAula.hora }} - {{ proximaAula.sala.codigo }}</p>
+          <p class="professor">{{ proximaAula.professor.nome }}</p>
+        </div>
+        <div class="card-status">
+          <span class="status-badge">{{ proximaAula.status }}</span>
+        </div>
+      </div>
 
-        <div class="floorplan-container" [class.is-dragging]="isDragging">
+      <!-- Aulas de Hoje -->
+      <div class="info-card today-classes">
+        <div class="card-icon">
+          <i class="bi bi-calendar-day"></i>
+        </div>
+        <div class="card-content">
+          <h3 *ngIf="isLoggedIn && isStudent">Suas Aulas</h3>
+          <h3 *ngIf="!isLoggedIn || !isStudent">Aulas de Hoje</h3>
+          <p class="count">{{ isLoggedIn && isStudent ? aulasHoje.length : todasAulasHoje.length }}</p>
+          <p class="label" *ngIf="isLoggedIn && isStudent">suas aulas</p>
+          <p class="label" *ngIf="!isLoggedIn || !isStudent">aulas no campus</p>
+        </div>
+      </div>
+
+      <!-- Bloco Atual -->
+      <div class="info-card current-block" *ngIf="blocoAtual">
+        <div class="card-icon">
+          <i class="bi bi-building"></i>
+        </div>
+        <div class="card-content">
+          <h3>Bloco Atual</h3>
+          <p class="block-name">{{ blocoAtual.nome }}</p>
+          <p class="room-count">{{ blocoAtual.salas.length || 0 }} salas</p>
+        </div>
+      </div>
+
+      <!-- Status do Sistema -->
+      <div class="info-card system-status">
+        <div class="card-icon">
+          <i class="bi bi-wifi"></i>
+        </div>
+        <div class="card-content">
+          <h3>Sistema</h3>
+          <p class="status">Online</p>
+          <p class="label">Atualizado agora</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Conteúdo Principal -->
+  <main class="main-content">
+    
+    <!-- Sidebar de Navegação -->
+    <aside class="navigation-sidebar">
+      <div class="sidebar-header">
+        <h2>Explore os Blocos</h2>
+        <p>Selecione um bloco para ver suas salas</p>
+      </div>
+      
+      <!-- Filtros de Data - CORRIGIDO -->
+      <div class="filters-section">
+        <h3>Filtros</h3>
+        <div class="filter-group">
+          <label>Período:</label>
+          <select class="filter-select" [(ngModel)]="filtroPeriodo" (change)="aplicarFiltros()">
+            <option value="hoje">Hoje</option>
+            <option value="semana">Esta Semana</option>
+          </select>
+        </div>
+        
+        <div class="filter-actions">
+          <button class="btn btn-sm btn-outline-primary" (click)="limparFiltros()">
+            <i class="bi bi-x-circle"></i> Limpar
+          </button>
+        </div>
+      </div>
+
+      <div class="blocos-list">
+        <button 
+          *ngFor="let bloco of blocos" 
+          class="bloco-item"
+          [class.active]="bloco.id === activeBlocoId"
+          [class.has-class]="blocoTemAulaVisitante(bloco.id!)"
+          (click)="toggleBloco(bloco.id!)"
+        >
+          <div class="bloco-icon">
+            <i [ngClass]="getBlocoIcon(bloco.nome)"></i>
+          </div>
+          <div class="bloco-info">
+            <h3>{{ bloco.nome }}</h3>
+            <p>{{ bloco.salas.length || 0 }} salas</p>
+            <div class="bloco-status" *ngIf="blocoTemAula(bloco.id!)">
+              <i class="bi bi-check-circle-fill"></i>
+              <span>Você tem aula aqui</span>
+            </div>
+          </div>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Área do Mapa Principal -->
+    <section class="map-section">
+      <div class="map-header">
+        <div class="map-title">
+          <h2 *ngIf="activeBlocoId">{{ getActiveBlocoName() }}</h2>
+          <h2 *ngIf="!activeBlocoId">Selecione um Bloco</h2>
+          <p *ngIf="activeBlocoId">{{ getActiveBlocoName() }} - {{ getActiveBlocoSalasCount() }} salas disponíveis</p>
+          <p *ngIf="!activeBlocoId">Escolha um bloco ao lado para explorar suas salas</p>
+        </div>
+        
+        <div class="map-actions" *ngIf="activeBlocoId">
+          <button class="action-btn refresh-btn" (click)="refreshAulas()" title="Atualizar">
+            <i class="bi bi-arrow-clockwise"></i>
+          </button>
+          <button *ngIf="authService.hasRole('ROLE_ADMIN')" class="action-btn admin-btn" (click)="voltarAoPainelAdmin()" title="Voltar ao Painel">
+            <i class="bi bi-house-door-fill"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mapa Interativo -->
+      <div class="map-container" *ngIf="activeBlocoId; else welcomeScreen">
+        <div class="floorplan-wrapper">
           <ngx-pan-zoom [config]="panZoomConfig">
-            <svg class="floorplan-svg" viewBox="0 0 3200 1800">
-              <ng-container *ngFor="let bloco of blocos">
+            <svg class="campus-floorplan" viewBox="0 0 2000 1200">
+              <!-- Grid de fundo -->
+              <defs>
+                <pattern id="floor-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                  <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#e9ecef" stroke-width="1" opacity="0.3"/>
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#floor-grid)" />
+              
+              <!-- Salas do bloco ativo -->
+              <g *ngFor="let bloco of blocos">
                 <g *ngIf="bloco.id === activeBlocoId">
                   <g *ngFor="let sala of bloco.salas"
                       class="sala-group"
                       [class.clickable-for-user]="!(authService.isAdmin$ | async)"
                       [class.dragging]="draggingSala?.id === sala.id"
+                      [class.has-class]="salaTemAulaVisitante(sala.id!)"
+                      [class.user-aula]="isLoggedIn && isStudent && usuarioTemAulaHoje() && salaTemAulaVisitante(sala.id!)"
                       (mousedown)="onMouseDown($event, sala)"
-                      (touchstart)="onTouchStart($event, sala)">
+                      (touchstart)="onTouchStart($event, sala)"
+                      (mousemove)="onMouseMove($event)"
+                      (mouseup)="onMouseUp($event)"
+                      (touchend)="onTouchEnd($event)">
                     <rect
                         [attr.x]="sala.posX ?? 0"
                         [attr.y]="sala.posY ?? 0"
@@ -219,135 +219,171 @@
                       <tspan class="sala-codigo">{{ sala.codigo }}</tspan>
                       <tspan [attr.x]="(sala.posX ?? 0) + (sala.largura ?? 150) / 2" dy="1.4em" class="sala-capacidade">Cap: {{ sala.capacidade }}</tspan>
                     </text>
+                    
+                    <!-- Indicador de aulas do usuário -->
+                    <circle *ngIf="isLoggedIn && isStudent && usuarioTemAulaHoje() && salaTemAulaVisitante(sala.id!)" 
+                            [attr.cx]="(sala.posX ?? 0) + (sala.largura ?? 150) - 15" 
+                            [attr.cy]="(sala.posY ?? 0) + 15" 
+                            r="10" 
+                            fill="#ff6b35" 
+                            stroke="#ffffff" 
+                            stroke-width="3">
+                    </circle>
+                    <text *ngIf="isLoggedIn && isStudent && usuarioTemAulaHoje() && salaTemAulaVisitante(sala.id!)" 
+                          [attr.x]="(sala.posX ?? 0) + (sala.largura ?? 150) - 15" 
+                          [attr.y]="(sala.posY ?? 0) + 20" 
+                          text-anchor="middle" 
+                          fill="#ffffff" 
+                          font-size="14" 
+                          font-weight="bold">🔥</text>
+                    
+                    <!-- Área invisível para capturar eventos de mouse -->
+                    <rect
+                        [attr.x]="sala.posX ?? 0"
+                        [attr.y]="sala.posY ?? 0"
+                        [attr.width]="sala.largura ?? 150"
+                        [attr.height]="sala.altura ?? 100"
+                        fill="transparent"
+                        class="sala-hover-area"
+                        (mouseenter)="onSalaMouseEnter($event, sala)"
+                        (mouseleave)="onSalaMouseLeave()"
+                        (mousemove)="onSalaMouseMove($event)">
+                    </rect>
                   </g>
                 </g>
-              </ng-container>
+              </g>
             </svg>
           </ngx-pan-zoom>
         </div>
       </div>
 
-      <!-- LEGENDA PARA SALAS DO DIA E DA SEMANA -->
-      <div class="mapa-legenda">
-        <div>
-          <span class="sala-legenda sala-aula-hoje"></span> Você tem aula aqui <strong>hoje</strong>
-        </div>
-        <div class="mt-2">
-          <strong>Aulas da semana:</strong>
-          <ul class="list-unstyled small ms-2">
-            <li *ngFor="let aula of aulasSemana">
-              <span class="sala-legenda sala-aula-semana"></span>
-              <span class="fw-bold">{{ aula.disciplina.nome }}</span> -
-              {{ aula.diaSemana | diaSemana }}
-              {{ aula.horaInicio || aula.hora }} -
-              {{ aula.horaFim ? aula.horaFim : '' }}<br>
-              <span class="text-muted">Sala: {{ aula.sala.codigo }}</span>
-            </li>
-            <ng-container *ngIf="aulasSemana.length === 0">
-              <li *ngIf="alunoTemTurmaMasSemAulas" class="text-muted">Sua turma ainda não tem nenhuma aula cadastrada!</li>
-              <li *ngIf="!alunoTemTurmaMasSemAulas" class="text-muted">Nenhuma aula cadastrada para esta semana.</li>
-            </ng-container>
-          </ul>
-        </div>
-      </div>
-    </ng-container>
-
-    <ng-template #welcomeScreen>
-      <!-- Modo: Visão Geral do Campus -->
-      <div class="campus-overview">
-        <!-- Título da Seção -->
-        <div class="campus-header">
-          <h1 class="campus-title">
-            <i class="bi bi-geo-alt-fill"></i>
-            Mapa do Campus
-          </h1>
-          <p class="campus-subtitle">Clique em um bloco para explorar suas salas e horários</p>
-        </div>
-
-        <div class="campus-image-container">
-          <!-- Imagem aérea real do campus -->
-          <img
-            src="assets/images/campus-aereo.jpg"
-            alt="Vista aérea do campus"
-            class="campus-image"
-            (error)="onImageError($event)"
-            (load)="onImageLoad($event)">
-
-          <!-- Fallback caso a imagem não carregue -->
-          <div class="campus-placeholder" style="display: none;" id="image-fallback">
-            <div class="placeholder-content">
-              <i class="bi bi-building"></i>
-              <h3>Campus do Instituto Federal</h3>
-              <p>Imagem não pôde ser carregada</p>
+      <!-- Tela de Boas-vindas -->
+      <ng-template #welcomeScreen>
+        <div class="welcome-screen">
+          <div class="welcome-content">
+            <div class="welcome-icon">
+              <i class="bi bi-map-fill"></i>
             </div>
-          </div>
-
-          <!-- Overlay com blocos clicáveis -->
-          <div class="blocos-overlay">
-            <!-- Bloco A -->
-            <div class="bloco-hotspot bloco-a"
-                 (click)="selecionarBlocoFisico('A')"
-                 [class.has-classes]="blocoTemAulasHoje('A')">
-              <div class="bloco-info">
-                <h3>BLOCO A</h3>
-                <span>{{ getSalasCount('A') }} salas</span>
-                <div *ngIf="blocoTemAulasHoje('A')" class="aulas-indicator">
-                  <i class="bi bi-clock"></i>
-                  Aulas hoje
-                </div>
+            <h2>Bem-vindo ao Mapa do Campus</h2>
+            <p>Selecione um bloco ao lado para explorar suas salas e horários</p>
+            
+            <div class="welcome-features">
+              <div class="feature-item">
+                <i class="bi bi-search"></i>
+                <span>Encontre suas salas</span>
               </div>
-            </div>
-
-            <!-- Bloco B -->
-            <div class="bloco-hotspot bloco-b"
-                 (click)="selecionarBlocoFisico('B')"
-                 [class.has-classes]="blocoTemAulasHoje('B')">
-              <div class="bloco-info">
-                <h3>BLOCO B</h3>
-                <span>{{ getSalasCount('B') }} salas</span>
-                <div *ngIf="blocoTemAulasHoje('B')" class="aulas-indicator">
-                  <i class="bi bi-clock"></i>
-                  Aulas hoje
-                </div>
+              <div class="feature-item">
+                <i class="bi bi-clock"></i>
+                <span>Veja seus horários</span>
               </div>
-            </div>
-
-            <!-- Bloco C -->
-            <div class="bloco-hotspot bloco-c"
-                 (click)="selecionarBlocoFisico('C')"
-                 [class.has-classes]="blocoTemAulasHoje('C')">
-              <div class="bloco-info">
-                <h3>BLOCO C</h3>
-                <span>{{ getSalasCount('C') }} salas</span>
-                <div *ngIf="blocoTemAulasHoje('C')" class="aulas-indicator">
-                  <i class="bi bi-clock"></i>
-                  Aulas hoje
-                </div>
-              </div>
-            </div>
-
-            <!-- Bloco D -->
-            <div class="bloco-hotspot bloco-d"
-                 (click)="selecionarBlocoFisico('D')"
-                 [class.has-classes]="blocoTemAulasHoje('D')">
-              <div class="bloco-info">
-                <h3>BLOCO D</h3>
-                <span>{{ getSalasCount('D') }} salas</span>
-                <div *ngIf="blocoTemAulasHoje('D')" class="aulas-indicator">
-                  <i class="bi bi-clock"></i>
-                  Aulas hoje
-                </div>
+              <div class="feature-item">
+                <i class="bi bi-geo-alt"></i>
+                <span>Navegue pelo campus</span>
               </div>
             </div>
           </div>
-
-          <!-- Instruções -->
-          <div class="campus-instructions">
-            <i class="bi bi-hand-pointer"></i>
-            Clique em um bloco para ver suas salas
-          </div>
         </div>
-      </div>
-    </ng-template>
+      </ng-template>
+    </section>
   </main>
+
+  <!-- Tooltip Dinâmico HTML -->
+  <div class="dynamic-tooltip" 
+       [class.visible]="tooltipVisible" 
+       [style.left.px]="tooltipX" 
+       [style.top.px]="tooltipY"
+       *ngIf="tooltipSala">
+    <div class="tooltip-content">
+      <div class="tooltip-header">
+        <h4>{{ tooltipSala.codigo }}</h4>
+        <span class="tooltip-close" (click)="hideTooltip()">×</span>
+      </div>
+      
+      <div class="tooltip-body">
+        <div class="sala-info">
+          <p><strong>Capacidade:</strong> {{ tooltipSala.capacidade }} pessoas</p>
+          <p><strong>Dimensões:</strong> {{ tooltipSala.largura }}x{{ tooltipSala.altura }}</p>
+        </div>
+        
+        <div class="aulas-info">
+          <h5 *ngIf="isLoggedIn && isStudent && usuarioTemAulaHoje() && filtroPeriodo === 'hoje'">Suas Aulas:</h5>
+          <h5 *ngIf="isLoggedIn && isStudent && usuarioTemAulaHoje() && filtroPeriodo === 'semana'">Aulas:</h5>
+          <h5 *ngIf="!isLoggedIn || !isStudent || !usuarioTemAulaHoje()">Aulas de Hoje:</h5>
+          
+          <div *ngIf="getAulasDaSala(tooltipSala.id!).length === 0" class="no-aulas">
+            <i class="bi bi-info-circle"></i>
+            <span>Nenhuma aula agendada</span>
+          </div>
+          
+          <div *ngFor="let aula of getAulasDaSala(tooltipSala.id!)" 
+               class="aula-item" 
+               [class.user-aula]="isAulaDoUsuario(aula)">
+            <div class="aula-time">
+              {{ aula.hora }}
+              <span *ngIf="filtroPeriodo === 'semana'" class="aula-dia">{{ getDiaSemanaFormatado(aula.diaSemana) }}</span>
+            </div>
+            <div class="aula-details">
+              <div class="aula-disciplina">{{ aula.disciplina.nome }}</div>
+              <div class="aula-professor">{{ aula.professor.nome }}</div>
+            </div>
+            <div *ngIf="isAulaDoUsuario(aula)" class="user-indicator">🔥</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Painel Administrativo -->
+  <div *ngIf="authService.isAdmin$ | async" class="admin-panel">
+    <div class="admin-header">
+      <h3><i class="bi bi-gear-fill"></i> Painel Administrativo</h3>
+      <button class="admin-toggle" (click)="toggleAdminPanel()">
+        <i class="bi" [ngClass]="adminPanelExpanded ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+      </button>
+    </div>
+    
+    <div class="admin-content" [class.expanded]="adminPanelExpanded">
+      <div class="admin-section">
+        <h4><i class="bi bi-building"></i> Gerenciar Blocos</h4>
+        <div class="admin-actions">
+          <button class="admin-btn primary" (click)="showCreateBlocoModal()">
+            <i class="bi bi-plus-circle"></i>
+            <span>Novo Bloco</span>
+          </button>
+
+          <button *ngIf="activeBlocoId" class="admin-btn danger" (click)="handleDeleteBloco(activeBlocoId)">
+            <i class="bi bi-trash"></i>
+            <span>Excluir Bloco</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="admin-section">
+        <h4><i class="bi bi-door-open"></i> Gerenciar Salas</h4>
+        <div class="admin-actions">
+          <button class="admin-btn primary" (click)="showCreateSalaModal()">
+            <i class="bi bi-plus-circle"></i>
+            <span>Nova Sala</span>
+          </button>
+
+          <button *ngIf="activeBlocoId" class="admin-btn secondary" (click)="showEditSalasModal()">
+            <i class="bi bi-pencil"></i>
+            <span>Editar Salas</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Legenda do Mapa -->
+  <div class="map-legend" *ngIf="activeBlocoId">
+    <div class="legend-item">
+      <span class="legend-color sala-aula-hoje"></span>
+      <span>Você tem aula aqui hoje</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-color sala-normal"></span>
+      <span>Salas disponíveis</span>
+    </div>
+  </div>
 </div>

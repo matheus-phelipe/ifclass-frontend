@@ -30,6 +30,12 @@ export class LoginComponent implements OnInit {
   constructor(private service: UsuarioService, private router: Router, private authService: AuthService) {}
 
   ngOnInit(): void {
+    // Verifica se já está autenticado (evita login duplo)
+    if (this.authService.isAuthenticated()) {
+      this.router.navigate(['/app/home']);
+      return;
+    }
+
     const savedEmail = localStorage.getItem('rememberedEmail');
     const rememberMeFlag = localStorage.getItem('rememberMeFlag');
 
@@ -40,10 +46,24 @@ export class LoginComponent implements OnInit {
   }
 
   login() {
+    // Limpa qualquer estado anterior antes do login (sem navegar)
+    this.authService.clearAuthState();
+    
     this.authService.login(this.credenciais.email, this.credenciais.senha).subscribe({
       next: (response) => {
+        // Salva o token
         this.authService.salvarToken(response.token);
 
+        // Salva email se "lembrar-me" estiver marcado
+        if (this.lembrarMe) {
+          localStorage.setItem('rememberedEmail', this.credenciais.email);
+          localStorage.setItem('rememberMeFlag', 'true');
+        } else {
+          localStorage.removeItem('rememberedEmail');
+          localStorage.removeItem('rememberMeFlag');
+        }
+
+        // Determina o perfil ativo
         const availableRoles = this.authService.getAvailableRoles();
         const isStudent = availableRoles.includes('ROLE_ALUNO');
 
@@ -57,6 +77,12 @@ export class LoginComponent implements OnInit {
           }
           this.router.navigate(['/app/home']);
         }
+      },
+      error: (error) => {
+        console.error('Erro no login:', error);
+        // Mostra erro específico se disponível
+        const errorMessage = error.error?.message || 'Erro ao fazer login. Tente novamente.';
+        this.mostrarAlerta(errorMessage, 'danger');
       }
     });
   }

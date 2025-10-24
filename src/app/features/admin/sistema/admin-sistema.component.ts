@@ -34,9 +34,11 @@ import { NotificationService } from '../../../shared/sweetalert/notification.ser
         <p>{{erro}}</p>
       </div>
 
-      <div class="alert alert-success" *ngIf="monitoramento && !carregando && !erro">
-        <h4>🖥️ Sistema {{monitoramento.status}}</h4>
-        <p>Monitoramento em tempo real - Última verificação: {{monitoramento.ultimaVerificacao | date:'short'}}</p>
+      <div class="alert" 
+           [ngClass]="getSystemStatusClass()" 
+           *ngIf="monitoramento && !carregando && !erro">
+        <h4>🖥️ Sistema {{monitoramento.status || 'ONLINE'}}</h4>
+        <p>Monitoramento em tempo real - Última verificação: {{monitoramento.ultimaVerificacao | date:'dd/MM/yyyy HH:mm'}}</p>
       </div>
 
       <!-- Informações Gerais do Sistema -->
@@ -52,33 +54,33 @@ import { NotificationService } from '../../../shared/sweetalert/notification.ser
               <div class="row">
                 <div class="col-6">
                   <strong>Versão do Sistema:</strong><br>
-                  <span class="text-muted">1.0.3</span>
+                  <span class="text-muted">{{monitoramento?.versaoSistema || 'N/A'}}</span>
                 </div>
                 <div class="col-6">
                   <strong>Uptime:</strong><br>
-                  <span class="text-success">30d 12h 45m</span>
+                  <span class="text-success">{{formatarTempo(monitoramento?.tempoOnlineMinutos || 0)}}</span>
                 </div>
               </div>
               <hr>
               <div class="row">
                 <div class="col-6">
                   <strong>Java Version:</strong><br>
-                  <span class="text-muted">17.0.2</span>
+                  <span class="text-muted">{{monitoramento?.versaoJava || 'N/A'}}</span>
                 </div>
                 <div class="col-6">
                   <strong>Database:</strong><br>
-                  <span class="text-muted">PostgreSQL 14.5</span>
+                  <span class="text-muted">{{monitoramento?.statusBancoDados || 'N/A'}}</span>
                 </div>
               </div>
               <hr>
               <div class="row">
                 <div class="col-6">
                   <strong>Conexões Ativas:</strong><br>
-                  <span class="badge bg-info fs-6">156</span>
+                  <span class="badge bg-info fs-6">{{monitoramento?.conexoesAtivas || 0}}</span>
                 </div>
                 <div class="col-6">
                   <strong>Último Backup:</strong><br>
-                  <span class="text-muted">Hoje às 03:00</span>
+                  <span class="text-muted">{{monitoramento?.inicioSistema ? (monitoramento?.inicioSistema | date:'dd/MM/yyyy HH:mm') : 'N/A'}}</span>
                 </div>
               </div>
             </div>
@@ -97,11 +99,13 @@ import { NotificationService } from '../../../shared/sweetalert/notification.ser
               <div class="mb-3">
                 <div class="d-flex justify-content-between align-items-center mb-1">
                   <strong>Memória</strong>
-                  <span class="text-muted">5.5 / 8.0 GB</span>
+                  <span class="text-muted">{{monitoramento?.usoMemoria || 0}}%</span>
                 </div>
                 <div class="progress" style="height: 20px;">
-                  <div class="progress-bar bg-success" style="width: 67%">
-                    67%
+                  <div class="progress-bar" 
+                       [ngClass]="getProgressBarClass(monitoramento?.usoMemoria || 0)"
+                       [style.width.%]="monitoramento?.usoMemoria || 0">
+                    {{monitoramento?.usoMemoria || 0}}%
                   </div>
                 </div>
               </div>
@@ -110,11 +114,13 @@ import { NotificationService } from '../../../shared/sweetalert/notification.ser
               <div class="mb-3">
                 <div class="d-flex justify-content-between align-items-center mb-1">
                   <strong>Espaço em Disco</strong>
-                  <span class="text-muted">425 / 500 GB</span>
+                  <span class="text-muted">{{getDiskUsagePercent()}}%</span>
                 </div>
                 <div class="progress" style="height: 20px;">
-                  <div class="progress-bar bg-warning" style="width: 85%">
-                    85%
+                  <div class="progress-bar" 
+                       [ngClass]="getProgressBarClass(getDiskUsagePercent())"
+                       [style.width.%]="getDiskUsagePercent()">
+                    {{getDiskUsagePercent()}}%
                   </div>
                 </div>
               </div>
@@ -123,11 +129,13 @@ import { NotificationService } from '../../../shared/sweetalert/notification.ser
               <div class="mb-3">
                 <div class="d-flex justify-content-between align-items-center mb-1">
                   <strong>CPU Usage</strong>
-                  <span class="text-muted">45%</span>
+                  <span class="text-muted">{{monitoramento?.usoCPU || 0}}%</span>
                 </div>
                 <div class="progress" style="height: 20px;">
-                  <div class="progress-bar bg-success" style="width: 45%">
-                    45%
+                  <div class="progress-bar" 
+                       [ngClass]="getProgressBarClass(monitoramento?.usoCPU || 0)"
+                       [style.width.%]="monitoramento?.usoCPU || 0">
+                    {{monitoramento?.usoCPU || 0}}%
                   </div>
                 </div>
               </div>
@@ -143,40 +151,18 @@ import { NotificationService } from '../../../shared/sweetalert/notification.ser
             <div class="card-header">
               <h5 class="mb-0">
                 <i class="bi bi-heart-pulse me-2"></i>Health Checks
-                <span class="badge bg-success ms-2">SAUDÁVEL</span>
+                <span class="badge ms-2" [ngClass]="getOverallHealthBadge()">{{getOverallHealthStatus()}}</span>
               </h5>
             </div>
             <div class="card-body">
               <div class="row">
-                <div class="col-md-4 mb-3">
-                  <div class="card border-success">
+                <div class="col-md-4 mb-3" *ngFor="let check of getHealthChecks()">
+                  <div class="card" [ngClass]="getHealthCheckClass(check.status)">
                     <div class="card-body text-center">
-                      <i class="bi bi-check-circle-fill text-success fs-1 mb-2"></i>
-                      <h6 class="card-title">Database Connection</h6>
-                      <p class="card-text small text-muted">Conexão com PostgreSQL funcionando</p>
-                      <span class="badge bg-success">UP</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div class="col-md-4 mb-3">
-                  <div class="card border-success">
-                    <div class="card-body text-center">
-                      <i class="bi bi-check-circle-fill text-success fs-1 mb-2"></i>
-                      <h6 class="card-title">Email Service</h6>
-                      <p class="card-text small text-muted">Serviço de email funcionando</p>
-                      <span class="badge bg-success">UP</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div class="col-md-4 mb-3">
-                  <div class="card border-warning">
-                    <div class="card-body text-center">
-                      <i class="bi bi-exclamation-triangle-fill text-warning fs-1 mb-2"></i>
-                      <h6 class="card-title">Disk Space</h6>
-                      <p class="card-text small text-muted">Espaço em disco baixo (85% utilizado)</p>
-                      <span class="badge bg-warning text-dark">WARNING</span>
+                      <i class="bi fs-1 mb-2" [ngClass]="getHealthCheckIcon(check.status)"></i>
+                      <h6 class="card-title">{{check.name}}</h6>
+                      <p class="card-text small text-muted">{{check.description}}</p>
+                      <span class="badge" [ngClass]="getHealthCheckBadge(check.status)">{{check.status}}</span>
                     </div>
                   </div>
                 </div>
@@ -303,9 +289,9 @@ export class AdminSistemaComponent implements OnInit {
   verificarSaude(): void {
     this.adminService.healthCheck().subscribe({
       next: (response) => {
-        this.notificationService.showSuccess(
-          'Sistema funcionando normalmente!',
-          'Health Check Concluído'
+        this.notificationService.success(
+          'Health Check Concluído',
+          'Sistema funcionando normalmente!'
         );
       },
       error: (error) => {
@@ -320,7 +306,7 @@ export class AdminSistemaComponent implements OnInit {
           mensagem = 'Serviço indisponível: Sistema temporariamente fora do ar.';
         }
 
-        this.notificationService.showError(mensagem, 'Erro no Health Check');
+        this.notificationService.error('Erro no Health Check', mensagem);
       }
     });
   }
@@ -346,9 +332,9 @@ export class AdminSistemaComponent implements OnInit {
         },
         error: (error) => {
           this.carregando = false;
-          this.notificationService.showError(
-            'Erro ao reiniciar serviços. Tente novamente.',
-            'Erro na Reinicialização'
+          this.notificationService.error(
+            'Erro na Reinicialização',
+            'Erro ao reiniciar serviços. Tente novamente.'
           );
         }
       });
@@ -377,9 +363,9 @@ export class AdminSistemaComponent implements OnInit {
         error: (error) => {
           this.carregando = false;
           console.error('Erro ao criar backup:', error);
-          this.notificationService.showError(
-            'Erro ao criar backup. Tente novamente.',
-            'Erro no Backup'
+          this.notificationService.error(
+            'Erro no Backup',
+            'Erro ao criar backup. Tente novamente.'
           );
         }
       });
@@ -407,9 +393,9 @@ export class AdminSistemaComponent implements OnInit {
         error: (error) => {
           this.carregando = false;
           console.error('Erro ao limpar cache:', error);
-          this.notificationService.showError(
-            'Erro ao limpar cache. Tente novamente.',
-            'Erro na Limpeza'
+          this.notificationService.error(
+            'Erro na Limpeza',
+            'Erro ao limpar cache. Tente novamente.'
           );
         }
       });
@@ -437,9 +423,9 @@ export class AdminSistemaComponent implements OnInit {
         error: (error) => {
           this.carregando = false;
           console.error('Erro ao otimizar banco:', error);
-          this.notificationService.showError(
-            'Erro ao otimizar banco de dados. Tente novamente.',
-            'Erro na Otimização'
+          this.notificationService.error(
+            'Erro na Otimização',
+            'Erro ao otimizar banco de dados. Tente novamente.'
           );
         }
       });
@@ -447,13 +433,17 @@ export class AdminSistemaComponent implements OnInit {
   }
 
   formatarTempo(minutos: number): string {
+    if (!minutos || minutos <= 0) return '0m';
+    
     const horas = Math.floor(minutos / 60);
     const dias = Math.floor(horas / 24);
 
     if (dias > 0) {
       return `${dias}d ${horas % 24}h`;
-    } else {
+    } else if (horas > 0) {
       return `${horas}h ${minutos % 60}m`;
+    } else {
+      return `${minutos}m`;
     }
   }
 
@@ -481,6 +471,101 @@ export class AdminSistemaComponent implements OnInit {
       case 'WARNING': return 'bg-warning text-dark';
       case 'ERROR': return 'bg-danger';
       default: return 'bg-secondary';
+    }
+  }
+
+  getProgressBarClass(percent: number): string {
+    if (percent >= 90) return 'bg-danger';
+    if (percent >= 75) return 'bg-warning';
+    return 'bg-success';
+  }
+
+  getDiskUsagePercent(): number {
+    if (!this.monitoramento) return 0;
+    const total = this.monitoramento.espacoDiscoTotal;
+    const livre = this.monitoramento.espacoDiscoLivre;
+    if (total === 0) return 0;
+    return Math.round(((total - livre) / total) * 100);
+  }
+
+  getHealthChecks(): any[] {
+    if (!this.monitoramento?.healthChecks) {
+      return [
+        { name: 'Database', status: 'UNKNOWN', description: 'Verificando conexão...' },
+        { name: 'Email Service', status: 'UNKNOWN', description: 'Verificando serviço...' },
+        { name: 'Disk Space', status: 'UNKNOWN', description: 'Verificando espaço...' }
+      ];
+    }
+
+    return Object.entries(this.monitoramento.healthChecks).map(([key, status]) => ({
+      name: this.getHealthCheckName(key),
+      status: status,
+      description: this.getHealthCheckDescription(key, status)
+    }));
+  }
+
+  getHealthCheckName(key: string): string {
+    const names: { [key: string]: string } = {
+      'database': 'Database Connection',
+      'email': 'Email Service',
+      'disk': 'Disk Space',
+      'memory': 'Memory Usage',
+      'cpu': 'CPU Usage'
+    };
+    return names[key] || key;
+  }
+
+  getHealthCheckDescription(key: string, status: string): string {
+    const descriptions: { [key: string]: { [key: string]: string } } = {
+      'database': {
+        'OK': 'Conexão com PostgreSQL funcionando',
+        'WARNING': 'Conexão com problemas de performance',
+        'ERROR': 'Falha na conexão com o banco'
+      },
+      'email': {
+        'OK': 'Serviço de email funcionando',
+        'WARNING': 'Serviço de email com latência',
+        'ERROR': 'Serviço de email indisponível'
+      },
+      'disk': {
+        'OK': 'Espaço em disco adequado',
+        'WARNING': 'Espaço em disco baixo',
+        'ERROR': 'Espaço em disco crítico'
+      }
+    };
+    return descriptions[key]?.[status] || 'Status desconhecido';
+  }
+
+  getOverallHealthStatus(): string {
+    if (!this.monitoramento?.healthChecks) return 'VERIFICANDO';
+    
+    const statuses = Object.values(this.monitoramento.healthChecks);
+    if (statuses.includes('ERROR')) return 'CRÍTICO';
+    if (statuses.includes('WARNING')) return 'ATENÇÃO';
+    if (statuses.every(s => s === 'OK')) return 'SAUDÁVEL';
+    return 'VERIFICANDO';
+  }
+
+  getOverallHealthBadge(): string {
+    const status = this.getOverallHealthStatus();
+    switch (status) {
+      case 'SAUDÁVEL': return 'bg-success';
+      case 'ATENÇÃO': return 'bg-warning text-dark';
+      case 'CRÍTICO': return 'bg-danger';
+      default: return 'bg-secondary';
+    }
+  }
+
+  getSystemStatusClass(): string {
+    if (!this.monitoramento) return 'alert-info';
+    
+    const status = this.monitoramento.status?.toLowerCase();
+    switch (status) {
+      case 'online': return 'alert-success';
+      case 'warning': return 'alert-warning';
+      case 'error': return 'alert-danger';
+      case 'offline': return 'alert-danger';
+      default: return 'alert-info';
     }
   }
 }

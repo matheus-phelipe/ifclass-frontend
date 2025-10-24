@@ -25,7 +25,7 @@ import { RelatorioService, RelatorioRequest } from '../services/relatorio.servic
           <div class="card">
             <div class="card-body">
               <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-6">
                   <label class="form-label">Tipo de Relatório:</label>
                   <select class="form-select" [(ngModel)]="tipoRelatorio">
                     <option value="">Selecione um relatório</option>
@@ -43,23 +43,17 @@ import { RelatorioService, RelatorioRequest } from '../services/relatorio.servic
                   <label class="form-label">Data Fim:</label>
                   <input type="date" class="form-control" [(ngModel)]="dataFim">
                 </div>
-                <div class="col-md-2">
-                  <label class="form-label">&nbsp;</label>
-                  <button class="btn btn-primary d-block w-100" (click)="gerarRelatorio()">
-                    <i class="bi bi-search me-1"></i>Gerar
-                  </button>
-                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Exemplo de Relatório -->
+      <!-- Botões de Exportação -->
       <div *ngIf="tipoRelatorio" class="card mb-4">
         <div class="card-header d-flex justify-content-between">
           <h5 class="mb-0">
-            <i class="bi bi-door-open me-2"></i>{{getTituloRelatorio()}}
+            <i class="bi bi-file-earmark-bar-graph me-2"></i>{{getTituloRelatorio()}}
           </h5>
           <div class="btn-group">
             <button class="btn btn-outline-success btn-sm" (click)="exportarExcel()">
@@ -71,37 +65,9 @@ import { RelatorioService, RelatorioRequest } from '../services/relatorio.servic
           </div>
         </div>
         <div class="card-body">
-          <div class="alert alert-success">
-            <h6>✅ Relatório Gerado com Sucesso!</h6>
-            <p>Os dados do relatório "{{getTituloRelatorio()}}" foram processados para o período selecionado.</p>
-          </div>
-          
-          <!-- Dados de Exemplo -->
-          <div class="row">
-            <div class="col-md-4">
-              <div class="card bg-light">
-                <div class="card-body text-center">
-                  <h5>Dados Processados</h5>
-                  <h2 class="text-primary">{{getDadosProcessados()}}</h2>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="card bg-light">
-                <div class="card-body text-center">
-                  <h5>Período</h5>
-                  <p class="mb-0">{{dataInicio}} a {{dataFim}}</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="card bg-light">
-                <div class="card-body text-center">
-                  <h5>Status</h5>
-                  <span class="badge bg-success fs-6">Concluído</span>
-                </div>
-              </div>
-            </div>
+          <div class="alert alert-info">
+            <h6>📊 Relatório Disponível</h6>
+            <p>Selecione o formato desejado para exportar o relatório "{{getTituloRelatorio()}}" para o período de {{dataInicio}} a {{dataFim}}.</p>
           </div>
         </div>
       </div>

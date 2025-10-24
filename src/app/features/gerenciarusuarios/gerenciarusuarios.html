@@ -34,6 +34,17 @@
       </div>
     </div>
       
+    <div class="page-header d-flex justify-content-between align-items-start">
+      <div class="align-items-center">
+        <!-- Botão para adicionar usuário -->
+        <button class="btn-adicionar" (click)="abrirCriarUsuario()">+ Adicionar Usuário</button>
+        <app-criar-usuario 
+          *ngIf="mostrarCriarUsuario" 
+          (fechar)="fecharCriarUsuario()">
+        </app-criar-usuario>
+      </div>
+    </div>
+
     <div class="row g-4">
       <div class="col-lg-7">
         <div class="table-container">

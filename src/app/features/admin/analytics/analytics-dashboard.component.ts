@@ -24,21 +24,24 @@ Chart.register(...registerables);
             <h1 class="h3 mb-1">📊 Analytics Dashboard</h1>
             <p class="text-muted mb-0">Insights avançados e análise de dados do sistema</p>
           </div>
-          <div class="d-flex gap-2">
+          <div class="d-flex flex-wrap gap-2">
             <select class="form-select form-select-sm" [(ngModel)]="selectedPeriod" (change)="onPeriodChange()">
               <option value="7">Últimos 7 dias</option>
               <option value="30">Últimos 30 dias</option>
               <option value="90">Últimos 3 meses</option>
             </select>
-            <button class="btn btn-primary btn-sm" (click)="refreshData()">
-              <i class="bi bi-arrow-clockwise"></i> Atualizar
+            <button class="btn btn-primary btn-sm" (click)="refreshData()" [disabled]="loading">
+              <i class="bi bi-arrow-clockwise" [class.spin]="loading"></i> 
+              <span class="d-none d-sm-inline">Atualizar</span>
             </button>
             <div class="btn-group">
               <button class="btn btn-success btn-sm" (click)="exportReport()">
-                <i class="bi bi-download"></i> Exportar
+                <i class="bi bi-download"></i> 
+                <span class="d-none d-sm-inline">Exportar</span>
               </button>
               <button class="btn btn-outline-primary btn-sm" (click)="gerarRelatorioCompleto()">
-                <i class="bi bi-file-earmark-text"></i> Relatório
+                <i class="bi bi-file-earmark-text"></i> 
+                <span class="d-none d-sm-inline">Relatório</span>
               </button>
             </div>
           </div>
@@ -291,6 +294,48 @@ Chart.register(...registerables);
       line-height: 1.4;
     }
 
+    /* Animação do botão de atualizar */
+    .spin {
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Responsividade para header */
+    .dashboard-header .d-flex {
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .dashboard-header .btn-group {
+      flex-wrap: wrap;
+    }
+
+    /* Responsividade para botões */
+    @media (max-width: 576px) {
+      .dashboard-header .d-flex {
+        flex-direction: column;
+        align-items: stretch !important;
+      }
+      
+      .dashboard-header .d-flex > * {
+        width: 100%;
+        margin-bottom: 0.5rem;
+      }
+      
+      .btn-group {
+        width: 100%;
+        display: flex;
+      }
+      
+      .btn-group .btn {
+        flex: 1;
+      }
+    }
+
     @media (max-width: 768px) {
       .analytics-dashboard {
         padding: 15px;
@@ -304,6 +349,20 @@ Chart.register(...registerables);
       
       .chart-container {
         height: 250px;
+      }
+
+      .dashboard-header h1 {
+        font-size: 1.5rem;
+      }
+
+      .dashboard-header p {
+        font-size: 0.9rem;
+      }
+    }
+
+    @media (max-width: 992px) {
+      .kpi-card {
+        margin-bottom: 1rem;
       }
     }
   `]

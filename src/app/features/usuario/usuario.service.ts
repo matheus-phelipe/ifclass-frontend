@@ -12,14 +12,19 @@ export class UsuarioService {
 
   constructor(private http: HttpClient) {}
 
-   // Cadastrar novo usuário
-  cadastrar(usuario: any) {
-    return this.http.post(this.apiUrl, usuario);
+  // Cadastrar novo usuário
+  cadastrar(usuario: any): Observable<Usuario> {
+    return this.http.post<Usuario>(this.apiUrl, usuario);
   }
 
   // Listar todos os usuários
   listarTodos() {
     return this.http.get<Usuario[]>(this.apiUrl);
+  }
+
+  // Listar todos os professores, mesmo com acesso ADMIN na criação de aula
+  listarProfessores() {
+    return this.http.get<Usuario[]>(`${this.apiUrl}/listar/professores`);
   }
 
   // Listar usuários com detalhes (turma/curso para alunos, disciplinas para professores)
@@ -54,3 +59,4 @@ export class UsuarioService {
     return this.http.get<import('../disciplinas/disciplina.model').Disciplina[]>(`${this.apiUrl}/${professorId}/disciplinas`);
   }
 }
+ 

@@ -41,7 +41,7 @@ export class App implements OnInit, OnDestroy {
   isPwaMode = false;
 
   // Lista de rotas onde a sidebar NÃO deve aparecer.
-  private standaloneRoutes = ['/login', '/cadastro', '/resetar-senha', '/aluno/mapa'];
+  private standaloneRoutes = ['/login', '/cadastro', '/resetar-senha', '/aluno/mapa', '/mapa'];
   private roleSubscription!: Subscription;
 
   get loaderVisible$() {
@@ -60,6 +60,9 @@ export class App implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    // Verifica se há inconsistência de estado (token sem activeRole ou vice-versa)
+    this.validateAuthState();
+
     // Escuta as mudanças de rota para ATUALIZAR O LAYOUT (mostrar/esconder sidebar)
     this.router.events.pipe(
       filter((event: RouterEvent): event is NavigationEnd => event instanceof NavigationEnd)
@@ -115,7 +118,7 @@ export class App implements OnInit, OnDestroy {
 
   logout(): void {
     this.authService.logout();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/mapa']);
   }
 
   // ===== MÉTODOS DE RESPONSIVIDADE =====
@@ -152,6 +155,25 @@ export class App implements OnInit, OnDestroy {
   closeSidebar(): void {
     if (this.isMobile) {
       this.sidebarCollapsed = true;
+    }
+  }
+
+  // ===== VALIDAÇÃO DE ESTADO =====
+
+  private validateAuthState(): void {
+    const hasToken = this.authService.isAuthenticated();
+    const hasActiveRole = !!this.authService.getActiveRole();
+
+    // Se há token mas não há activeRole, limpa o estado
+    if (hasToken && !hasActiveRole) {
+      console.warn('Estado inconsistente detectado: token sem activeRole. Limpando estado...');
+      this.authService.clearAuthState();
+    }
+    
+    // Se há activeRole mas não há token, limpa o estado
+    if (!hasToken && hasActiveRole) {
+      console.warn('Estado inconsistente detectado: activeRole sem token. Limpando estado...');
+      this.authService.clearAuthState();
     }
   }
 

@@ -15,6 +15,7 @@ export class ProfileSwitcherComponent implements OnInit {
   availableRoles: string[] = [];
   activeRole: string | null = null;
   nomeUsuario: string = '';
+  dropdownOpen: boolean = false;
 
   constructor(private authService: AuthService, private router: Router) {}
 
@@ -44,7 +45,31 @@ export class ProfileSwitcherComponent implements OnInit {
     });
   }
 
+  toggleDropdown(): void {
+    this.dropdownOpen = !this.dropdownOpen;
+  }
+
   formatRoleName(role: string): string {
     return role.replace('ROLE_', '').charAt(0).toUpperCase() + role.replace('ROLE_', '').slice(1).toLowerCase();
+  }
+
+  getRoleIcon(role: string): string {
+    const icons: { [key: string]: string } = {
+      'ROLE_ADMIN': 'bi bi-gear-fill',
+      'ROLE_ALUNO': 'bi bi-person-fill',
+      'ROLE_PROFESSOR': 'bi bi-person-badge-fill',
+      'ROLE_COORDENADOR': 'bi bi-people-fill'
+    };
+    return icons[role] || 'bi bi-person-fill';
+  }
+
+  getRoleDescription(role: string): string {
+    const descriptions: { [key: string]: string } = {
+      'ROLE_ADMIN': 'Acesso completo ao sistema',
+      'ROLE_ALUNO': 'Visualizar aulas e horários',
+      'ROLE_PROFESSOR': 'Gerenciar aulas e turmas',
+      'ROLE_COORDENADOR': 'Coordenar cursos e professores'
+    };
+    return descriptions[role] || 'Perfil de usuário';
   }
 }
