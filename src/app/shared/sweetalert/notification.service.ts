@@ -31,29 +31,32 @@ export class NotificationService {
    * Exibe um toast de sucesso
    */
   public showSuccess(message: string, title: string = 'Sucesso', options?: NotificationOptions): void {
-    this.toastr.success(message, title, this.buildToastrOptions(options));
-  }
+  this.toastr.success(message, title, {
+    ...this.buildToastrOptions(options),
+    enableHtml: true
+  });
+}
 
-  /**
-   * Exibe um toast de erro
-   */
-  public showError(message: string, title: string = 'Erro', options?: NotificationOptions): void {
-    this.toastr.error(message, title, this.buildToastrOptions(options));
-  }
+public showError(message: string, title: string = 'Erro', options?: NotificationOptions): void {
+  this.toastr.error(message, title, {
+    ...this.buildToastrOptions(options),
+    enableHtml: true
+  });
+}
 
-  /**
-   * Exibe um toast de aviso
-   */
-  public showWarning(message: string, title: string = 'Atenção', options?: NotificationOptions): void {
-    this.toastr.warning(message, title, this.buildToastrOptions(options));
-  }
+public showWarning(message: string, title: string = 'Atenção', options?: NotificationOptions): void {
+  this.toastr.warning(message, title, {
+    ...this.buildToastrOptions(options),
+    enableHtml: true
+  });
+}
 
-  /**
-   * Exibe um toast de informação
-   */
-  public showInfo(message: string, title: string = 'Informação', options?: NotificationOptions): void {
-    this.toastr.info(message, title, this.buildToastrOptions(options));
-  }
+public showInfo(message: string, title: string = 'Informação', options?: NotificationOptions): void {
+  this.toastr.info(message, title, {
+    ...this.buildToastrOptions(options),
+    enableHtml: true
+  });
+}
 
   // ===== MODAL NOTIFICATIONS (SweetAlert2) =====
 
@@ -101,7 +104,7 @@ export class NotificationService {
       title: title,
       text: text,
       icon: 'error',
-      confirmButtonColor: '#dc3545',
+      confirmButtonColor: '#e70101ff',
       confirmButtonText: 'Entendi',
       customClass: {
         popup: 'swal-modern',
