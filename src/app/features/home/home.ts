@@ -15,14 +15,14 @@ import { Bloco } from '../aluno/bloco.model';
 import { FormsModule } from '@angular/forms';
 import { ViewChild } from '@angular/core';
 import { AlertComponent } from '../../shared/alert/alert';
-import { ModalConfirmacaoComponent } from '../../shared/modal-confirmacao/modal-confirmacao';
 import { Action } from 'rxjs/internal/scheduler/Action';
 import { AvisosService } from './aviso.service';
+import { NotificationService } from '../../shared/sweetalert/notification.service';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule, ProfileSwitcherComponent, FormsModule, AlertComponent, ModalConfirmacaoComponent],
+  imports: [CommonModule, RouterModule, ProfileSwitcherComponent, FormsModule, AlertComponent],
   templateUrl: './home.html',
   styleUrls: ['./home.css']
 })
@@ -46,7 +46,6 @@ export class Home implements OnInit, OnDestroy {
   exibirModalExcluir = false;
 
   @ViewChild(AlertComponent) alertComponent!: AlertComponent;
-  @ViewChild('modalConfirm') modalConfirm!: ModalConfirmacaoComponent;
 
   private roleSubscription!: Subscription;
 
@@ -55,7 +54,8 @@ export class Home implements OnInit, OnDestroy {
     private aulaService: AulaService,
     private usuarioService: UsuarioService,
     private blocoService: BlocoService,
-    private avisosService: AvisosService
+    private avisosService: AvisosService,
+    private notificationService: NotificationService
   ) { }
 
   ngOnInit(): void {
@@ -220,29 +220,22 @@ export class Home implements OnInit, OnDestroy {
     this.exibirModalTodosAvisos = false;
     if (!aviso) return;
 
-    // Função que só será executada se o usuário confirmar no modal
-    const action = () => {
-      this.avisosService.deleteAviso(aviso.id).subscribe({
-        next: () => {
-          this.avisos = this.avisos.filter(a => a.id !== aviso.id);
-          this.exibirModalExcluir = false;
-          this.alertComponent.show('Aviso removido com sucesso!', 3000, 'success');
-        },
-        error: () => this.mostrarAlerta('Erro ao remover aviso.', 'danger')
-      });
-    };
-
-    // Abre o modal passando o callback
-    this.modalConfirm.open(
-      'danger',
+    this.notificationService.confirm(
       'Confirmar Remoção',
-      `Tem certeza que deseja remover o aviso ${aviso.titulo}?`,
-      action
-    );
-  }
-
-  cancelarRemocao() {
-    this.modalConfirm.close();
+      `Tem certeza que deseja remover o aviso "${aviso.titulo}"?`,
+      'Sim, remover'
+    ).then((confirmed) => {
+      if (confirmed) {
+        this.avisosService.deleteAviso(aviso.id).subscribe({
+          next: () => {
+            this.avisos = this.avisos.filter(a => a.id !== aviso.id);
+            this.exibirModalExcluir = false;
+            this.notificationService.success('Sucesso!', 'Aviso removido com sucesso!');
+          },
+          error: () => this.notificationService.error('Erro!', 'Erro ao remover aviso.')
+        });
+      }
+    });
   }
 
   salvarAviso(): void {
@@ -254,9 +247,9 @@ export class Home implements OnInit, OnDestroy {
           const index = this.avisos.findIndex(a => a.id === this.avisoSelecionado?.id);
           if (index !== -1) this.avisos[index] = aviso;
           this.fecharModalAviso();
-          this.alertComponent.show('Aviso editado com sucesso!', 3000, 'success');
+          this.notificationService.success('Sucesso!', 'Aviso editado com sucesso!');
         },
-        error: (err) => this.alertComponent.show('Erro ao editar aviso.', 3000, 'danger')
+        error: (err) => this.notificationService.error('Erro!', 'Erro ao editar aviso.')
       });
     } else {
       const avisoParaSalvar = {
@@ -269,9 +262,9 @@ export class Home implements OnInit, OnDestroy {
         next: (aviso) => {
           this.avisos.push(aviso);
           this.fecharModalAviso();
-          this.alertComponent.show('Aviso adicionado com sucesso!', 3000, 'success');
+          this.notificationService.success('Sucesso!', 'Aviso adicionado com sucesso!');
         },
-        error: (err) => this.alertComponent.show('Erro ao adicionar aviso...', 3000, 'danger')
+        error: (err) => this.notificationService.error('Erro!', 'Erro ao adicionar aviso.')
       });
     }
   }
