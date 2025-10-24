@@ -5,6 +5,17 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { NotificationService } from '../../../shared/sweetalert/notification.service';
 
+interface ConfiguracaoSistema {
+  chave: string;
+  valor: string;
+  tipo: string;
+  descricao: string;
+  categoria: string;
+  editavel: boolean;
+  ultimaAtualizacao?: string;
+  valorPadrao?: string;
+}
+
 @Component({
   selector: 'app-admin-configuracoes',
   standalone: true,
@@ -54,43 +65,72 @@ import { NotificationService } from '../../../shared/sweetalert/notification.ser
         </div>
       </div>
 
-      <!-- Configurações Gerais -->
-      <div class="card mb-4">
-        <div class="card-header">
-          <h5 class="mb-0">
-            <i class="bi bi-gear-fill me-2"></i>Configurações Gerais
-            <span class="badge bg-secondary ms-2">4</span>
-          </h5>
-        </div>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <div class="card border-primary">
-                <div class="card-body">
-                  <div class="d-flex justify-content-between align-items-start mb-2">
-                    <h6 class="card-title mb-0">app.name</h6>
-                    <span class="badge bg-primary">STRING</span>
-                  </div>
-                  <p class="card-text small text-muted mb-3">Nome da aplicação</p>
-                  <input type="text" class="form-control form-control-sm" [(ngModel)]="configs.appName" value="IFClass">
-                </div>
-              </div>
-            </div>
-            
-            <div class="col-md-6 mb-3">
-              <div class="card border-secondary">
-                <div class="card-body">
-                  <div class="d-flex justify-content-between align-items-start mb-2">
-                    <h6 class="card-title mb-0">app.version</h6>
-                    <div class="d-flex gap-1">
-                      <span class="badge bg-primary">STRING</span>
-                      <span class="badge bg-secondary" title="Somente leitura">
-                        <i class="bi bi-lock"></i>
-                      </span>
+      <!-- Indicador de Carregamento -->
+      <div *ngIf="carregando" class="alert alert-info">
+        <h4><i class="bi bi-hourglass-split me-2"></i>Carregando configurações...</h4>
+        <p>Aguarde enquanto carregamos as configurações do sistema.</p>
+      </div>
+
+      <!-- Erro -->
+      <div *ngIf="erro" class="alert alert-danger">
+        <h4><i class="bi bi-exclamation-triangle me-2"></i>Erro ao Carregar</h4>
+        <p>{{erro}}</p>
+        <button class="btn btn-outline-danger" (click)="carregarConfiguracoes()">
+          <i class="bi bi-arrow-clockwise me-1"></i>Tentar Novamente
+        </button>
+      </div>
+
+      <!-- Configurações Dinâmicas -->
+      <div *ngIf="!carregando && !erro && configuracoes.length > 0">
+        <div *ngFor="let categoria of getCategorias()" class="card mb-4">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <i class="bi bi-gear-fill me-2"></i>{{categoria}}
+              <span class="badge bg-secondary ms-2">{{getConfiguracoesPorCategoria(categoria).length}}</span>
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div *ngFor="let config of getConfiguracoesPorCategoria(categoria)" class="col-md-6 mb-3">
+                <div class="card" [ngClass]="getCardClass(config.tipo)">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                      <h6 class="card-title mb-0">{{config.chave}}</h6>
+                      <div class="d-flex gap-1">
+                        <span class="badge" [ngClass]="getBadgeClass(config.tipo)">{{config.tipo}}</span>
+                        <span *ngIf="!config.editavel" class="badge bg-secondary" title="Somente leitura">
+                          <i class="bi bi-lock"></i>
+                        </span>
+                      </div>
+                    </div>
+                    <p class="card-text small text-muted mb-3">{{config.descricao}}</p>
+                    
+                    <!-- Input baseado no tipo -->
+                    <input *ngIf="config.tipo === 'STRING'" 
+                           type="text" 
+                           class="form-control form-control-sm" 
+                           [value]="config.valor"
+                           [disabled]="!config.editavel"
+                           (input)="onConfigChangeValue(config.chave, $event)">
+                    
+                    <input *ngIf="config.tipo === 'NUMBER'" 
+                           type="number" 
+                           class="form-control form-control-sm" 
+                           [value]="config.valor"
+                           [disabled]="!config.editavel"
+                           (input)="onConfigChangeValue(config.chave, $event)">
+                    
+                    <div *ngIf="config.tipo === 'BOOLEAN'" class="form-check form-switch">
+                      <input class="form-check-input" 
+                             type="checkbox" 
+                             [checked]="config.valor === 'true'"
+                             [disabled]="!config.editavel"
+                             (change)="onConfigChangeValue(config.chave, $event)">
+                      <label class="form-check-label">
+                        {{config.valor === 'true' ? 'Habilitado' : 'Desabilitado'}}
+                      </label>
                     </div>
                   </div>
-                  <p class="card-text small text-muted mb-3">Versão da aplicação</p>
-                  <input type="text" class="form-control form-control-sm" value="1.0.3" disabled>
                 </div>
               </div>
             </div>
@@ -98,88 +138,12 @@ import { NotificationService } from '../../../shared/sweetalert/notification.ser
         </div>
       </div>
 
-      <!-- Configurações de Segurança -->
-      <div class="card mb-4">
-        <div class="card-header">
-          <h5 class="mb-0">
-            <i class="bi bi-shield-fill me-2"></i>Configurações de Segurança
-            <span class="badge bg-secondary ms-2">3</span>
-          </h5>
-        </div>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <div class="card border-primary">
-                <div class="card-body">
-                  <div class="d-flex justify-content-between align-items-start mb-2">
-                    <h6 class="card-title mb-0">security.session.timeout</h6>
-                    <span class="badge bg-success">NUMBER</span>
-                  </div>
-                  <p class="card-text small text-muted mb-3">Timeout da sessão em segundos</p>
-                  <input type="number" class="form-control form-control-sm" [(ngModel)]="configs.sessionTimeout" value="3600">
-                </div>
-              </div>
-            </div>
-            
-            <div class="col-md-6 mb-3">
-              <div class="card border-primary">
-                <div class="card-body">
-                  <div class="d-flex justify-content-between align-items-start mb-2">
-                    <h6 class="card-title mb-0">security.max.login.attempts</h6>
-                    <span class="badge bg-success">NUMBER</span>
-                  </div>
-                  <p class="card-text small text-muted mb-3">Máximo de tentativas de login</p>
-                  <input type="number" class="form-control form-control-sm" [(ngModel)]="configs.maxLoginAttempts" value="5">
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <!-- Mensagem quando não há configurações -->
+      <div *ngIf="!carregando && !erro && configuracoes.length === 0" class="alert alert-warning">
+        <h4><i class="bi bi-exclamation-triangle me-2"></i>Nenhuma Configuração Encontrada</h4>
+        <p>Não foram encontradas configurações do sistema. Verifique se o backend está funcionando corretamente.</p>
       </div>
 
-      <!-- Configurações de Backup -->
-      <div class="card mb-4">
-        <div class="card-header">
-          <h5 class="mb-0">
-            <i class="bi bi-cloud-arrow-up-fill me-2"></i>Configurações de Backup
-            <span class="badge bg-secondary ms-2">2</span>
-          </h5>
-        </div>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <div class="card border-primary">
-                <div class="card-body">
-                  <div class="d-flex justify-content-between align-items-start mb-2">
-                    <h6 class="card-title mb-0">backup.automatic.enabled</h6>
-                    <span class="badge bg-warning text-dark">BOOLEAN</span>
-                  </div>
-                  <p class="card-text small text-muted mb-3">Habilitar backup automático</p>
-                  <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" [(ngModel)]="configs.backupEnabled" [checked]="configs.backupEnabled">
-                    <label class="form-check-label">
-                      {{configs.backupEnabled ? 'Habilitado' : 'Desabilitado'}}
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="col-md-6 mb-3">
-              <div class="card border-primary">
-                <div class="card-body">
-                  <div class="d-flex justify-content-between align-items-start mb-2">
-                    <h6 class="card-title mb-0">backup.schedule.time</h6>
-                    <span class="badge bg-primary">STRING</span>
-                  </div>
-                  <p class="card-text small text-muted mb-3">Horário do backup automático</p>
-                  <input type="time" class="form-control form-control-sm" [(ngModel)]="configs.backupTime" value="03:00">
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
       <!-- Resumo de Alterações -->
       <div *ngIf="temAlteracoesPendentes()" class="card border-warning">
@@ -245,6 +209,7 @@ export class AdminConfiguracoesComponent implements OnInit {
   carregando = false;
   erro: string | null = null;
   alteracoesPendentes = false;
+  configuracoes: ConfiguracaoSistema[] = [];
 
   configs = {
     appName: 'IFClass',
@@ -269,33 +234,15 @@ export class AdminConfiguracoesComponent implements OnInit {
     this.carregando = true;
     this.erro = null;
 
-    // Tentar carregar configurações do backend
-    this.http.get<any>(`${environment.SERVIDOR}/api/configuracoes/settings`).subscribe({
+    // Carregar configurações do backend
+    this.http.get<ConfiguracaoSistema[]>(`${environment.SERVIDOR}/api/admin/configuracoes`).subscribe({
       next: (configuracoes) => {
-        // Mapear configurações do backend para o formato local
-        if (configuracoes && configuracoes.length > 0) {
-          configuracoes.forEach((config: any) => {
-            switch (config.configKey) {
-              case 'app.name':
-                this.configs.appName = config.configValue;
-                break;
-              case 'session.timeout':
-                this.configs.sessionTimeout = parseInt(config.configValue);
-                break;
-              case 'security.max.login.attempts':
-                this.configs.maxLoginAttempts = parseInt(config.configValue);
-                break;
-              case 'backup.enabled':
-                this.configs.backupEnabled = config.configValue === 'true';
-                break;
-              case 'backup.time':
-                this.configs.backupTime = config.configValue;
-                break;
-            }
-          });
-        }
-        this.configsOriginais = { ...this.configs };
+        this.configuracoes = configuracoes;
         this.carregando = false;
+        this.notificationService.showInfo(
+          'Configurações carregadas',
+          `${configuracoes.length} configurações carregadas com sucesso`
+        );
       },
       error: (error) => {
         console.error('Erro ao carregar configurações:', error);
@@ -318,57 +265,18 @@ export class AdminConfiguracoesComponent implements OnInit {
   }
 
   temAlteracoesPendentes(): boolean {
-    return JSON.stringify(this.configs) !== JSON.stringify(this.configsOriginais);
+    // Com o novo sistema dinâmico, não precisamos mais verificar alterações pendentes
+    // pois as mudanças são salvas automaticamente
+    return false;
   }
 
   salvarConfiguracoes(): void {
-    this.carregando = true;
-
-    // Preparar dados para envio
-    const configuracoes = [
-      { configKey: 'app.name', configValue: this.configs.appName, description: 'Nome da aplicação', type: 'STRING', adminOnly: false },
-      { configKey: 'session.timeout', configValue: this.configs.sessionTimeout.toString(), description: 'Timeout da sessão em segundos', type: 'NUMBER', adminOnly: true },
-      { configKey: 'security.max.login.attempts', configValue: this.configs.maxLoginAttempts.toString(), description: 'Máximo de tentativas de login', type: 'NUMBER', adminOnly: true },
-      { configKey: 'backup.enabled', configValue: this.configs.backupEnabled.toString(), description: 'Backup automático habilitado', type: 'BOOLEAN', adminOnly: true },
-      { configKey: 'backup.time', configValue: this.configs.backupTime, description: 'Horário do backup automático', type: 'STRING', adminOnly: true }
-    ];
-
-    // Salvar cada configuração individualmente
-    let configsSalvas = 0;
-    const totalConfigs = configuracoes.length;
-
-    configuracoes.forEach(config => {
-      this.http.post(`${environment.SERVIDOR}/api/configuracoes/settings`, config).subscribe({
-        next: (response) => {
-          configsSalvas++;
-          if (configsSalvas === totalConfigs) {
-            this.configsOriginais = { ...this.configs };
-            this.carregando = false;
-            this.notificationService.showSuccess(
-              'Configurações salvas com sucesso!',
-              'Configurações Atualizadas'
-            );
-          }
-        },
-        error: (error) => {
-          console.error('Erro ao salvar configuração:', error);
-          this.carregando = false;
-
-          let mensagem = 'Erro ao salvar configurações.';
-          if (error.status === 0) {
-            mensagem = 'Erro de conexão: Verifique sua conexão com o servidor.';
-          } else if (error.status === 403) {
-            mensagem = 'Acesso negado: Você não tem permissão para alterar configurações.';
-          } else if (error.status === 500) {
-            mensagem = 'Erro interno do servidor: Tente novamente em alguns minutos.';
-          } else if (error.error && error.error.message) {
-            mensagem = `Erro: ${error.error.message}`;
-          }
-
-          this.notificationService.showError(mensagem, 'Erro ao Salvar');
-        }
-      });
-    });
+    // Com o novo sistema dinâmico, as configurações são salvas automaticamente
+    // quando o usuário faz alterações. Este método agora apenas mostra uma mensagem.
+    this.notificationService.success(
+      'Configurações Salvas',
+      'Todas as configurações foram salvas automaticamente!'
+    );
   }
 
   async descartarAlteracoes(): Promise<void> {
@@ -415,5 +323,96 @@ export class AdminConfiguracoesComponent implements OnInit {
 
   onConfigChange(): void {
     this.alteracoesPendentes = this.temAlteracoesPendentes();
+  }
+
+  // Métodos para template dinâmico
+  getCategorias(): string[] {
+    const categorias = [...new Set(this.configuracoes.map((c: ConfiguracaoSistema) => c.categoria))];
+    return categorias.sort();
+  }
+
+  getConfiguracoesPorCategoria(categoria: string): ConfiguracaoSistema[] {
+    return this.configuracoes.filter((c: ConfiguracaoSistema) => c.categoria === categoria);
+  }
+
+  getCardClass(tipo: string): string {
+    switch (tipo) {
+      case 'STRING': return 'border-primary';
+      case 'NUMBER': return 'border-success';
+      case 'BOOLEAN': return 'border-warning';
+      default: return 'border-secondary';
+    }
+  }
+
+  getBadgeClass(tipo: string): string {
+    switch (tipo) {
+      case 'STRING': return 'bg-primary';
+      case 'NUMBER': return 'bg-success';
+      case 'BOOLEAN': return 'bg-warning text-dark';
+      default: return 'bg-secondary';
+    }
+  }
+
+  onConfigChangeValue(chave: string, event: any): void {
+    let novoValor: string;
+    
+    if (event.target.type === 'checkbox') {
+      novoValor = event.target.checked.toString();
+    } else {
+      novoValor = event.target.value;
+    }
+
+    // Atualizar configuração no backend
+    this.atualizarConfiguracao(chave, novoValor);
+  }
+
+  atualizarConfiguracao(chave: string, valor: string): void {
+    this.http.put(`${environment.SERVIDOR}/api/admin/configuracoes/${chave}`, { valor })
+      .subscribe({
+        next: (response: any) => {
+          if (response.sucesso) {
+            // Atualizar configuração local
+            const config = this.configuracoes.find((c: ConfiguracaoSistema) => c.chave === chave);
+            if (config) {
+              config.valor = valor;
+            }
+            this.notificationService.success('Configuração Atualizada', response.mensagem);
+          } else {
+            this.notificationService.error('Erro ao Atualizar', response.mensagem);
+          }
+        },
+        error: (error) => {
+          this.notificationService.error('Erro ao Atualizar', 'Erro ao atualizar configuração');
+        }
+      });
+  }
+
+  async salvarConfiguracoesNovo(): Promise<void> {
+    this.notificationService.success('Configurações Salvas', 'Todas as configurações foram salvas com sucesso!');
+  }
+
+  async resetarTodasConfiguracoesNovo(): Promise<void> {
+    const confirmado = await this.notificationService.confirmCritical(
+      'Resetar Configurações',
+      'Tem certeza que deseja resetar todas as configurações para os valores padrão?',
+      'Sim, resetar tudo'
+    );
+
+    if (confirmado) {
+      this.http.post(`${environment.SERVIDOR}/api/admin/configuracoes/reset`, {})
+        .subscribe({
+          next: (response: any) => {
+            if (response.sucesso) {
+              this.notificationService.success('Configurações Resetadas', response.mensagem);
+              this.carregarConfiguracoes();
+            } else {
+              this.notificationService.error('Erro ao Resetar', response.mensagem);
+            }
+          },
+          error: (error) => {
+            this.notificationService.error('Erro ao Resetar', 'Erro ao resetar configurações');
+          }
+        });
+    }
   }
 }
