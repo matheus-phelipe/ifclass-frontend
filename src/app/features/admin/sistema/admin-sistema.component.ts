@@ -80,7 +80,7 @@ import { NotificationService } from '../../../shared/sweetalert/notification.ser
                 </div>
                 <div class="col-6">
                   <strong>Último Backup:</strong><br>
-                  <span class="text-muted">{{monitoramento?.inicioSistema | date:'dd/MM/yyyy HH:mm' || 'N/A'}}</span>
+                  <span class="text-muted">{{monitoramento?.inicioSistema ? (monitoramento?.inicioSistema | date:'dd/MM/yyyy HH:mm') : 'N/A'}}</span>
                 </div>
               </div>
             </div>
