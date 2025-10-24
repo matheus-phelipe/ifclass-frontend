@@ -134,6 +134,29 @@ export interface StatCard {
       color: #dc3545;
     }
 
+    /* Responsividade para tablets */
+    @media (max-width: 992px) {
+      .stat-card-body {
+        padding: 1.25rem;
+        gap: 0.75rem;
+      }
+
+      .stat-icon {
+        width: 45px;
+        height: 45px;
+        font-size: 1.3rem;
+      }
+
+      .stat-value {
+        font-size: 1.6rem;
+      }
+
+      .stat-title {
+        font-size: 0.8rem;
+      }
+    }
+
+    /* Responsividade para mobile */
     @media (max-width: 768px) {
       .stat-card-body {
         padding: 1rem;
@@ -150,6 +173,40 @@ export interface StatCard {
 
       .stat-value {
         font-size: 1.5rem;
+      }
+
+      .stat-title {
+        font-size: 0.75rem;
+      }
+
+      .stat-subtitle {
+        font-size: 0.7rem;
+      }
+    }
+
+    /* Responsividade para mobile pequeno */
+    @media (max-width: 576px) {
+      .stat-card-body {
+        padding: 0.75rem;
+        gap: 0.5rem;
+      }
+
+      .stat-icon {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
+      }
+
+      .stat-value {
+        font-size: 1.3rem;
+      }
+
+      .stat-title {
+        font-size: 0.7rem;
+      }
+
+      .stat-subtitle {
+        font-size: 0.65rem;
       }
     }
   `]
