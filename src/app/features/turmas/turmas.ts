@@ -92,6 +92,8 @@ export class TurmasComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     // Inicializar tooltips do Bootstrap
     this.initializeTooltips();
+    // Configurar posicionamento dos preview cards
+    this.setupPreviewPositioning();
   }
 
   initializeTooltips(): void {
@@ -105,11 +107,65 @@ export class TurmasComponent implements OnInit, AfterViewInit {
     }, 100);
   }
 
+  setupPreviewPositioning(): void {
+    setTimeout(() => {
+      const cards = this.elementRef.nativeElement.querySelectorAll('.turma-card');
+      cards.forEach((card: HTMLElement) => {
+        this.adjustPreviewPosition(card);
+      });
+    }, 200);
+    
+    // Listener para redimensionamento da janela
+    window.addEventListener('resize', () => {
+      this.setupPreviewPositioning();
+    });
+  }
+
+  adjustPreviewPosition(card: HTMLElement): void {
+    const rect = card.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const previewWidth = 280;
+    const previewHeight = 200;
+    
+    // Remove classes anteriores
+    card.classList.remove('preview-left', 'preview-top', 'preview-bottom');
+    
+    // Verifica se está no canto direito da tela
+    const isNearRightEdge = rect.right > viewportWidth - (previewWidth + 20);
+    
+    // Verifica se está no canto inferior da tela
+    const isNearBottomEdge = rect.bottom > viewportHeight - (previewHeight + 20);
+    
+    // Verifica se está no canto esquerdo da tela
+    const isNearLeftEdge = rect.left < 20;
+    
+    // Verifica se está no canto superior da tela
+    const isNearTopEdge = rect.top < 20;
+    
+    // Lógica mais específica para evitar sobreposição
+    if (isNearRightEdge && !isNearLeftEdge) {
+      // Se está no canto direito, mostra à esquerda
+      card.classList.add('preview-left');
+    } else if (isNearBottomEdge && !isNearTopEdge) {
+      // Se está no canto inferior, mostra acima
+      card.classList.add('preview-top');
+    } else if (isNearTopEdge && !isNearBottomEdge) {
+      // Se está no canto superior, mostra abaixo
+      card.classList.add('preview-bottom');
+    }
+    // Se não está em nenhum canto, usa o comportamento padrão (direita)
+  }
+
   carregarTurmas(): void {
     this.turmaService.listar().subscribe({
       next: (turmas: Turma[]) => {
         this.turmas = turmas;
         this.carregarEstatisticas();
+        // Reposicionar previews após carregar dados
+        setTimeout(() => {
+          this.setupPreviewPositioning();
+        }, 300);
       },
       error: (error: any) => {
         console.error('Erro ao carregar turmas:', error);

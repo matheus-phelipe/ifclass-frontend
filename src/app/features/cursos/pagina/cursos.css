@@ -550,6 +550,45 @@ body.modal-open {
   pointer-events: auto;
 }
 
+/* Preview para cards no canto direito - aparece à esquerda */
+.curso-card.preview-left .curso-card-preview {
+  left: auto;
+  right: 100%;
+  transform: translateX(-10px);
+}
+
+.curso-card.preview-left:hover .curso-card-preview {
+  transform: translateX(0);
+}
+
+/* Preview para cards no canto inferior - aparece acima */
+.curso-card.preview-top .curso-card-preview {
+  top: auto;
+  bottom: 100%;
+  left: 0;
+  right: auto;
+  transform: translateY(10px);
+  width: 320px;
+}
+
+.curso-card.preview-top:hover .curso-card-preview {
+  transform: translateY(0);
+}
+
+/* Preview para cards no canto superior - aparece abaixo */
+.curso-card.preview-bottom .curso-card-preview {
+  top: 100%;
+  bottom: auto;
+  left: 0;
+  right: auto;
+  transform: translateY(-10px);
+  width: 320px;
+}
+
+.curso-card.preview-bottom:hover .curso-card-preview {
+  transform: translateY(0);
+}
+
 .preview-title {
   font-size: 1.1rem;
   font-weight: 600;

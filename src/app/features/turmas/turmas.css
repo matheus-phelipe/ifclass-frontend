@@ -427,6 +427,45 @@ body, html {
   pointer-events: auto;
 }
 
+/* Preview para cards no canto direito - aparece à esquerda */
+.turma-card.preview-left .turma-card-preview {
+  left: auto;
+  right: 100%;
+  transform: translateX(-10px);
+}
+
+.turma-card.preview-left:hover .turma-card-preview {
+  transform: translateX(0);
+}
+
+/* Preview para cards no canto inferior - aparece acima */
+.turma-card.preview-top .turma-card-preview {
+  top: auto;
+  bottom: 0;
+  left: 0;
+  right: auto;
+  transform: translateY(10px);
+  width: 320px;
+}
+
+.turma-card.preview-top:hover .turma-card-preview {
+  transform: translateY(0);
+}
+
+/* Preview para cards no canto superior - aparece abaixo */
+.turma-card.preview-bottom .turma-card-preview {
+  top: 100%;
+  bottom: auto;
+  left: 0;
+  right: auto;
+  transform: translateY(-10px);
+  width: 320px;
+}
+
+.turma-card.preview-bottom:hover .turma-card-preview {
+  transform: translateY(0);
+}
+
 .turma-preview-title {
   font-size: 1rem;
   font-weight: 600;
