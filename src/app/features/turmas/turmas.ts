@@ -15,6 +15,7 @@ import { Usuario } from '../usuario/usuario.model';
 import { Router } from '@angular/router';
 import { DashboardStatsComponent, StatCard } from '../../shared/dashboard-stats/dashboard-stats.component';
 import { FilterPipe } from '../../shared/pipes/filter.pipe';
+import { NotificationService } from '../../shared/sweetalert/notification.service';
 
 @Component({
   selector: 'app-turmas',
@@ -61,7 +62,8 @@ export class TurmasComponent implements OnInit, AfterViewInit {
     private authService: AuthService,
     private usuarioService: UsuarioService,
     private router: Router,
-    private elementRef: ElementRef
+    private elementRef: ElementRef,
+    private notificationService: NotificationService
   ) {
     this.turmaForm = this.fb.group({
       id: [null],
@@ -217,16 +219,31 @@ export class TurmasComponent implements OnInit, AfterViewInit {
     }
   }
 
-  excluirTurma(id: number): void {
-    if (confirm('Tem certeza que deseja excluir esta turma?')) {
+  async excluirTurma(id: number): Promise<void> {
+    const turma = this.turmas.find(t => t.id === id);
+    const turmaNome = turma ? `${turma.curso?.nome} - ${turma.ano}/${turma.semestre}º semestre` : 'esta turma';
+    
+    const confirmado = await this.notificationService.confirm(
+      'Excluir Turma',
+      `Tem certeza que deseja excluir ${turmaNome}?`,
+      'Sim, excluir'
+    );
+    
+    if (confirmado) {
       this.turmaService.excluir(id).subscribe({
         next: () => {
           this.carregarTurmas();
-          this.toastr.success('Turma excluída com sucesso!');
+          this.notificationService.success(
+            'Turma Excluída',
+            `${turmaNome} foi excluída com sucesso!`
+          );
         },
         error: (error: any) => {
           console.error('Erro ao excluir turma:', error);
-          this.toastr.error('Erro ao excluir turma. Tente novamente.');
+          this.notificationService.error(
+            'Erro ao Excluir',
+            error.error?.message || 'Não foi possível excluir a turma. Tente novamente.'
+          );
         }
       });
     }
