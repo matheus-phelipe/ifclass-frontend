@@ -10,6 +10,7 @@ import { ModalConfirmacaoComponent } from '../../shared/modal-confirmacao/modal-
 import { ProfileSwitcherComponent } from '../../shared/profile-switcher/profile-switcher';
 import { CriarUsuario } from '../gerenciarusuarios/criar-usuario/criar-usuario';
 import { ChangeDetectorRef } from '@angular/core';
+import { NotificationService } from '../../shared/sweetalert/notification.service';
 
 declare var bootstrap: any;
 
@@ -75,7 +76,8 @@ export class Gerenciarusuarios implements OnInit {
   constructor(
     public authService: AuthService,
     private usuarioService: UsuarioService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private notificationService: NotificationService
   ) {}
 
    ngOnInit(): void {
@@ -285,7 +287,7 @@ abrirModalEditar(usuario: Usuario) {
           }
           this.filtrarUsuarios();
           this.editarUsuarioModal.hide();
-          this.mostrarAlerta('Usuário atualizado com sucesso!');
+          this.notificationService.success('Sucesso!', 'Usuário atualizado com sucesso!');
         },
         error: (err) => {
           let errorMessage = 'Erro ao atualizar usuário';
@@ -302,7 +304,7 @@ abrirModalEditar(usuario: Usuario) {
             errorMessage = err.error.message;
           }
           
-          this.mostrarAlerta(errorMessage, 'danger');
+          this.notificationService.error('Erro!', errorMessage);
         }
     });
   }
