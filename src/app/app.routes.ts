@@ -11,6 +11,12 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'cadastro', component: CadastroComponent },
   { path: 'resetar-senha', component: ResetarSenhaComponent },
+  
+  // Mapa como rota pública (tela principal)
+  { 
+    path: 'mapa', 
+    loadComponent: () => import('./features/aluno/mapa-aluno/mapa-aluno').then(m => m.MapaAlunoComponent)
+  },
 
   // --- Layout e Rotas do Aluno (Lazy Loading) ---
   {
@@ -153,7 +159,7 @@ export const routes: Routes = [
     ]
   },
 
-  // Rota de fallback
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
-  { path: '**', redirectTo: 'login' }
+  // Rota de fallback - Mapa como tela principal
+  { path: '', redirectTo: 'mapa', pathMatch: 'full' },
+  { path: '**', redirectTo: 'mapa' }
 ];

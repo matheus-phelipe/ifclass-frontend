@@ -41,7 +41,7 @@ export class App implements OnInit, OnDestroy {
   isPwaMode = false;
 
   // Lista de rotas onde a sidebar NÃO deve aparecer.
-  private standaloneRoutes = ['/login', '/cadastro', '/resetar-senha', '/aluno/mapa'];
+  private standaloneRoutes = ['/login', '/cadastro', '/resetar-senha', '/aluno/mapa', '/mapa'];
   private roleSubscription!: Subscription;
 
   get loaderVisible$() {
@@ -118,7 +118,7 @@ export class App implements OnInit, OnDestroy {
 
   logout(): void {
     this.authService.logout();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/mapa']);
   }
 
   // ===== MÉTODOS DE RESPONSIVIDADE =====

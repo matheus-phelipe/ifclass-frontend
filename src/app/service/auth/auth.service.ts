@@ -67,7 +67,7 @@ export class AuthService {
       this.activeRoleSubject.next(null); 
       
       // Força navegação para login
-      this.router.navigate(['/login']).then(() => {
+      this.router.navigate(['/mapa']).then(() => {
         // Força reload da página para garantir limpeza completa
         window.location.reload();
       });
