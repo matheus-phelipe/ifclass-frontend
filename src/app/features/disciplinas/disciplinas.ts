@@ -11,6 +11,7 @@ import { ProfileSwitcherComponent } from '../../shared/profile-switcher/profile-
 import { Router } from '@angular/router';
 import { DashboardStatsComponent, StatCard } from '../../shared/dashboard-stats/dashboard-stats.component';
 import { FilterPipe } from '../../shared/pipes/filter.pipe';
+import { NotificationService } from '../../shared/sweetalert/notification.service';
 
 @Component({
   selector: 'app-disciplinas',
@@ -41,7 +42,7 @@ export class DisciplinasComponent implements OnInit {
     private authService: AuthService,
     private cursoService: CursoService,
     private router: Router,
-
+    private notificationService: NotificationService
   ) {
     this.disciplinaForm = this.fb.group({
       id: [null],
@@ -147,18 +148,24 @@ export class DisciplinasComponent implements OnInit {
   }
 
   excluirDisciplina(id: number): void {
-    if (confirm('Tem certeza que deseja excluir esta disciplina?')) {
-      this.disciplinaService.excluir(id).subscribe({
-        next: () => {
-          this.carregarDisciplinas();
-          this.toastr.success('Disciplina excluída com sucesso!');
-        },
-        error: (error: any) => {
-          console.error('Erro ao excluir disciplina:', error);
-          this.toastr.error('Erro ao excluir disciplina. Tente novamente.');
-        }
-      });
-    }
+    this.notificationService.confirm(
+      'Excluir Disciplina',
+      'Tem certeza que deseja excluir esta disciplina?',
+      'warning'
+    ).then((confirmed) => {
+      if (confirmed) {
+        this.disciplinaService.excluir(id).subscribe({
+          next: () => {
+            this.carregarDisciplinas();
+            this.notificationService.success('Sucesso!', 'Disciplina excluída com sucesso!');
+          },
+          error: (error: any) => {
+            console.error('Erro ao excluir disciplina:', error);
+            this.notificationService.error('Erro!', 'Erro ao excluir disciplina. Tente novamente.');
+          }
+        });
+      }
+    });
   }
 
   onBackdropClick(event: MouseEvent) {
